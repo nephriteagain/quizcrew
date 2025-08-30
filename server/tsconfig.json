@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "nodenext",
+    "moduleResolution": "NodeNext",        /* 👈 for ESM in Node */
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Strictness */
+    "strict": true,
+    "skipLibCheck": true,
+
+    /* Paths */
+    "rootDir": "src",
+    "outDir": "dist",
+
+    /* Debugging */
+    "sourceMap": true,
+
+    /* Incremental builds */
+    "incremental": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "tests", "migrations"]
+}
