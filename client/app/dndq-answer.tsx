@@ -207,6 +207,14 @@ export default function DragAndDropQuizAns() {
                 {/* Container for FlashList */}
                 <View style={styles.scrollContainer} ref={registerContainer}>
                     <FlashList
+                        ListFooterComponent={
+                            <QuizResultModal
+                                visible={resultModalVisible}
+                                onClose={() => setResultModalVisible(false)}
+                                score={score}
+                                totalQuestion={totalQuestion}
+                            />
+                        }
                         ref={flashListRef}
                         data={DRAG_AND_DROP.questions}
                         horizontal={true}
@@ -432,12 +440,6 @@ export default function DragAndDropQuizAns() {
                     )}
                 </View>
             </GestureHandlerRootView>
-            <QuizResultModal
-                visible={resultModalVisible}
-                onClose={() => setResultModalVisible(false)}
-                score={score}
-                totalQuestion={totalQuestion}
-            />
         </>
     );
 }
