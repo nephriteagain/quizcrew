@@ -10,6 +10,8 @@ export default function RootLayout() {
             <Stack.Screen name="tofq-answer" options={{ headerTitle: "True of False Questions" }} />
             <Stack.Screen name="dndq" options={{ headerTitle: "Drag and Drop Questions" }} />
             <Stack.Screen name="dndq-answer" options={{ headerTitle: "Drag and Drop Questions" }} />
+
+            <Stack.Screen name="create" options={{ headerTitle: "Create a Reviewer" }} />
         </Stack>
     );
 }

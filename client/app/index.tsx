@@ -8,6 +8,7 @@ const routes: {
     { name: "/mcq", label: "Multiple Choice" },
     { name: "/tofq", label: "True or False" },
     { name: "/dndq", label: "Drag and Drop" },
+    { name: "/create", label: "Create Reviewer" },
 ];
 
 export default function Index() {
