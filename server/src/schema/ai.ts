@@ -1,13 +1,13 @@
 import { FromSchema } from "json-schema-to-ts";
 
-
 export const openAiPromptSchema = {
     type: "object",
+    required: ["prompt", "type"],
+    additionalProperties: false,
     properties: {
-        prompt: {type: "string"}
+        prompt: { type: "string" },
+        type: { enum: ["MCQ", "TOFQ", "DNDQ"] },
     },
-    required: ["prompt"],
-    additionalProperties: false
 } as const;
 
 export type OpenAiPromptDto = FromSchema<typeof openAiPromptSchema>;
