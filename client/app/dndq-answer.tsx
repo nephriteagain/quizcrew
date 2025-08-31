@@ -1,7 +1,13 @@
 // app/DragAndDropQuiz.tsx
+import Card from "@/components/Card";
+import { QuizResultModal } from "@/components/QuizResultModal";
+import { WIDTH } from "@/constants/values";
 import { DRAG_AND_DROP } from "@/lib/data";
-import React, { useCallback, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { cloneDeep, debounce } from "lodash";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
     runOnJS,
@@ -18,27 +24,57 @@ type DropZone = {
     index: number;
 };
 
-export default function DragAndDropQuiz() {
-    const [assigned, setAssigned] = useState<{ [key: number]: string }>({});
+export default function DragAndDropQuizAns() {
+    const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-    const [dropZones, setDropZones] = useState<DropZone[]>([]); // ✅ Changed to useState
-    const containerOffset = useRef({ x: 0, y: 0 });
-    const scrollViewRef = useRef<ScrollView>(null);
+    const [dropZones, setDropZones] = useState<DropZone[]>([]);
+    const [resultModalVisible, setResultModalVisible] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    /**only enable answer submission when user answers every choice */
+    const isSubmitEnabled = useMemo(
+        () => Object.keys(answers).length === DRAG_AND_DROP.questions.length,
+        [answers]
+    );
 
-    // Fixed ref array initialization
+    const score = useMemo(() => {
+        let total: number = 0;
+        for (let i = 0; i < DRAG_AND_DROP.questions.length; ++i) {
+            const q = DRAG_AND_DROP.questions[i];
+            const correctAns = q.answer;
+            const userAnswer = answers[i];
+            if (correctAns === userAnswer) {
+                total += 1;
+            }
+        }
+        return total;
+    }, [answers]);
+
+    const totalQuestion = useMemo(() => DRAG_AND_DROP.questions.length, [DRAG_AND_DROP.questions]);
+
+    const containerOffset = useRef({ x: 0, y: 0 });
+    const flashListRef = useRef<FlashListRef<(typeof DRAG_AND_DROP.questions)[0]>>(null);
+
     const questionRefs = useRef<(View | null)[]>([]);
 
-    // Initialize refs array based on questions length
     const initializeRefs = useCallback(() => {
         questionRefs.current = new Array(DRAG_AND_DROP.questions.length).fill(null);
     }, []);
 
-    // Call initialization when component mounts
-    React.useEffect(() => {
+    useEffect(() => {
         initializeRefs();
     }, [initializeRefs]);
 
-    // measure container position in screen space
+    const handleSubmit = useCallback(() => {
+        setResultModalVisible(true);
+        setIsSubmitted(true);
+    }, [setResultModalVisible]);
+
+    const handleReset = useCallback(() => {
+        setIsSubmitted(false);
+        setAnswers({});
+        flashListRef.current?.scrollToIndex({ index: 0, animated: true });
+    }, [setIsSubmitted]);
+
     const registerContainer = useCallback((ref: View | null) => {
         if (!ref) return;
         ref.measureInWindow((x, y) => {
@@ -46,51 +82,17 @@ export default function DragAndDropQuiz() {
         });
     }, []);
 
-    // measure each drop zone - FIXED VERSION
-    // const registerDropZone = useCallback((index: number, layout: any) => {
-    //     // The issue: onLayout gives coordinates relative to ScrollView,
-    //     // but we need them relative to the container we measured with registerContainer
-
-    //     // Use the ref to get proper screen coordinates, then convert to container-relative
-    //     setTimeout(() => {
-    //         const ref = questionRefs.current[index];
-    //         if (ref && containerOffset.current.x !== 0) {
-    //             ref.measureInWindow((x, y, width, height) => {
-    //                 const { x: offsetX, y: offsetY } = containerOffset.current;
-    //                 const relativeX = x - offsetX;
-    //                 const relativeY = y - offsetY;
-
-    //                 const newZone: DropZone = {
-    //                     x: relativeX,
-    //                     y: relativeY,
-    //                     width,
-    //                     height,
-    //                     index,
-    //                 };
-    //                 setDropZones([...dropZones.filter((z) => z.index !== index), newZone]);
-    //             });
-    //         } else if (containerOffset.current.x === 0) {
-    //             // Container not ready yet, try again
-    //             setTimeout(() => registerDropZone(index, layout), 100);
-    //         }
-    //     }, 50);
-    // }, []);
-
-    // Fixed recalibration function using questionRefs array
     const recalibrateDropZones = useCallback(() => {
         const container = containerOffset.current;
         if (!container) return;
 
-        // Don't clear existing drop zones immediately - build new array first
         const newDropZones: DropZone[] = [];
         let completedMeasurements = 0;
         const totalMeasurements = questionRefs.current.length;
 
-        // Measure each question ref and update drop zones
         questionRefs.current.forEach((ref, index) => {
             if (ref) {
                 ref.measureInWindow((x, y, width, height) => {
-                    // Convert absolute coordinates to relative coordinates within the container
                     const relativeX = x - container.x;
                     const relativeY = y - container.y;
 
@@ -102,17 +104,14 @@ export default function DragAndDropQuiz() {
                         index,
                     };
 
-                    // Add to new array instead of modifying current array
                     newDropZones.push(newZone);
                     completedMeasurements++;
 
-                    // Only update the main array when all measurements are complete
                     if (completedMeasurements === totalMeasurements) {
                         setDropZones(newDropZones.sort((a, b) => a.index - b.index));
                     }
                 });
             } else {
-                // Handle null refs
                 completedMeasurements++;
                 if (completedMeasurements === totalMeasurements) {
                     setDropZones(newDropZones.sort((a, b) => a.index - b.index));
@@ -123,7 +122,6 @@ export default function DragAndDropQuiz() {
 
     const handleDropZones = useCallback(
         (e: any) => {
-            // Use setTimeout to ensure scroll has completed before recalibrating
             setTimeout(() => {
                 recalibrateDropZones();
             }, 100);
@@ -147,7 +145,7 @@ export default function DragAndDropQuiz() {
             setHoveredIndex(zone ? zone.index : null);
         },
         [dropZones]
-    ); // ✅ Now depends on dropZones state
+    );
 
     const handleDrop = useCallback(
         (absX: number, absY: number, answer: string) => {
@@ -163,14 +161,22 @@ export default function DragAndDropQuiz() {
                     localY <= z.y + z.height
             );
             if (zone) {
-                setAssigned((prev) => ({ ...prev, [zone.index]: answer }));
+                setAnswers((prev) => ({ ...prev, [zone.index]: answer }));
+                // ✅ auto-scroll to next question if not the last
+                if (!flashListRef.current || hoveredIndex === null) return;
+                const delayedScrollToIndex = debounce(flashListRef?.current?.scrollToIndex, 150);
+                if (hoveredIndex < DRAG_AND_DROP.questions.length - 1) {
+                    delayedScrollToIndex({
+                        index: hoveredIndex + 1,
+                        animated: true,
+                    });
+                }
             }
             setHoveredIndex(null);
         },
-        [dropZones]
-    ); // ✅ Now depends on dropZones state
+        [dropZones, hoveredIndex]
+    );
 
-    // Function to set individual question refs
     const setQuestionRef = useCallback(
         (index: number) => (ref: View | null) => {
             questionRefs.current[index] = ref;
@@ -179,56 +185,260 @@ export default function DragAndDropQuiz() {
     );
 
     return (
-        <GestureHandlerRootView style={styles.container}>
-            {/* Answers palette */}
-            <View style={styles.answersRow}>
-                {DRAG_AND_DROP.answers.map((ans) => (
-                    <DraggableChip
-                        key={ans}
-                        label={ans}
-                        onDrop={handleDrop}
-                        onHover={handleHover}
-                    />
-                ))}
-            </View>
+        <>
+            <GestureHandlerRootView style={styles.container}>
+                {/* Answers palette */}
+                <View style={styles.answersRow}>
+                    {DRAG_AND_DROP.answers.map((ans, index) => {
+                        const isSelected = Object.values(answers).includes(ans);
+                        return (
+                            <DraggableChip
+                                key={`${ans}-${index}`}
+                                label={ans}
+                                onDrop={handleDrop}
+                                onHover={handleHover}
+                                isSelected={isSelected}
+                                isDisabled={isSubmitted}
+                            />
+                        );
+                    })}
+                </View>
 
-            {/* Wrap ScrollView inside a View we can measure */}
-            <View style={{ flex: 1 }} ref={registerContainer}>
-                <ScrollView
-                    onLayout={handleDropZones}
-                    ref={scrollViewRef}
-                    onScroll={handleDropZones}
-                    scrollEventThrottle={16} // so recalibration happens smoothly
-                >
-                    <View style={styles.questions}>
-                        {DRAG_AND_DROP.questions.map((q, idx) => (
-                            <View
-                                ref={setQuestionRef(idx)}
-                                key={idx}
-                                style={[
-                                    styles.dropZone,
-                                    hoveredIndex === idx && styles.dropZoneHovered,
-                                ]}
-                                // onLayout={(e) => registerDropZone(idx, e.nativeEvent.layout)}
-                            >
-                                <Text style={styles.questionText}>{q.question}</Text>
-                                <Text
+                {/* Container for FlashList */}
+                <View style={styles.scrollContainer} ref={registerContainer}>
+                    <FlashList
+                        ref={flashListRef}
+                        data={DRAG_AND_DROP.questions}
+                        horizontal={true}
+                        pagingEnabled={true}
+                        showsHorizontalScrollIndicator={false}
+                        scrollEventThrottle={16}
+                        onLayout={handleDropZones}
+                        onScroll={handleDropZones}
+                        // Remove conflicting style properties
+                        renderItem={({ item: q, index: idx }) => (
+                            <View style={styles.questionContainer} ref={setQuestionRef(idx)}>
+                                <Card
+                                    key={idx}
                                     style={[
-                                        styles.answerText,
-                                        assigned[idx] !== undefined && {
-                                            color: "black",
-                                            fontWeight: "600",
-                                        },
+                                        styles.dropZone,
+                                        hoveredIndex === idx && styles.dropZoneHovered,
                                     ]}
                                 >
-                                    {assigned[idx] ? assigned[idx] : "Drop answer here"}
-                                </Text>
+                                    <Text style={styles.questionText}>{q.question}</Text>
+                                    {isSubmitted ? (
+                                        <View
+                                            style={{
+                                                rowGap: 4,
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            {/* user answer */}
+                                            <View
+                                                style={[
+                                                    {
+                                                        paddingHorizontal: 12,
+                                                        paddingVertical: 8,
+                                                        borderRadius: 16,
+                                                        borderWidth: 2,
+                                                        alignSelf: "flex-start",
+                                                        borderColor: "transparent",
+                                                    },
+                                                    answers[idx] === q.answer
+                                                        ? {
+                                                              backgroundColor: "green",
+                                                          }
+                                                        : {
+                                                              backgroundColor: "red",
+                                                          },
+                                                ]}
+                                            >
+                                                <Text
+                                                    style={[
+                                                        styles.answerText,
+                                                        answers[idx] !== undefined
+                                                            ? {
+                                                                  color: "white",
+                                                                  fontWeight: "600",
+                                                              }
+                                                            : {},
+                                                    ]}
+                                                >
+                                                    {answers[idx] ? answers[idx] : "No answer here"}
+                                                </Text>
+                                            </View>
+                                            {/* correct answer */}
+                                            {answers[idx] !== q.answer && (
+                                                <>
+                                                    <Text
+                                                        style={{
+                                                            textAlign: "left",
+                                                            width: "100%",
+                                                            fontWeight: 600,
+                                                        }}
+                                                    >
+                                                        Correct Answer:
+                                                    </Text>
+                                                    <View
+                                                        style={[
+                                                            {
+                                                                paddingHorizontal: 12,
+                                                                paddingVertical: 8,
+                                                                borderRadius: 16,
+                                                                borderWidth: 2,
+                                                                alignSelf: "flex-start",
+                                                                borderColor: "transparent",
+                                                            },
+                                                            {
+                                                                backgroundColor: "green",
+                                                            },
+                                                        ]}
+                                                    >
+                                                        <Text
+                                                            style={[
+                                                                styles.answerText,
+                                                                {
+                                                                    color: "white",
+                                                                    fontWeight: "600",
+                                                                },
+                                                            ]}
+                                                        >
+                                                            {q.answer}
+                                                        </Text>
+                                                    </View>
+                                                </>
+                                            )}
+                                        </View>
+                                    ) : (
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                columnGap: 4,
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <View
+                                                style={[
+                                                    {
+                                                        paddingHorizontal: 12,
+                                                        paddingVertical: 8,
+                                                        borderRadius: 16,
+                                                        borderWidth: 2,
+                                                        alignSelf: "flex-start",
+                                                        borderColor: "transparent",
+                                                    },
+                                                    answers[idx] && {
+                                                        backgroundColor: "#4f46e5",
+                                                    },
+                                                ]}
+                                            >
+                                                <Text
+                                                    style={[
+                                                        styles.answerText,
+                                                        answers[idx] !== undefined && {
+                                                            color: "white",
+                                                            fontWeight: "600",
+                                                        },
+                                                    ]}
+                                                >
+                                                    {answers[idx]
+                                                        ? answers[idx]
+                                                        : "Drop answer here"}
+                                                </Text>
+                                            </View>
+                                            {answers[idx] && (
+                                                <TouchableOpacity
+                                                    hitSlop={10}
+                                                    activeOpacity={0.8}
+                                                    onPress={() => {
+                                                        const copy = cloneDeep(answers);
+                                                        delete copy[idx];
+                                                        setAnswers(copy);
+                                                    }}
+                                                >
+                                                    <AntDesign
+                                                        name="closesquare"
+                                                        size={30}
+                                                        color="red"
+                                                    />
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                    )}
+                                </Card>
                             </View>
-                        ))}
-                    </View>
-                </ScrollView>
-            </View>
-        </GestureHandlerRootView>
+                        )}
+                    />
+                </View>
+                {/* Submit button at bottom */}
+                <View
+                    style={{
+                        padding: 16,
+                        borderTopWidth: 1,
+                        borderColor: "#eee",
+                        backgroundColor: "white",
+                    }}
+                >
+                    {!isSubmitted && (
+                        <Pressable
+                            android_ripple={
+                                isSubmitEnabled ? { color: "#ccc", borderless: false } : null
+                            }
+                            style={{
+                                backgroundColor: "#4CAF50",
+                                padding: 16,
+                                borderRadius: 12,
+                                alignItems: "center",
+                            }}
+                            onPress={handleSubmit}
+                            disabled={!isSubmitEnabled}
+                        >
+                            <Text
+                                style={{
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    fontSize: 16,
+                                    opacity: isSubmitEnabled ? 1 : 0.6,
+                                }}
+                            >
+                                Submit ({Object.keys(answers).length}/
+                                {DRAG_AND_DROP.questions.length})
+                            </Text>
+                        </Pressable>
+                    )}
+                    {isSubmitted && (
+                        <Pressable
+                            android_ripple={
+                                isSubmitEnabled ? { color: "#b8d418ff", borderless: false } : null
+                            }
+                            style={{
+                                backgroundColor: "#c58142ff",
+                                padding: 16,
+                                borderRadius: 12,
+                                alignItems: "center",
+                            }}
+                            onPress={handleReset}
+                        >
+                            <Text
+                                style={{
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    fontSize: 16,
+                                }}
+                            >
+                                TRY AGAIN ({score}/{DRAG_AND_DROP.questions.length})
+                            </Text>
+                        </Pressable>
+                    )}
+                </View>
+            </GestureHandlerRootView>
+            <QuizResultModal
+                visible={resultModalVisible}
+                onClose={() => setResultModalVisible(false)}
+                score={score}
+                totalQuestion={totalQuestion}
+            />
+        </>
     );
 }
 
@@ -236,70 +446,115 @@ function DraggableChip({
     label,
     onDrop,
     onHover,
+    isSelected,
+    isDisabled,
 }: {
     label: string;
+    isSelected: boolean;
+    isDisabled: boolean;
     onDrop: (x: number, y: number, ans: string) => void;
     onHover: (x: number, y: number) => void;
 }) {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
+    const opacity = useSharedValue(1);
 
     const gesture = Gesture.Pan()
+        .enabled(!isSelected && !isDisabled) // Disable gesture when selected
         .onUpdate((e) => {
             offsetX.value = e.translationX;
             offsetY.value = e.translationY;
             runOnJS(onHover)(e.absoluteX, e.absoluteY);
         })
         .onEnd((e) => {
+            // Set opacity to 0 immediately when dropping
+            opacity.value = 0;
+
             runOnJS(onDrop)(e.absoluteX, e.absoluteY, label);
-            offsetX.value = withSpring(0);
+
+            // Animate back to position
+            offsetX.value = withSpring(0, {}, () => {
+                // When spring animation completes, fade back in
+                opacity.value = withSpring(1);
+            });
             offsetY.value = withSpring(0);
         });
 
     const stylez = useAnimatedStyle(() => ({
         transform: [{ translateX: offsetX.value }, { translateY: offsetY.value }],
+        opacity: opacity.value,
     }));
 
     return (
         <GestureDetector gesture={gesture}>
-            <Animated.View style={[styles.chip, stylez]}>
-                <Text style={styles.chipText}>{label}</Text>
+            <Animated.View
+                style={[
+                    styles.chip,
+                    stylez,
+                    isSelected && {
+                        borderColor: "#4f46e5",
+                        backgroundColor: "white",
+                    },
+                ]}
+            >
+                <Text style={[styles.chipText, isSelected && { color: "black" }]}>{label}</Text>
             </Animated.View>
         </GestureDetector>
     );
 }
-
 const styles = StyleSheet.create({
-    container: { padding: 16, flex: 1 },
+    container: {
+        flex: 1,
+    },
     answersRow: {
         flexDirection: "row",
         flexWrap: "wrap",
-        marginBottom: 20,
+        gap: 8,
+        padding: 8,
     },
     chip: {
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 16,
+        borderWidth: 2,
+        borderColor: "transparent",
         backgroundColor: "#4f46e5",
-        margin: 4,
         zIndex: 10,
     },
-    chipText: { color: "white", fontWeight: "600" },
-    questions: { gap: 12 },
+    chipText: {
+        color: "white",
+        fontWeight: "600",
+    },
+    // New style for scroll container
+    scrollContainer: {
+        flex: 1,
+    },
+    // Updated style for question container
+    questionContainer: {
+        width: WIDTH,
+        justifyContent: "center",
+        padding: 20,
+    },
     dropZone: {
-        padding: 16,
         borderWidth: 2,
         borderColor: "#d1d5db",
         borderRadius: 12,
-        minHeight: 70,
+        minHeight: 144,
         justifyContent: "center",
         backgroundColor: "white",
-        marginBottom: 12,
+        padding: 16,
     },
     dropZoneHovered: {
         borderColor: "#4f46e5",
         backgroundColor: "#eef2ff",
     },
-    questionText: { fontSize: 16, fontWeight: "500", marginBottom: 6 },
-    answerText: { fontSize: 14, color: "#6b7280" },
+    questionText: {
+        fontSize: 16,
+        fontWeight: "500",
+        marginBottom: 8,
+    },
+    answerText: {
+        fontSize: 14,
+        color: "#6b7280",
+    },
 });

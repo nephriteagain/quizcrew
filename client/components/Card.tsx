@@ -1,13 +1,14 @@
-import { ReactNode } from "react";
+import { forwardRef, ReactNode } from "react";
 import { View, ViewProps } from "react-native";
 
 export interface CardProps extends ViewProps {
     children: ReactNode;
 }
 
-export default function Card({ children, style, ...props }: CardProps) {
+const Card = forwardRef<View, CardProps>(({ children, style, ...props }, ref) => {
     return (
         <View
+            ref={ref}
             style={[
                 {
                     flex: 1,
@@ -27,4 +28,8 @@ export default function Card({ children, style, ...props }: CardProps) {
             {children}
         </View>
     );
-}
+});
+
+Card.displayName = "Card";
+
+export default Card;

@@ -7,7 +7,7 @@ const routes: {
 }[] = [
     { name: "/mcq", label: "Multiple Choice" },
     { name: "/tofq", label: "True or False" },
-    { name: "/dndq-answer", label: "Drag and Drop" },
+    { name: "/dndq", label: "Drag and Drop" },
 ];
 
 export default function Index() {
@@ -22,7 +22,7 @@ export default function Index() {
                             justifyContent: "center",
                             padding: 12,
                             borderRadius: 12,
-                            backgroundColor: "#d4462cff",
+                            backgroundColor: "#d81f1fff",
                         }}
                     >
                         <Text style={{ fontSize: 24, fontWeight: "700", color: "white" }}>

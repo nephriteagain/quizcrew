@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 
 interface QuizResultModalProps {
@@ -35,14 +35,24 @@ export function QuizResultModal({ score, totalQuestion, visible, onClose }: Quiz
                 : "Better Luck Next Time!";
 
     return (
-        <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <Modal
+            visible={visible}
+            transparent
+            animationType="fade"
+            onRequestClose={onClose}
+            statusBarTranslucent
+            style={{ flex: 1 }}
+        >
             <View
-                style={{
-                    flex: 1,
-                    backgroundColor: "rgba(0,0,0,0.6)",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
+                style={[
+                    StyleSheet.absoluteFill,
+                    {
+                        flex: 1,
+                        backgroundColor: "rgba(0,0,0,0.6)",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    },
+                ]}
             >
                 {/* Card */}
                 <View
