@@ -1,10 +1,13 @@
 // app/DragAndDropQuiz.tsx
 import { DRAG_AND_DROP } from "@/lib/data";
 import { Link } from "expo-router";
-import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 
 export default function DragAndDropQuiz() {
+    const [showAnswer, setShowAnswer] = useState(false);
+    const toggleSwitch = () => setShowAnswer((previousState) => !previousState);
+
     return (
         <View style={styles.container}>
             {/* Answers palette */}
@@ -13,7 +16,23 @@ export default function DragAndDropQuiz() {
                     <Chip key={ans} label={ans} />
                 ))}
             </View>
-
+            <View
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    zIndex: 10, // 👈 sometimes needed on Android
+                }}
+            >
+                <Text style={{ fontWeight: "600", fontSize: 16 }}>Show answers</Text>
+                <Switch
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleSwitch}
+                    value={showAnswer}
+                />
+            </View>
             {/* Wrap ScrollView inside a View we can measure */}
             <View style={{ flex: 1 }}>
                 <ScrollView
@@ -27,17 +46,19 @@ export default function DragAndDropQuiz() {
                                 // onLayout={(e) => registerDropZone(idx, e.nativeEvent.layout)}
                             >
                                 <Text style={styles.questionText}>{q.question}</Text>
-                                <Text
-                                    style={[
-                                        styles.answerText,
-                                        {
-                                            color: "black",
-                                            fontWeight: "600",
-                                        },
-                                    ]}
-                                >
-                                    {q.answer}
-                                </Text>
+                                {showAnswer && (
+                                    <Text
+                                        style={[
+                                            styles.answerText,
+                                            {
+                                                color: "black",
+                                                fontWeight: "600",
+                                            },
+                                        ]}
+                                    >
+                                        {q.answer}
+                                    </Text>
+                                )}
                             </View>
                         ))}
                     </View>
