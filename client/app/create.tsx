@@ -1,3 +1,5 @@
+import { RadioGroup } from "@/components/Radio";
+import { QUIZ_TYPE } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -7,17 +9,31 @@ import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-nati
 const { width } = Dimensions.get("window");
 const imageSize = (width - 48) / 2; // 2 columns with padding
 
+const QUIZ_RADIO_ARR = [
+    {
+        label: "Multiple Choice",
+        value: QUIZ_TYPE.MCQ,
+    },
+    {
+        label: "True or False",
+        value: QUIZ_TYPE.TOFQ,
+    },
+    {
+        label: "Matching",
+        value: QUIZ_TYPE.DNDQ,
+    },
+];
+
 export default function CreateQuiz() {
     /** note: format in base64 */
     const [assets, setAssets] = useState<ImagePicker.ImagePickerAsset[]>([]);
-    const [quizType, setQuizType] = useState(false);
+    const [quizType, setQuizType] = useState<QUIZ_TYPE | null>(null);
 
     const pickImage = useCallback(async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: "images",
             quality: 1,
             allowsMultipleSelection: true,
-            base64: true,
         });
 
         if (!result.canceled) {
@@ -68,6 +84,8 @@ export default function CreateQuiz() {
                 text: "Confirm",
                 onPress: async () => {
                     // await createReviewer()
+                    console.log({ type: quizType, images: assets.map((a) => a.base64) });
+                    Alert.alert("Reviewer created.");
                 },
                 style: "default",
             },
@@ -109,20 +127,31 @@ export default function CreateQuiz() {
                 </Pressable>
             </View>
 
+            <RadioGroup
+                data={QUIZ_RADIO_ARR}
+                onValueChange={setQuizType}
+                style={{ paddingHorizontal: 20, flexDirection: "row", gap: 12, flexWrap: "wrap" }}
+            />
             {/* Save Buttons */}
-            <View style={styles.buttonContainer}>
-                <Pressable
-                    onPress={handleCreateQuizReviewer}
-                    style={({ pressed }) => [
-                        styles.button,
-                        styles.primaryButton,
-                        pressed && styles.buttonPressed,
-                    ]}
-                >
-                    <Text style={styles.buttonIcon}>💡</Text>
-                    <Text style={styles.primaryButtonText}>Create Reviewer</Text>
-                </Pressable>
-            </View>
+            {assets.length > 0 && (
+                <>
+                    <View style={styles.buttonContainer}>
+                        <Pressable
+                            disabled={!Boolean(quizType)}
+                            onPress={handleCreateQuizReviewer}
+                            style={({ pressed }) => [
+                                styles.button,
+                                styles.primaryButton,
+                                pressed && styles.buttonPressed,
+                                !Boolean(quizType) && { opacity: 0.6 },
+                            ]}
+                        >
+                            <Text style={styles.buttonIcon}>💡</Text>
+                            <Text style={styles.primaryButtonText}>Create Reviewer</Text>
+                        </Pressable>
+                    </View>
+                </>
+            )}
 
             {/* Images Section */}
             <View style={styles.imagesSection}>
