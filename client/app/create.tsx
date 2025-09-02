@@ -1,8 +1,12 @@
+import LoadingModal from "@/components/LoadingModal";
 import { RadioGroup } from "@/components/Radio";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { createReviewer } from "@/store/review/actions/createReviewer";
 import { QUIZ_TYPE } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -28,6 +32,7 @@ export default function CreateQuiz() {
     /** note: format in base64 */
     const [assets, setAssets] = useState<ImagePicker.ImagePickerAsset[]>([]);
     const [quizType, setQuizType] = useState<QUIZ_TYPE | null>(null);
+    const router = useRouter();
 
     const pickImage = useCallback(async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -73,7 +78,13 @@ export default function CreateQuiz() {
         setAssets((prev) => prev.filter((_, index) => index !== indexToRemove));
     }, []);
 
-    const handleCreateQuizReviewer = () => {
+    const [handleCreateQuizReviewer, { isLoading: isSubmitting }] = useAsyncAction(createReviewer, {
+        onComplete: () => {
+            router.back();
+        },
+    });
+
+    const onCreateQuizReviewer = useCallback(() => {
         Alert.alert("Create reviewer", "Create a quiz based on this assets.", [
             {
                 text: "Cancel",
@@ -83,14 +94,28 @@ export default function CreateQuiz() {
             {
                 text: "Confirm",
                 onPress: async () => {
-                    // await createReviewer()
-                    console.log({ type: quizType, images: assets.map((a) => a.base64) });
+                    if (!quizType) {
+                        Alert.alert("Invalid quiz type");
+                        return;
+                    }
+                    if (assets.length === 0) {
+                        Alert.alert("Select atleast 1 image first.");
+                        return;
+                    }
+                    const imagesBase64 = assets
+                        .map((a) => a.base64)
+                        .filter((s) => typeof s === "string");
+                    const result = await handleCreateQuizReviewer(quizType, imagesBase64);
+                    if (!result) {
+                        Alert.alert("Server error.");
+                        return;
+                    }
                     Alert.alert("Reviewer created.");
                 },
                 style: "default",
             },
         ]);
-    };
+    }, [quizType, assets]);
 
     return (
         <View style={styles.container}>
@@ -137,8 +162,8 @@ export default function CreateQuiz() {
                 <>
                     <View style={styles.buttonContainer}>
                         <Pressable
-                            disabled={!Boolean(quizType)}
-                            onPress={handleCreateQuizReviewer}
+                            disabled={!Boolean(quizType) || isSubmitting}
+                            onPress={onCreateQuizReviewer}
                             style={({ pressed }) => [
                                 styles.button,
                                 styles.primaryButton,
@@ -147,7 +172,9 @@ export default function CreateQuiz() {
                             ]}
                         >
                             <Text style={styles.buttonIcon}>💡</Text>
-                            <Text style={styles.primaryButtonText}>Create Reviewer</Text>
+                            <Text style={styles.primaryButtonText}>
+                                {isSubmitting ? "Creating Reviewer..." : "Create Reviewer"}
+                            </Text>
                         </Pressable>
                     </View>
                 </>
@@ -198,6 +225,10 @@ export default function CreateQuiz() {
                     )}
                 />
             </View>
+            <LoadingModal
+                isVisible={isSubmitting}
+                loadingText="Creating reviewer, please don't close the app..."
+            />
         </View>
     );
 }

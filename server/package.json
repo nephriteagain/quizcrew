@@ -9,6 +9,7 @@
     "dev": "tsx watch src/index.ts"
   },
   "dependencies": {
+    "@fastify/cors": "^11.1.0",
     "@fastify/env": "^5.0.2",
     "@fastify/sensible": "^6.0.3",
     "dotenv": "^17.2.1",

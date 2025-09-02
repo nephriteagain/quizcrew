@@ -1,3 +1,4 @@
+import reviewSelector from "@/store/review/review.store";
 import { Link, LinkProps } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
@@ -12,6 +13,8 @@ const routes: {
 ];
 
 export default function Index() {
+    const reviewer = reviewSelector.use.quizzes();
+
     return (
         <View style={{ flex: 1, backgroundColor: "white", padding: 10, rowGap: 10 }}>
             {routes.map((route) => (
@@ -32,6 +35,7 @@ export default function Index() {
                     </Pressable>
                 </Link>
             ))}
+            <Text>{JSON.stringify(reviewer, null, 2)}</Text>
         </View>
     );
 }

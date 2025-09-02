@@ -1,7 +1,7 @@
 import { Quiz } from "@/types/review";
 import { create } from "zustand";
 import { persist, type StorageValue } from "zustand/middleware";
-import { createSelectors } from "./createSelector";
+import { createSelectors } from "../createSelector";
 
 interface Review {
     quizzes: Quiz[];
