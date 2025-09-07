@@ -107,7 +107,15 @@ export default function MultipleChoiceQuestions() {
                     backgroundColor: "white",
                 }}
             >
-                <Link href={"/mcq-answer"} asChild>
+                <Link
+                    href={{
+                        pathname: "/mcq-answer",
+                        params: {
+                            quiz_id,
+                        },
+                    }}
+                    asChild
+                >
                     <Pressable
                         android_ripple={{ color: "#ccc", borderless: false }}
                         style={{

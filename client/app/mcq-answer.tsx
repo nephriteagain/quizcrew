@@ -90,6 +90,38 @@ export default function MultipleChoiceQuestionsAns() {
         listRef.current?.scrollToIndex({ index: 0, animated: true });
     }, [setIsSubmitted]);
 
+    if (!quiz_id) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Invalid Quiz Id</Text>
+            </View>
+        );
+    }
+
+    if (!selectedQuiz) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Quiz not found.</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={{ flex: 1, backgroundColor: "white" }}>
             {/* MULTIPLE_CHOICE_QUESTIONS list */}
