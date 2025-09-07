@@ -2,9 +2,11 @@
 import Card from "@/components/Card";
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { WIDTH } from "@/constants/values";
-import { DRAG_AND_DROP } from "@/lib/data";
+import reviewSelector from "@/store/review/review.store";
+import { DragAndDrop } from "@/types/review";
 import { AntDesign } from "@expo/vector-icons";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { useLocalSearchParams } from "expo-router";
 import { cloneDeep, debounce } from "lodash";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -25,11 +27,26 @@ type DropZone = {
 };
 
 export default function DragAndDropQuizAns() {
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
+    const quizzes = reviewSelector.use.quizzes();
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as DragAndDrop | undefined;
+
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [dropZones, setDropZones] = useState<DropZone[]>([]);
     const [resultModalVisible, setResultModalVisible] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const DRAG_AND_DROP = useMemo(() => {
+        if (!selectedQuiz)
+            return {
+                questions: [],
+                answers: [],
+            };
+        return selectedQuiz;
+    }, [selectedQuiz]);
+
     /**only enable answer submission when user answers every choice */
     const isSubmitEnabled = useMemo(
         () => Object.keys(answers).length === DRAG_AND_DROP.questions.length,
@@ -183,6 +200,38 @@ export default function DragAndDropQuizAns() {
         },
         []
     );
+
+    if (!quiz_id) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Invalid Quiz Id</Text>
+            </View>
+        );
+    }
+
+    if (!selectedQuiz) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Quiz not found.</Text>
+            </View>
+        );
+    }
 
     return (
         <>

@@ -1,18 +1,56 @@
 // app/DragAndDropQuiz.tsx
-import { DRAG_AND_DROP } from "@/lib/data";
-import { Link } from "expo-router";
+// import { DRAG_AND_DROP } from "@/lib/data";
+import reviewSelector from "@/store/review/review.store";
+import { DragAndDrop } from "@/types/review";
+import { Link, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 
 export default function DragAndDropQuiz() {
     const [showAnswer, setShowAnswer] = useState(false);
     const toggleSwitch = () => setShowAnswer((previousState) => !previousState);
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
+    const quizzes = reviewSelector.use.quizzes();
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as DragAndDrop | undefined;
+
+    if (!quiz_id) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Invalid Quiz Id</Text>
+            </View>
+        );
+    }
+
+    if (!selectedQuiz) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Quiz not found.</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
             {/* Answers palette */}
             <View style={styles.answersRow}>
-                {DRAG_AND_DROP.answers.map((ans) => (
+                {selectedQuiz.answers.map((ans) => (
                     <Chip key={ans} label={ans} />
                 ))}
             </View>
@@ -39,7 +77,7 @@ export default function DragAndDropQuiz() {
                     scrollEventThrottle={16} // so recalibration happens smoothly
                 >
                     <View style={styles.questions}>
-                        {DRAG_AND_DROP.questions.map((q, idx) => (
+                        {selectedQuiz.questions.map((q, idx) => (
                             <View
                                 key={idx}
                                 style={[styles.dropZone]}
@@ -74,7 +112,15 @@ export default function DragAndDropQuiz() {
                     backgroundColor: "white",
                 }}
             >
-                <Link href={"/dndq-answer"} asChild>
+                <Link
+                    href={{
+                        pathname: "/dndq-answer",
+                        params: {
+                            quiz_id,
+                        },
+                    }}
+                    asChild
+                >
                     <Pressable
                         android_ripple={{ color: "#ccc", borderless: false }}
                         style={{

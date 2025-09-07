@@ -47,7 +47,7 @@ export type DragAndDrop = {
     answers: string[];
     questions: {
         question: string;
-        answer: string[];
+        answer: string;
     }[];
 } & DragAndDropType;
 
