@@ -39,6 +39,7 @@ export default function CreateQuiz() {
             mediaTypes: "images",
             quality: 1,
             allowsMultipleSelection: true,
+            base64: true,
         });
 
         if (!result.canceled) {
@@ -105,6 +106,7 @@ export default function CreateQuiz() {
                     const imagesBase64 = assets
                         .map((a) => a.base64)
                         .filter((s) => typeof s === "string");
+                    console.log(`sending ${imagesBase64.length} images...`);
                     const result = await handleCreateQuizReviewer(quizType, imagesBase64);
                     if (!result) {
                         Alert.alert("Server error.");

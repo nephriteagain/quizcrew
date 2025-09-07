@@ -7,14 +7,10 @@ import fastifySensible from "@fastify/sensible";
 import { config } from "dotenv";
 import Fastify from "fastify";
 import { QUIZ } from "./constants/quiz.js";
+import { getImageDataUrl } from "./lib/utils/getImageDataUrl.js";
+import { getImageInstructions } from "./lib/utils/getImageInstructions.js";
 import openAiConnector from "./plugins/openai.js";
-import {
-    DNDQSchema,
-    MCQSchema,
-    OpenAiPromptDto,
-    openAiPromptSchema,
-    TOFQSchema,
-} from "./schema/ai.js";
+import { OpenAiPromptDto, openAiPromptSchema } from "./schema/ai.js";
 
 config();
 
@@ -352,36 +348,14 @@ fastify.post<{ Body: OpenAiImagePromptDto }>(
         }
         fastify.log.info(`[${requestId}] Image validation completed successfully`);
 
-        let outputName: string;
-        let description: string;
-        let structuredSchema;
-
-        fastify.log.info(`[${requestId}] Setting up quiz configuration for type: ${type}`);
-        switch (type) {
-            case "MCQ":
-                outputName = QUIZ.MCQ.name;
-                structuredSchema = MCQSchema;
-                description = QUIZ.MCQ.description;
-                break;
-            case "TOFQ":
-                outputName = QUIZ.TOFQ.name;
-                structuredSchema = TOFQSchema;
-                description = QUIZ.TOFQ.description;
-                break;
-            case "DNDQ":
-                outputName = QUIZ.DNDQ.name;
-                structuredSchema = DNDQSchema;
-                description = QUIZ.DNDQ.description;
-                break;
-            default:
-                fastify.log.error(`[${requestId}] Invalid quiz type: ${type}`);
-                throw fastify.httpErrors.badRequest("invalid_type");
-        }
-        fastify.log.info(`[${requestId}] Quiz configuration set: ${outputName}`);
+        const { outputName, description, structuredSchema } = getImageInstructions(
+            type,
+            fastify,
+            requestId
+        );
 
         // Prepare the content array for the OpenAI API
         fastify.log.info(`[${requestId}] Preparing message content for OpenAI API...`);
-        const messageContent: any[] = [];
 
         // Add text instruction
         const baseInstruction = `Analyze the provided image(s) and extract all educational content, notes, diagrams, and text. 
@@ -400,56 +374,53 @@ fastify.post<{ Body: OpenAiImagePromptDto }>(
             ? `${baseInstruction}\n\nAdditional instructions: ${additionalPrompt}`
             : baseInstruction;
 
-        messageContent.push({
-            type: "text",
-            text: finalInstruction,
-        });
-
-        // Add all images to the message content
-        fastify.log.info(`[${requestId}] Adding ${images.length} images to message content...`);
+        const messageContent: any[] = [];
+        // Add all images
         for (let i = 0; i < images.length; i++) {
             const base64Image = images[i];
             messageContent.push({
-                type: "image_url",
-                image_url: {
-                    url: `data:image/jpeg;base64,${base64Image}`,
-                    detail: "high", // Use high detail for better text extraction
-                },
+                type: "input_image",
+                image_url: getImageDataUrl(base64Image), // string only
+                detail: "high",
             });
-            fastify.log.info(
-                `[${requestId}] Added image ${i + 1}/${images.length} to message content`
-            );
+            fastify.log.info(`[${requestId}] Added image ${i + 1}/${images.length}`);
         }
 
         fastify.log.info(`[${requestId}] Sending request to OpenAI API...`);
         const startTime = Date.now();
 
+        let interval = setInterval(() => {
+            console.log("openai processing request...");
+        }, 1_000);
+
         try {
-            let interval = setInterval(() => {
-                console.log("openai processing request...");
-            }, 1_000);
             const response = await fastify.openai.responses.parse({
-                model: "gpt-4o", // Use gpt-4o for better image analysis
+                model: "gpt-4.1-mini", // Use gpt-4o for better image analysis
                 input: [
                     {
-                        role: "system",
-                        content: `You are a ${outputName} quiz generator that creates quizzes from educational content found in images. 
-                            You will analyze images of notes, textbooks, diagrams, or other educational materials and create relevant quiz questions.
+                        role: "user",
+                        content: [
+                            {
+                                type: "input_text",
+                                text: `You are a ${outputName} quiz generator that creates quizzes from educational content found in images. 
+                                You will analyze images of notes, textbooks, diagrams, or other educational materials and create relevant quiz questions.
                             
-                            Additional description: ${description}
-                            
-                            Instructions:
-                            1. Carefully read and understand all text, diagrams, and visual content in the provided images
-                            2. Extract key educational concepts, facts, and relationships
+                                Additional description: ${description}
+                                
+                                Instructions:
+                                1. Carefully read and understand all text, diagrams, and visual content in the provided images
+                                2. Extract key educational concepts, facts, and relationships
                             3. Create quiz questions that test comprehension of the material shown
                             4. Ensure questions are clear, accurate, and based on the actual content visible
                             5. For multiple choice questions, make distractors plausible but clearly incorrect
                             6. For true/false questions, focus on specific factual claims from the content
-                            7. For drag-and-drop questions, use concepts that have clear relationships visible in the material`,
-                    },
-                    {
-                        role: "user",
-                        content: messageContent,
+                            7. For drag-and-drop questions, use concepts that have clear relationships visible in the material
+                            
+                            ${finalInstruction}
+                            `,
+                            },
+                            ...messageContent,
+                        ],
                     },
                 ],
                 text: {
@@ -461,16 +432,13 @@ fastify.post<{ Body: OpenAiImagePromptDto }>(
                     },
                 },
             });
-            clearInterval(interval);
 
             const endTime = Date.now();
             const duration = (endTime - startTime) / 1000;
 
             fastify.log.info(`[${requestId}] OpenAI API request completed in ${duration}s`);
             fastify.log.info(
-                `[${requestId}] Generated quiz with ${
-                    response.output_parsed || "unknown"
-                } questions`
+                `[${requestId}] Generated quiz with ${response.output || "unknown"} questions`
             );
 
             console.log("Image-based quiz generation response:", response);
@@ -483,7 +451,10 @@ fastify.post<{ Body: OpenAiImagePromptDto }>(
 
             fastify.log.error(`[${requestId}] OpenAI API request failed after ${duration}s:`);
             console.error(error);
+            clearInterval(interval);
             throw error;
+        } finally {
+            clearInterval(interval);
         }
     }
 );
