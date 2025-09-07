@@ -31,7 +31,7 @@ export default function QuizList({
 
     const keyExtractor = useCallback((item: Quiz) => {
         // Use a combination of type, title, and createdAt as unique key
-        return `${item.quizId}`;
+        return `${item.quiz_id}`;
     }, []);
 
     const getItemType = useCallback((item: Quiz) => {

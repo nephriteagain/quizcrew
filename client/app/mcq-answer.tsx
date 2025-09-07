@@ -5,7 +5,9 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
-import { MULTIPLE_CHOICE_QUESTIONS } from "@/lib/data";
+import reviewSelector from "@/store/review/review.store";
+import { MultipleChoiceQ } from "@/types/review";
+import { useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -13,12 +15,23 @@ export default function MultipleChoiceQuestionsAns() {
     const listRef = useRef<FlashListRef<any>>(null);
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     /**only enable answer submission when user answers every choice */
+
+    const [resultModalVisible, setResultModalVisible] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
+    const quizzes = reviewSelector.use.quizzes();
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as MultipleChoiceQ | undefined;
+
+    const MULTIPLE_CHOICE_QUESTIONS = useMemo(() => {
+        if (!selectedQuiz) return [];
+        return selectedQuiz.questions;
+    }, [selectedQuiz]);
+
     const isSubmitEnabled = useMemo(
         () => Object.keys(answers).length === MULTIPLE_CHOICE_QUESTIONS.length,
         [answers]
     );
-    const [resultModalVisible, setResultModalVisible] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const score = useMemo(() => {
         let total: number = 0;

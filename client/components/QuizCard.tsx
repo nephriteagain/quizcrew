@@ -81,8 +81,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
-        minHeight: 160, // Makes it more square-like
-        aspectRatio: 1, // Makes it perfectly square
+        aspectRatio: 1.6, // Makes it perfectly square
         justifyContent: "space-between",
         width: "100%",
     },

@@ -2,12 +2,49 @@ import { FlashList } from "@shopify/flash-list";
 import React, { useState } from "react";
 import { Pressable, Switch, Text, View } from "react-native";
 
-import { MULTIPLE_CHOICE_QUESTIONS } from "@/lib/data";
-import { Link } from "expo-router";
+import reviewSelector from "@/store/review/review.store";
+import { MultipleChoiceQ } from "@/types/review";
+import { Link, useLocalSearchParams } from "expo-router";
 
 export default function MultipleChoiceQuestions() {
     const [showAnswer, setShowAnswer] = useState(false);
     const toggleSwitch = () => setShowAnswer((previousState) => !previousState);
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
+    const quizzes = reviewSelector.use.quizzes();
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as MultipleChoiceQ | undefined;
+
+    if (!quiz_id) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Invalid Quiz Id</Text>
+            </View>
+        );
+    }
+
+    if (!selectedQuiz) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Quiz not found.</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={{ flex: 1, padding: 16, backgroundColor: "white" }}>
@@ -30,7 +67,7 @@ export default function MultipleChoiceQuestions() {
                 />
             </View>
             <FlashList
-                data={MULTIPLE_CHOICE_QUESTIONS}
+                data={selectedQuiz.questions}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item, index }) => (
                     <View style={{ marginBottom: 24 }}>
@@ -42,7 +79,7 @@ export default function MultipleChoiceQuestions() {
                         {/* Choices */}
                         {item.choices.map((choice: string, cIndex: number) => {
                             const shouldShowAnswer =
-                                showAnswer && choice === MULTIPLE_CHOICE_QUESTIONS[index].answer;
+                                showAnswer && choice === selectedQuiz.questions[index].answer;
                             return (
                                 <View
                                     key={cIndex}
