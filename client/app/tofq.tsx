@@ -1,13 +1,49 @@
+import reviewSelector from "@/store/review/review.store";
+import { TrueOrFalseQ } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
+import { Link, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, Switch, Text, View } from "react-native";
-
-import { TOF_QUESTIONS } from "@/lib/data";
-import { Link } from "expo-router";
 
 export default function TrueOrFalseQuestions() {
     const [showAnswer, setShowAnswer] = useState(false);
     const toggleSwitch = () => setShowAnswer((previousState) => !previousState);
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
+    const quizzes = reviewSelector.use.quizzes();
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as TrueOrFalseQ | undefined;
+
+    if (!quiz_id) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Invalid Quiz Id</Text>
+            </View>
+        );
+    }
+
+    if (!selectedQuiz) {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    padding: 16,
+                    backgroundColor: "white",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Text>Quiz not found.</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={{ flex: 1, padding: 16, backgroundColor: "white" }}>
@@ -33,7 +69,7 @@ export default function TrueOrFalseQuestions() {
 
             {/* Questions List */}
             <FlashList
-                data={TOF_QUESTIONS}
+                data={selectedQuiz.questions}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item, index }) => (
                     <View style={{ marginBottom: 24 }}>
@@ -79,7 +115,15 @@ export default function TrueOrFalseQuestions() {
                     backgroundColor: "white",
                 }}
             >
-                <Link href={"/tofq-answer"} asChild>
+                <Link
+                    href={{
+                        pathname: "/tofq-answer",
+                        params: {
+                            quiz_id,
+                        },
+                    }}
+                    asChild
+                >
                     <Pressable
                         android_ripple={{ color: "#ccc", borderless: false }}
                         style={{

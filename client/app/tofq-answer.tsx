@@ -5,7 +5,9 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
-import { TOF_QUESTIONS } from "@/lib/data";
+import reviewSelector from "@/store/review/review.store";
+import { TrueOrFalseQ } from "@/types/review";
+import { useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -14,6 +16,16 @@ export default function TrueOrFalseQuestionsAns() {
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     const [resultModalVisible, setResultModalVisible] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
+    const quizzes = reviewSelector.use.quizzes();
+    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as TrueOrFalseQ | undefined;
+
+    const TOF_QUESTIONS = useMemo(() => {
+        if (!selectedQuiz) return [];
+        return selectedQuiz.questions;
+    }, [selectedQuiz]);
 
     /** only enable submission when all questions are answered */
     const isSubmitEnabled = useMemo(
