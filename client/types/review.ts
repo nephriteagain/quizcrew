@@ -17,6 +17,10 @@ export type DragAndDropType = {
 };
 
 export type MultipleChoiceQ = {
+    quizId: string;
+    createdAt: number; // Timestamp;
+    title: string;
+    description: string;
     questions: {
         question: string;
         choices: string[];
@@ -25,7 +29,10 @@ export type MultipleChoiceQ = {
 } & MultipleChoiceType;
 
 export type TrueOrFalseQ = {
-    type: "TOFQ";
+    quizId: string;
+    createdAt: number; // Timestamp;
+    title: string;
+    description: string;
     questions: {
         question: string;
         answer: boolean;
@@ -33,7 +40,10 @@ export type TrueOrFalseQ = {
 } & TrueOrFalseType;
 
 export type DragAndDrop = {
-    type: "DNDQ";
+    quizId: string;
+    createdAt: number; // Timestamp;
+    title: string;
+    description: string;
     answers: string[];
     questions: {
         question: string;

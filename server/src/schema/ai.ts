@@ -12,12 +12,33 @@ export const openAiPromptSchema = {
 
 export type OpenAiPromptDto = FromSchema<typeof openAiPromptSchema>;
 
-export const MCQSchema = {
+export const openAiImagePromptSchema = {
     type: "object",
-    required: ["quiz"],
+    required: ["images", "type"],
     additionalProperties: false,
     properties: {
-        quiz: {
+        images: {
+            type: "array",
+            items: { type: "string" },
+            minItems: 1,
+            maxItems: 10, // Reasonable limit for performance
+        },
+        type: {
+            type: "string",
+            enum: ["MCQ", "TOFQ", "DNDQ"],
+        },
+        prompt: { type: "string" },
+    },
+} as const;
+
+export type OpenAiImagePromptDto = FromSchema<typeof openAiImagePromptSchema>;
+
+export const MCQSchema = {
+    type: "object",
+    required: ["questions", "title", "description"],
+    additionalProperties: false,
+    properties: {
+        questions: {
             type: "array",
             items: {
                 type: "object",
@@ -34,16 +55,20 @@ export const MCQSchema = {
                 required: ["question", "answer", "choices"],
                 additionalProperties: false,
             },
+            minItems: 10,
+            maxItems: 10,
         },
+        title: { type: "string" },
+        description: { type: "string" },
     },
 } as const;
 
 export const TOFQSchema = {
     type: "object",
-    required: ["quiz"],
+    required: ["questions", "title", "description"],
     additionalProperties: false,
     properties: {
-        quiz: {
+        questions: {
             type: "array",
             items: {
                 type: "object",
@@ -54,39 +79,48 @@ export const TOFQSchema = {
                     answer: { type: "boolean" },
                 },
             },
+            minItems: 10,
+            maxItems: 10,
         },
+        title: { type: "string" },
+        description: { type: "string" },
     },
 } as const;
 
 export const DNDQSchema = {
     type: "object",
-    required: ["quiz"],
+    required: ["questions", "answers", "title", "description"],
     additionalProperties: false,
     properties: {
-        quiz: {
-            type: "object",
-            required: ["questions", "answers"],
-            additionalProperties: false,
-            properties: {
-                questions: {
-                    type: "array",
-                    items: {
-                        type: "object",
-                        required: ["question", "answer"],
-                        additionalProperties: false,
-                        properties: {
-                            question: { type: "string" },
-                            answer: { type: "string" },
-                        },
-                    },
-                },
-                answers: {
-                    type: "array",
-                    items: {
-                        type: "string",
-                    },
+        questions: {
+            type: "array",
+            items: {
+                type: "object",
+                required: ["question", "answer"],
+                additionalProperties: false,
+                properties: {
+                    question: { type: "string" },
+                    answer: { type: "string" },
                 },
             },
+            minItems: 10,
+            maxItems: 10,
         },
+        answers: {
+            type: "array",
+            items: {
+                type: "string",
+            },
+            minItems: 10,
+            maxItems: 10,
+        },
+        title: { type: "string" },
+        description: { type: "string" },
     },
 } as const;
+
+export type MCQSchemaType = FromSchema<typeof MCQSchema>;
+export type TOFQSchemaType = FromSchema<typeof TOFQSchema>;
+export type DNDQSchemaType = FromSchema<typeof DNDQSchema>;
+
+export type QUIZSchema = MCQSchemaType | TOFQSchemaType | DNDQSchemaType;

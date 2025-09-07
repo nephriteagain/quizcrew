@@ -1,4 +1,4 @@
-import { QUIZ_TYPE } from "@/types/review";
+import { Quiz, QUIZ_TYPE } from "@/types/review";
 import reviewSelector from "../review.store";
 
 export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
@@ -22,16 +22,13 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
     }
 
     // Check if response has content
-    const text = await response.text();
-    if (!text) {
+    const quiz = (await response.json()) as Quiz | null;
+    if (!quiz) {
         throw new Error("Empty response body");
     }
 
-    // Parse JSON
-    const json = JSON.parse(text);
-
     reviewSelector.setState((s) => ({
-        quizzes: [json, ...s.quizzes],
+        quizzes: [quiz, ...s.quizzes],
     }));
     console.log("reviewer created and saved!");
     return true;
