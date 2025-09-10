@@ -18,14 +18,14 @@ export default function Index() {
         (quiz: Quiz) => {
             if (quiz.type === QUIZ_TYPE.MCQ) {
                 router.push({
-                    pathname: "/mcq",
+                    pathname: "../mcq",
                     params: {
                         quiz_id: quiz.quiz_id,
                     },
                 });
             } else if (quiz.type === QUIZ_TYPE.TOFQ) {
                 router.push({
-                    pathname: "/tofq",
+                    pathname: "../tofq",
                     params: {
                         quiz_id: quiz.quiz_id,
                     },

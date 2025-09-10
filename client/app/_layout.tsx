@@ -70,8 +70,8 @@ export default function RootLayout() {
 
     return (
         <GestureHandlerRootView>
-            <Stack>
-                <Stack.Screen name="index" options={{ headerTitle: "Review" }} />
+            <Stack initialRouteName="(tabs)">
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="quiz-types" options={{ headerTitle: "Select a Quiz Type" }} />
                 <Stack.Screen
                     name="mcq-answer"
