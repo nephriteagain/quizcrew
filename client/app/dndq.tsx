@@ -16,15 +16,7 @@ export default function DragAndDropQuiz() {
 
     if (!quiz_id) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    padding: 16,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <View style={styles.errorContainer}>
                 <Text>Invalid Quiz Id</Text>
             </View>
         );
@@ -32,15 +24,7 @@ export default function DragAndDropQuiz() {
 
     if (!selectedQuiz) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    padding: 16,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <View style={styles.errorContainer}>
                 <Text>Quiz not found.</Text>
             </View>
         );
@@ -48,71 +32,44 @@ export default function DragAndDropQuiz() {
 
     return (
         <View style={styles.container}>
+            <View style={styles.switchContainer}>
+                <Text style={styles.switchLabel}>Show answers</Text>
+                <Switch
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleSwitch}
+                    value={showAnswer}
+                />
+            </View>
             {/* Answers palette */}
-            <ScrollView contentContainerStyle={styles.answersRow} style={{ flex: 1 }}>
-                {selectedQuiz.answers.map((ans) => (
-                    <Chip key={ans} label={ans} />
-                ))}
+            <ScrollView
+                contentContainerStyle={styles.answersRow}
+                style={styles.scrollView}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.answersRow}>
+                    {selectedQuiz.answers.map((ans) => (
+                        <Chip key={ans} label={ans} />
+                    ))}
+                </View>
+                {/* Wrap ScrollView inside a View we can measure */}
+                <View style={styles.questions}>
+                    {selectedQuiz.questions.map((q, idx) => (
+                        <View key={idx} style={[styles.dropZone]}>
+                            <Text style={styles.questionText}>{q.question}</Text>
+                            {showAnswer && (
+                                <Text style={[styles.answerText, styles.visibleAnswer]}>
+                                    {q.answer}
+                                </Text>
+                            )}
+                        </View>
+                    ))}
+                </View>
             </ScrollView>
 
-            {/* Wrap ScrollView inside a View we can measure */}
-            <View style={{ flex: 1 }}>
-                <View
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        zIndex: 10, // 👈 sometimes needed on Android
-                    }}
-                >
-                    <Text style={{ fontWeight: "600", fontSize: 16 }}>Show answers</Text>
-                    <Switch
-                        trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={toggleSwitch}
-                        value={showAnswer}
-                    />
-                </View>
-                <ScrollView
-                    scrollEventThrottle={16} // so recalibration happens smoothly
-                >
-                    <View style={styles.questions}>
-                        {selectedQuiz.questions.map((q, idx) => (
-                            <View
-                                key={idx}
-                                style={[styles.dropZone]}
-                                // onLayout={(e) => registerDropZone(idx, e.nativeEvent.layout)}
-                            >
-                                <Text style={styles.questionText}>{q.question}</Text>
-                                {showAnswer && (
-                                    <Text
-                                        style={[
-                                            styles.answerText,
-                                            {
-                                                color: "black",
-                                                fontWeight: "600",
-                                            },
-                                        ]}
-                                    >
-                                        {q.answer}
-                                    </Text>
-                                )}
-                            </View>
-                        ))}
-                    </View>
-                </ScrollView>
-            </View>
-
             {/* Bottom Button */}
-            <View
-                style={{
-                    padding: 16,
-                    borderTopWidth: 1,
-                    borderColor: "#eee",
-                    backgroundColor: "white",
-                }}
-            >
+            <View style={styles.bottomContainer}>
                 <Link
                     href={{
                         pathname: "/dndq-answer",
@@ -124,20 +81,9 @@ export default function DragAndDropQuiz() {
                 >
                     <Pressable
                         android_ripple={{ color: "#ccc", borderless: false }}
-                        style={{
-                            backgroundColor: "#2196F3",
-                            padding: 16,
-                            borderRadius: 12,
-                            alignItems: "center",
-                        }}
+                        style={styles.quizButton}
                     >
-                        <Text
-                            style={{
-                                color: "white",
-                                fontWeight: "bold",
-                                fontSize: 16,
-                            }}
-                        >
+                        <Text style={styles.quizButtonText}>
                             Take the Quiz
                         </Text>
                     </Pressable>
@@ -156,7 +102,30 @@ function Chip({ label }: { label: string }) {
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 16, flex: 1 },
+    container: {
+        padding: 16,
+        flex: 1,
+    },
+    errorContainer: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    switchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        zIndex: 10,
+    },
+    switchLabel: {
+        fontWeight: "600",
+        fontSize: 16,
+    },
+    scrollView: {
+        flex: 1,
+    },
     answersRow: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -170,8 +139,13 @@ const styles = StyleSheet.create({
         margin: 4,
         zIndex: 10,
     },
-    chipText: { color: "white", fontWeight: "600" },
-    questions: { gap: 12 },
+    chipText: {
+        color: "white",
+        fontWeight: "600",
+    },
+    questions: {
+        gap: 12,
+    },
     dropZone: {
         padding: 16,
         borderWidth: 2,
@@ -182,10 +156,34 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         marginBottom: 12,
     },
-    dropZoneHovered: {
-        borderColor: "#4f46e5",
-        backgroundColor: "#eef2ff",
+    questionText: {
+        fontSize: 16,
+        fontWeight: "500",
+        marginBottom: 6,
     },
-    questionText: { fontSize: 16, fontWeight: "500", marginBottom: 6 },
-    answerText: { fontSize: 14, color: "#6b7280" },
+    answerText: {
+        fontSize: 14,
+        color: "#6b7280",
+    },
+    visibleAnswer: {
+        color: "black",
+        fontWeight: "600",
+    },
+    bottomContainer: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderColor: "#eee",
+        backgroundColor: "white",
+    },
+    quizButton: {
+        backgroundColor: "#2196F3",
+        padding: 16,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+    quizButtonText: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
 });

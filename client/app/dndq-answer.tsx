@@ -19,7 +19,10 @@ import Animated, {
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
+    withRepeat,
+    withSequence,
     withSpring,
+    withTiming,
 } from "react-native-reanimated";
 
 type DropZone = {
@@ -488,32 +491,47 @@ function DraggableChip({
 }) {
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
-    const opacity = useSharedValue(1);
+    const rotation = useSharedValue(0);
+    const isDragging = useSharedValue(false);
 
     const gesture = Gesture.Pan()
         .enabled(!isSelected && !isDisabled) // Disable gesture when selected
+        .onStart(() => {
+            isDragging.value = true;
+            // Start shake animation
+            rotation.value = withRepeat(
+                withSequence(
+                    withTiming(-3, { duration: 50 }),
+                    withTiming(3, { duration: 100 }),
+                    withTiming(0, { duration: 50 })
+                ),
+                -1, // Infinite repeat
+                false
+            );
+        })
         .onUpdate((e) => {
             offsetX.value = e.translationX;
             offsetY.value = e.translationY;
             runOnJS(onHover)(e.absoluteX, e.absoluteY);
         })
         .onEnd((e) => {
-            // Set opacity to 0 immediately when dropping
-            opacity.value = 0;
+            isDragging.value = false;
+            // Stop shake animation
+            rotation.value = withTiming(0, { duration: 150 });
 
             runOnJS(onDrop)(e.absoluteX, e.absoluteY, label);
 
             // Animate back to position
-            offsetX.value = withSpring(0, {}, () => {
-                // When spring animation completes, fade back in
-                opacity.value = withSpring(1);
-            });
+            offsetX.value = withSpring(0);
             offsetY.value = withSpring(0);
         });
 
     const stylez = useAnimatedStyle(() => ({
-        transform: [{ translateX: offsetX.value }, { translateY: offsetY.value }],
-        opacity: opacity.value,
+        transform: [
+            { translateX: offsetX.value },
+            { translateY: offsetY.value },
+            { rotate: `${rotation.value}deg` },
+        ],
     }));
 
     return (
