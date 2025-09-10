@@ -10,6 +10,6 @@ export const QUIZ = {
     DNDQ: {
         name: "drag_and_drop_question",
         description:
-            "Create a one to one (question to answer) multi choice quiz, each question should match one answer in the pool.",
+            "Create a one to one (question to answer) multi choice quiz, each question should match one answer in the pool, The choices should only be a single word or a very short phrase.",
     },
 };
