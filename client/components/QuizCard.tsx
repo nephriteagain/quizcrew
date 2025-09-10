@@ -37,7 +37,7 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
     }, [quiz]);
 
     return (
-        <Pressable style={styles.container} {...props}>
+        <Pressable style={styles.container} {...props} android_ripple={{ color: "#fff" }}>
             <View style={styles.header}>
                 <Text style={styles.title} numberOfLines={2}>
                     {quiz.title}

@@ -3,7 +3,7 @@ import reviewSelector from "@/store/review/review.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Link, LinkProps, useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const routes: {
     name: LinkProps["href"];
@@ -17,7 +17,6 @@ export default function Index() {
     const handlePress = useCallback(
         (quiz: Quiz) => {
             if (quiz.type === QUIZ_TYPE.MCQ) {
-                console.log(quiz);
                 router.push({
                     pathname: "/mcq",
                     params: {
@@ -44,20 +43,16 @@ export default function Index() {
     );
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
-                {routes.map((route) => (
-                    <Link href={route.name} asChild key={route.label}>
-                        <Pressable style={styles.routeButton}>
-                            <Text style={styles.routeButtonText}>
-                                {route.label}
-                            </Text>
-                        </Pressable>
-                    </Link>
-                ))}
-                <QuizList quizzes={reviewer} onQuizPress={handlePress} />
-            </View>
-        </ScrollView>
+        <View style={styles.container}>
+            {routes.map((route) => (
+                <Link href={route.name} asChild key={route.label}>
+                    <Pressable style={styles.routeButton}>
+                        <Text style={styles.routeButtonText}>{route.label}</Text>
+                    </Pressable>
+                </Link>
+            ))}
+            <QuizList quizzes={reviewer} onQuizPress={handlePress} />
+        </View>
     );
 }
 
