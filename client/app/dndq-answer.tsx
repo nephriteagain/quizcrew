@@ -382,19 +382,8 @@ export default function DragAndDropQuizAns() {
                                         <View style={styles.answerInputContainer}>
                                             <View
                                                 style={[
-                                                    {
-                                                        paddingHorizontal: 12,
-                                                        paddingVertical: 8,
-                                                        borderRadius: 16,
-                                                        borderWidth: 2,
-                                                        borderColor: "transparent",
-                                                        justifyContent: "center",
-                                                        flex: 1,
-                                                    },
-                                                    answers[idx] && {
-                                                        backgroundColor: "#4f46e5",
-                                                        paddingRight: 30,
-                                                    },
+                                                    styles.answerBox,
+                                                    answers[idx] && styles.answerBoxFilled,
                                                 ]}
                                             >
                                                 <Text
@@ -410,24 +399,24 @@ export default function DragAndDropQuizAns() {
                                                         ? answers[idx]
                                                         : "Drop answer here"}
                                                 </Text>
-                                                {answers[idx] && (
-                                                    <TouchableOpacity
-                                                        hitSlop={10}
-                                                        onPress={() => {
-                                                            const copy = cloneDeep(answers);
-                                                            delete copy[idx];
-                                                            setAnswers(copy);
-                                                        }}
-                                                        style={styles.removeButton}
-                                                    >
-                                                        <AntDesign
-                                                            name="closesquare"
-                                                            size={30}
-                                                            color="#ffaaaa"
-                                                        />
-                                                    </TouchableOpacity>
-                                                )}
                                             </View>
+                                            {answers[idx] && (
+                                                <TouchableOpacity
+                                                    hitSlop={10}
+                                                    onPress={() => {
+                                                        const copy = cloneDeep(answers);
+                                                        delete copy[idx];
+                                                        setAnswers(copy);
+                                                    }}
+                                                    style={styles.removeButton}
+                                                >
+                                                    <AntDesign
+                                                        name="closesquare"
+                                                        size={24}
+                                                        color="#ff6b6b"
+                                                    />
+                                                </TouchableOpacity>
+                                            )}
                                         </View>
                                     )}
                                 </Card>
@@ -567,7 +556,6 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         gap: 8,
         padding: 8,
-        flexGrow: 1,
         zIndex: 10,
     },
     chip: {
@@ -585,12 +573,14 @@ const styles = StyleSheet.create({
     },
     // New style for scroll container
     scrollContainer: {
-        // flex: 1,
+        flex: 1,
+        justifyContent: "center",
     },
     // Updated style for question container
     questionContainer: {
         width: WIDTH,
         justifyContent: "center",
+        alignItems: "center",
         padding: 20,
     },
     dropZone: {
@@ -626,14 +616,25 @@ const styles = StyleSheet.create({
     },
     answerInputContainer: {
         flexDirection: "row",
-        columnGap: 4,
-        flex: 1,
+        alignItems: "center",
+        gap: 8,
         justifyContent: "center",
     },
+    answerBox: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 16,
+        borderWidth: 2,
+        borderColor: "transparent",
+        justifyContent: "center",
+        alignSelf: "flex-start",
+        maxWidth: "85%",
+    },
+    answerBoxFilled: {
+        backgroundColor: "#4f46e5",
+    },
     removeButton: {
-        position: "absolute",
-        top: 8,
-        right: 8,
+        padding: 4,
     },
     submitContainer: {
         padding: 16,
