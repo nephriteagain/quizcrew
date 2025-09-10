@@ -49,30 +49,31 @@ export default function DragAndDropQuiz() {
     return (
         <View style={styles.container}>
             {/* Answers palette */}
-            <View style={styles.answersRow}>
+            <ScrollView contentContainerStyle={styles.answersRow} style={{ flex: 1 }}>
                 {selectedQuiz.answers.map((ans) => (
                     <Chip key={ans} label={ans} />
                 ))}
-            </View>
-            <View
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    zIndex: 10, // 👈 sometimes needed on Android
-                }}
-            >
-                <Text style={{ fontWeight: "600", fontSize: 16 }}>Show answers</Text>
-                <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
-                    onValueChange={toggleSwitch}
-                    value={showAnswer}
-                />
-            </View>
+            </ScrollView>
+
             {/* Wrap ScrollView inside a View we can measure */}
             <View style={{ flex: 1 }}>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        zIndex: 10, // 👈 sometimes needed on Android
+                    }}
+                >
+                    <Text style={{ fontWeight: "600", fontSize: 16 }}>Show answers</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={toggleSwitch}
+                        value={showAnswer}
+                    />
+                </View>
                 <ScrollView
                     scrollEventThrottle={16} // so recalibration happens smoothly
                 >

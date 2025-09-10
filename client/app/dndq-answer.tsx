@@ -2,6 +2,7 @@
 import Card from "@/components/Card";
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { WIDTH } from "@/constants/values";
+import { fontSizeScaler } from "@/lib/utils/fontSizeScaler";
 import reviewSelector from "@/store/review/review.store";
 import { DragAndDrop } from "@/types/review";
 import { AntDesign } from "@expo/vector-icons";
@@ -12,6 +13,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
+    FadeIn,
+    FadeOut,
+    LinearTransition,
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
@@ -201,6 +205,13 @@ export default function DragAndDropQuizAns() {
         []
     );
 
+    const unselectedAnswers = useMemo(() => {
+        return DRAG_AND_DROP.answers.filter((ans) => {
+            const isSelected = Object.values(answers).includes(ans);
+            return !isSelected;
+        });
+    }, [answers]);
+
     if (!quiz_id) {
         return (
             <View
@@ -237,21 +248,30 @@ export default function DragAndDropQuizAns() {
         <>
             <GestureHandlerRootView style={styles.container}>
                 {/* Answers palette */}
-                <View style={styles.answersRow}>
-                    {DRAG_AND_DROP.answers.map((ans, index) => {
-                        const isSelected = Object.values(answers).includes(ans);
+                <Animated.View
+                    style={[styles.answersRow, isSubmitted && { height: 0, flexGrow: 0 }]}
+                    layout={LinearTransition.springify().damping(15).stiffness(100)}
+                >
+                    {unselectedAnswers.map((ans, index) => {
+                        // const isSelected = Object.values(answers).includes(ans);
                         return (
-                            <DraggableChip
-                                key={`${ans}-${index}`}
-                                label={ans}
-                                onDrop={handleDrop}
-                                onHover={handleHover}
-                                isSelected={isSelected}
-                                isDisabled={isSubmitted}
-                            />
+                            <Animated.View
+                                key={`${ans}`}
+                                layout={LinearTransition.springify().damping(15).stiffness(100)}
+                                entering={FadeIn.duration(300)}
+                                exiting={FadeOut.duration(300)}
+                            >
+                                <DraggableChip
+                                    label={ans}
+                                    onDrop={handleDrop}
+                                    onHover={handleHover}
+                                    // isSelected={isSelected}
+                                    isDisabled={isSubmitted}
+                                />
+                            </Animated.View>
                         );
                     })}
-                </View>
+                </Animated.View>
 
                 {/* Container for FlashList */}
                 <View style={styles.scrollContainer} ref={registerContainer}>
@@ -284,12 +304,7 @@ export default function DragAndDropQuizAns() {
                                 >
                                     <Text style={styles.questionText}>{q.question}</Text>
                                     {isSubmitted ? (
-                                        <View
-                                            style={{
-                                                rowGap: 4,
-                                                alignItems: "center",
-                                            }}
-                                        >
+                                        <View style={styles.submittedAnswerContainer}>
                                             {/* user answer */}
                                             <View
                                                 style={[
@@ -327,13 +342,7 @@ export default function DragAndDropQuizAns() {
                                             {/* correct answer */}
                                             {answers[idx] !== q.answer && (
                                                 <>
-                                                    <Text
-                                                        style={{
-                                                            textAlign: "left",
-                                                            width: "100%",
-                                                            fontWeight: 600,
-                                                        }}
-                                                    >
+                                                    <Text style={styles.correctAnswerLabel}>
                                                         Correct Answer:
                                                     </Text>
                                                     <View
@@ -367,13 +376,7 @@ export default function DragAndDropQuizAns() {
                                             )}
                                         </View>
                                     ) : (
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                columnGap: 4,
-                                                alignItems: "center",
-                                            }}
-                                        >
+                                        <View style={styles.answerInputContainer}>
                                             <View
                                                 style={[
                                                     {
@@ -381,11 +384,13 @@ export default function DragAndDropQuizAns() {
                                                         paddingVertical: 8,
                                                         borderRadius: 16,
                                                         borderWidth: 2,
-                                                        alignSelf: "flex-start",
                                                         borderColor: "transparent",
+                                                        justifyContent: "center",
+                                                        flex: 1,
                                                     },
                                                     answers[idx] && {
                                                         backgroundColor: "#4f46e5",
+                                                        paddingRight: 30,
                                                     },
                                                 ]}
                                             >
@@ -402,24 +407,24 @@ export default function DragAndDropQuizAns() {
                                                         ? answers[idx]
                                                         : "Drop answer here"}
                                                 </Text>
+                                                {answers[idx] && (
+                                                    <TouchableOpacity
+                                                        hitSlop={10}
+                                                        onPress={() => {
+                                                            const copy = cloneDeep(answers);
+                                                            delete copy[idx];
+                                                            setAnswers(copy);
+                                                        }}
+                                                        style={styles.removeButton}
+                                                    >
+                                                        <AntDesign
+                                                            name="closesquare"
+                                                            size={30}
+                                                            color="#ffaaaa"
+                                                        />
+                                                    </TouchableOpacity>
+                                                )}
                                             </View>
-                                            {answers[idx] && (
-                                                <TouchableOpacity
-                                                    hitSlop={10}
-                                                    activeOpacity={0.8}
-                                                    onPress={() => {
-                                                        const copy = cloneDeep(answers);
-                                                        delete copy[idx];
-                                                        setAnswers(copy);
-                                                    }}
-                                                >
-                                                    <AntDesign
-                                                        name="closesquare"
-                                                        size={30}
-                                                        color="red"
-                                                    />
-                                                </TouchableOpacity>
-                                            )}
                                         </View>
                                     )}
                                 </Card>
@@ -428,35 +433,21 @@ export default function DragAndDropQuizAns() {
                     />
                 </View>
                 {/* Submit button at bottom */}
-                <View
-                    style={{
-                        padding: 16,
-                        borderTopWidth: 1,
-                        borderColor: "#eee",
-                        backgroundColor: "white",
-                    }}
-                >
+                <View style={styles.submitContainer}>
                     {!isSubmitted && (
                         <Pressable
                             android_ripple={
                                 isSubmitEnabled ? { color: "#ccc", borderless: false } : null
                             }
-                            style={{
-                                backgroundColor: "#4CAF50",
-                                padding: 16,
-                                borderRadius: 12,
-                                alignItems: "center",
-                            }}
+                            style={styles.submitButton}
                             onPress={handleSubmit}
                             disabled={!isSubmitEnabled}
                         >
                             <Text
-                                style={{
-                                    color: "white",
-                                    fontWeight: "bold",
-                                    fontSize: 16,
-                                    opacity: isSubmitEnabled ? 1 : 0.6,
-                                }}
+                                style={[
+                                    styles.submitButtonText,
+                                    { opacity: isSubmitEnabled ? 1 : 0.6 },
+                                ]}
                             >
                                 Submit ({Object.keys(answers).length}/
                                 {DRAG_AND_DROP.questions.length})
@@ -468,21 +459,10 @@ export default function DragAndDropQuizAns() {
                             android_ripple={
                                 isSubmitEnabled ? { color: "#b8d418ff", borderless: false } : null
                             }
-                            style={{
-                                backgroundColor: "#c58142ff",
-                                padding: 16,
-                                borderRadius: 12,
-                                alignItems: "center",
-                            }}
+                            style={styles.resetButton}
                             onPress={handleReset}
                         >
-                            <Text
-                                style={{
-                                    color: "white",
-                                    fontWeight: "bold",
-                                    fontSize: 16,
-                                }}
-                            >
+                            <Text style={styles.resetButtonText}>
                                 TRY AGAIN ({score}/{DRAG_AND_DROP.questions.length})
                             </Text>
                         </Pressable>
@@ -501,7 +481,7 @@ function DraggableChip({
     isDisabled,
 }: {
     label: string;
-    isSelected: boolean;
+    isSelected?: boolean;
     isDisabled: boolean;
     onDrop: (x: number, y: number, ans: string) => void;
     onHover: (x: number, y: number) => void;
@@ -548,7 +528,14 @@ function DraggableChip({
                     },
                 ]}
             >
-                <Text style={[styles.chipText, isSelected && { color: "black" }]}>{label}</Text>
+                <Text
+                    style={[
+                        styles.chipText,
+                        isSelected && { color: "black", fontSize: fontSizeScaler(label) },
+                    ]}
+                >
+                    {label}
+                </Text>
             </Animated.View>
         </GestureDetector>
     );
@@ -562,6 +549,8 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         gap: 8,
         padding: 8,
+        flexGrow: 1,
+        zIndex: 10,
     },
     chip: {
         paddingHorizontal: 12,
@@ -578,7 +567,7 @@ const styles = StyleSheet.create({
     },
     // New style for scroll container
     scrollContainer: {
-        flex: 1,
+        // flex: 1,
     },
     // Updated style for question container
     questionContainer: {
@@ -607,5 +596,51 @@ const styles = StyleSheet.create({
     answerText: {
         fontSize: 14,
         color: "#6b7280",
+    },
+    submittedAnswerContainer: {
+        rowGap: 4,
+        alignItems: "center",
+    },
+    correctAnswerLabel: {
+        textAlign: "left",
+        width: "100%",
+        fontWeight: "600",
+    },
+    answerInputContainer: {
+        flexDirection: "row",
+        columnGap: 4,
+        flex: 1,
+        justifyContent: "center",
+    },
+    removeButton: {
+        position: "absolute",
+        top: 8,
+        right: 8,
+    },
+    submitContainer: {
+        padding: 16,
+        borderColor: "#eee",
+    },
+    submitButton: {
+        backgroundColor: "#4CAF50",
+        padding: 16,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+    submitButtonText: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
+    resetButton: {
+        backgroundColor: "#c58142ff",
+        padding: 16,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+    resetButtonText: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 16,
     },
 });

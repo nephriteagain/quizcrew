@@ -3,17 +3,12 @@ import reviewSelector from "@/store/review/review.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Link, LinkProps, useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const routes: {
     name: LinkProps["href"];
     label: string;
-}[] = [
-    { name: "/mcq", label: "Multiple Choice" },
-    { name: "/tofq", label: "True or False" },
-    { name: "/dndq", label: "Drag and Drop" },
-    { name: "/create", label: "Create Reviewer" },
-];
+}[] = [{ name: "/create", label: "Create Reviewer" }];
 
 export default function Index() {
     const reviewer = reviewSelector.use.quizzes();
@@ -50,20 +45,11 @@ export default function Index() {
 
     return (
         <ScrollView>
-            <View style={{ flex: 1, backgroundColor: "white", padding: 10, rowGap: 10 }}>
+            <View style={styles.container}>
                 {routes.map((route) => (
                     <Link href={route.name} asChild key={route.label}>
-                        <Pressable
-                            style={{
-                                width: "100%",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                padding: 12,
-                                borderRadius: 12,
-                                backgroundColor: "#d81f1fff",
-                            }}
-                        >
-                            <Text style={{ fontSize: 24, fontWeight: "700", color: "white" }}>
+                        <Pressable style={styles.routeButton}>
+                            <Text style={styles.routeButtonText}>
                                 {route.label}
                             </Text>
                         </Pressable>
@@ -74,3 +60,25 @@ export default function Index() {
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "white",
+        padding: 10,
+        rowGap: 10,
+    },
+    routeButton: {
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 12,
+        borderRadius: 12,
+        backgroundColor: "#d81f1fff",
+    },
+    routeButtonText: {
+        fontSize: 24,
+        fontWeight: "700",
+        color: "white",
+    },
+});

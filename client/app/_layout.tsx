@@ -1,20 +1,7 @@
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
 import { Stack } from "expo-router";
-import { useEffect } from "react";
-import { Alert } from "react-native";
 
 export default function RootLayout() {
-    useEffect(() => {
-        fetch(process.env.EXPO_PUBLIC_API_URL)
-            .then(async (res) => {
-                const json = await res.json();
-                Alert.alert(JSON.stringify(json, null, 4));
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    }, []);
-
     return (
         <>
             <Stack>
