@@ -8,7 +8,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 const routes: {
     name: LinkProps["href"];
     label: string;
-}[] = [{ name: "/create", label: "Create Reviewer" }];
+}[] = [{ name: "/quiz-types", label: "Create Quiz" }];
 
 export default function Index() {
     const reviewer = reviewSelector.use.quizzes();

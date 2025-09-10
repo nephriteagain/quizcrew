@@ -72,6 +72,7 @@ export default function RootLayout() {
         <GestureHandlerRootView>
             <Stack>
                 <Stack.Screen name="index" options={{ headerTitle: "Review" }} />
+                <Stack.Screen name="quiz-types" options={{ headerTitle: "Select a Quiz Type" }} />
                 <Stack.Screen
                     name="mcq-answer"
                     options={{ headerTitle: "Multiple Choice Question" }}
@@ -142,7 +143,7 @@ export default function RootLayout() {
                     options={{ headerTitle: "Drag and Drop Questions" }}
                 />
 
-                <Stack.Screen name="create" options={{ headerTitle: "Create a Reviewer" }} />
+                <Stack.Screen name="create" options={{ headerTitle: "Create a Quiz" }} />
             </Stack>
             <GlobalLoadingModal />
             <BottomSheet

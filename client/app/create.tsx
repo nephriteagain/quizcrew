@@ -1,38 +1,29 @@
 import LoadingModal from "@/components/LoadingModal";
-import { RadioGroup } from "@/components/Radio";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { createReviewer } from "@/store/review/actions/createReviewer";
 import { QUIZ_TYPE } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 const { width } = Dimensions.get("window");
 const imageSize = (width - 48) / 2; // 2 columns with padding
 
-const QUIZ_RADIO_ARR = [
-    {
-        label: "Multiple Choice",
-        value: QUIZ_TYPE.MCQ,
-    },
-    {
-        label: "True or False",
-        value: QUIZ_TYPE.TOFQ,
-    },
-    {
-        label: "Matching",
-        value: QUIZ_TYPE.DNDQ,
-    },
-];
+const QUIZ_LABEL = {
+    [QUIZ_TYPE.MCQ]: "Multiple Choice",
+    [QUIZ_TYPE.TOFQ]: "True or False",
+    [QUIZ_TYPE.DNDQ]: "Matching (Drag and Drop)",
+};
 
 export default function CreateQuiz() {
     /** note: format in base64 */
     const [assets, setAssets] = useState<ImagePicker.ImagePickerAsset[]>([]);
-    const [quizType, setQuizType] = useState<QUIZ_TYPE | null>(null);
     const router = useRouter();
+    const params = useLocalSearchParams<{ type: QUIZ_TYPE }>();
+    const quizType = params.type;
 
     const pickImage = useCallback(async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -123,7 +114,7 @@ export default function CreateQuiz() {
         <View style={styles.container}>
             {/* Header Section */}
             <View style={styles.header}>
-                <Text style={styles.title}>Create Quiz</Text>
+                <Text style={styles.title}>Create {QUIZ_LABEL[quizType]} Quiz</Text>
                 <Text style={styles.subtitle}>Upload your study materials to get started</Text>
             </View>
 
@@ -154,11 +145,6 @@ export default function CreateQuiz() {
                 </Pressable>
             </View>
 
-            <RadioGroup
-                data={QUIZ_RADIO_ARR}
-                onValueChange={setQuizType}
-                style={{ paddingHorizontal: 20, flexDirection: "row", gap: 12, flexWrap: "wrap" }}
-            />
             {/* Save Buttons */}
             {assets.length > 0 && (
                 <>
