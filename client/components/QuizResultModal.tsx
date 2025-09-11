@@ -1,4 +1,5 @@
 import { WIDTH } from "@/constants/values";
+import { AudioPlayer, useAudioPlayer } from "expo-audio";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
@@ -10,29 +11,61 @@ interface QuizResultModalProps {
     onClose: () => void;
 }
 
+const APPLAUSE1 = require("@/assets/sounds/applause1.wav"); // highest
+const APPLAUSE2 = require("@/assets/sounds/applause2.wav");
+const APPLAUSE3 = require("@/assets/sounds/applause3.wav");
+const APPLAUSE4 = require("@/assets/sounds/applause4.wav"); // lowest
+
 export function QuizResultModal({ score, totalQuestion, visible, onClose }: QuizResultModalProps) {
     const scorePercent = useMemo(() => {
         return score / totalQuestion;
     }, [score, totalQuestion]);
 
     const confettiRef = useRef<ConfettiCannon | null>(null);
-    // 🎉 Confetti count based on score (min 20, max 200)
+    // 🎉 Confetti count based on score (min 20, max 500)
     const confettiCount = useMemo(
         () => Math.max(20, Math.floor(scorePercent * 500)),
         [scorePercent]
     );
+    const player1 = useAudioPlayer(APPLAUSE1);
+    const player2 = useAudioPlayer(APPLAUSE2);
+    const player3 = useAudioPlayer(APPLAUSE3);
+
+    const playClapSound = useCallback(async () => {
+        try {
+            let player: AudioPlayer;
+            if (scorePercent >= 0.8) {
+                player = player1; // highest
+            } else if (scorePercent >= 0.5) {
+                player = player2;
+            } else {
+                player = player3; // lowest
+            }
+
+            await player.seekTo(0);
+            player.play();
+            player.play();
+        } catch (error) {
+            console.warn("Could not play clap sound:", error);
+        }
+    }, [scorePercent, player1, player2, player3]);
 
     const startConfetti = useCallback(() => {
         confettiRef.current?.start();
     }, []);
 
-    // Auto start confetti when modal opens
+    const startCelebration = useCallback(() => {
+        startConfetti();
+        playClapSound();
+    }, [startConfetti, playClapSound]);
+
+    // Auto start confetti and sound when modal opens
     useEffect(() => {
         if (visible) {
-            const timer = setTimeout(startConfetti, 300);
+            const timer = setTimeout(startCelebration, 300);
             return () => clearTimeout(timer);
         }
-    }, [visible, startConfetti]);
+    }, [visible, startCelebration]);
 
     const scoreText = useMemo(() => {
         if (scorePercent === 1) return "Perfect!";
