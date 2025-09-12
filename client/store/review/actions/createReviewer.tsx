@@ -1,8 +1,13 @@
-import { Quiz, QUIZ_TYPE } from "@/types/review";
+import { COL } from "@/constants/collections";
+import { db } from "@/firebase";
+import userSelector from "@/store/user/user.store";
+import { Quiz, QUIZ_TYPE, QuizDoc } from "@/types/review";
+import { doc, setDoc } from "@react-native-firebase/firestore";
 import reviewSelector from "../review.store";
 
 export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
     const url = `${process.env.EXPO_PUBLIC_API_URL}/quiz/from-images`;
+    const user = userSelector.getState().user;
 
     console.log("creating reviewer...");
     const response = await fetch(url, {
@@ -27,8 +32,21 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
         throw new Error("Empty response body");
     }
 
+    // save quiz to firestore document
+    const quizRef = doc(db, COL.QUIZZES, quiz.quiz_id);
+    const quizDoc: QuizDoc = {
+        ...quiz,
+        createdBy: user?.uid ?? null,
+        status: "LIVE",
+        privacy: "ALL",
+    };
+
+    console.log("creating quiz...");
+    await setDoc(quizRef, quizDoc);
+    console.log("quiz created.");
+
     reviewSelector.setState((s) => ({
-        quizzes: [quiz, ...s.quizzes],
+        quizzes: [quizDoc, ...s.quizzes],
     }));
     console.log("reviewer created and saved!");
     return true;

@@ -1,3 +1,5 @@
+import { Timestamp } from "@react-native-firebase/firestore";
+
 export enum QUIZ_TYPE {
     MCQ = "MCQ",
     TOFQ = "TOFQ",
@@ -52,3 +54,14 @@ export type DragAndDrop = {
 } & DragAndDropType;
 
 export type Quiz = MultipleChoiceQ | TrueOrFalseQ | DragAndDrop;
+
+export type QuizDocStatus = "LIVE" | "DELETED";
+export type QuizDocPrivacy = "ALL" | "FRIENDS_ONLY" | "JUST_ME";
+
+export type QuizDoc = Quiz & {
+    createdBy: string | null;
+    status: QuizDocStatus;
+    privacy: QuizDocPrivacy;
+    updatedAt?: Timestamp;
+    tags?: string[];
+};
