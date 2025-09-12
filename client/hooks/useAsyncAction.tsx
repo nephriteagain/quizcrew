@@ -6,13 +6,19 @@ type ActionState<T> = {
     isError: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AsyncFunction<TArgs extends any[], TResult> = (...args: TArgs) => Promise<TResult>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ *
+ * @param fn the function to wrap
+ * @param options
+ * @param options.onComplete callback function executed when the async action completes successfully
+ * @returns
+ */
 export function useAsyncAction<TArgs extends any[], TResult>(
     fn: AsyncFunction<TArgs, TResult>,
     options?: {
+        /** Callback function executed when the async action completes successfully */
         onComplete?: () => void;
     }
 ): [(...args: TArgs) => Promise<TResult | undefined>, ActionState<TResult>] {

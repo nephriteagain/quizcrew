@@ -7,9 +7,18 @@ export default function Layout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Review",
+                    title: "Home",
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="home" size={size} color={color} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="connections"
+                options={{
+                    title: "Connections",
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="people" size={size} color={color} />
                     ),
                 }}
             />
