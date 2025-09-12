@@ -1,4 +1,5 @@
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
+import AuthProvider from "@/providers/AuthProvider";
 import reviewSelector from "@/store/review/review.store";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
@@ -69,122 +70,127 @@ export default function RootLayout() {
     }, []);
 
     return (
-        <GestureHandlerRootView>
-            <Stack initialRouteName="(tabs)">
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="quiz-types" options={{ headerTitle: "Select a Quiz Type" }} />
-                <Stack.Screen
-                    name="mcq-answer"
-                    options={{ headerTitle: "Multiple Choice Question" }}
-                />
-                <Stack.Screen
-                    name="mcq"
-                    options={(props) => ({
-                        headerTitle: "Multiple Choice Questions",
-                        headerRight: () => (
-                            <TouchableOpacity
-                                onPress={() => {
-                                    const quiz_id = (props.route.params as { quiz_id?: string })
-                                        ?.quiz_id;
-                                    if (quiz_id) {
-                                        handleSettingsPress(quiz_id);
-                                    }
-                                }}
-                            >
-                                <Ionicons name="settings-sharp" size={24} color="black" />
-                            </TouchableOpacity>
-                        ),
-                    })}
-                />
-                <Stack.Screen
-                    name="tofq"
-                    options={(props) => ({
-                        headerTitle: "True or False Questions",
-                        headerRight: () => (
-                            <TouchableOpacity
-                                onPress={() => {
-                                    const quiz_id = (props.route.params as { quiz_id?: string })
-                                        ?.quiz_id;
-                                    if (quiz_id) {
-                                        handleSettingsPress(quiz_id);
-                                    }
-                                }}
-                            >
-                                <Ionicons name="settings-sharp" size={24} color="black" />
-                            </TouchableOpacity>
-                        ),
-                    })}
-                />
-                <Stack.Screen
-                    name="tofq-answer"
-                    options={{ headerTitle: "True of False Questions" }}
-                />
-                <Stack.Screen
-                    name="dndq"
-                    options={(props) => ({
-                        headerTitle: "Drag and Drop Questions",
-                        headerRight: () => (
-                            <TouchableOpacity
-                                onPress={() => {
-                                    const quiz_id = (props.route.params as { quiz_id?: string })
-                                        ?.quiz_id;
-                                    if (quiz_id) {
-                                        handleSettingsPress(quiz_id);
-                                    }
-                                }}
-                            >
-                                <Ionicons name="settings-sharp" size={24} color="black" />
-                            </TouchableOpacity>
-                        ),
-                    })}
-                />
-                <Stack.Screen
-                    name="dndq-answer"
-                    options={{ headerTitle: "Drag and Drop Questions" }}
-                />
+        <AuthProvider>
+            <GestureHandlerRootView>
+                <Stack initialRouteName="(tabs)">
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen
+                        name="quiz-types"
+                        options={{ headerTitle: "Select a Quiz Type" }}
+                    />
+                    <Stack.Screen
+                        name="mcq-answer"
+                        options={{ headerTitle: "Multiple Choice Question" }}
+                    />
+                    <Stack.Screen
+                        name="mcq"
+                        options={(props) => ({
+                            headerTitle: "Multiple Choice Questions",
+                            headerRight: () => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const quiz_id = (props.route.params as { quiz_id?: string })
+                                            ?.quiz_id;
+                                        if (quiz_id) {
+                                            handleSettingsPress(quiz_id);
+                                        }
+                                    }}
+                                >
+                                    <Ionicons name="settings-sharp" size={24} color="black" />
+                                </TouchableOpacity>
+                            ),
+                        })}
+                    />
+                    <Stack.Screen
+                        name="tofq"
+                        options={(props) => ({
+                            headerTitle: "True or False Questions",
+                            headerRight: () => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const quiz_id = (props.route.params as { quiz_id?: string })
+                                            ?.quiz_id;
+                                        if (quiz_id) {
+                                            handleSettingsPress(quiz_id);
+                                        }
+                                    }}
+                                >
+                                    <Ionicons name="settings-sharp" size={24} color="black" />
+                                </TouchableOpacity>
+                            ),
+                        })}
+                    />
+                    <Stack.Screen
+                        name="tofq-answer"
+                        options={{ headerTitle: "True of False Questions" }}
+                    />
+                    <Stack.Screen
+                        name="dndq"
+                        options={(props) => ({
+                            headerTitle: "Drag and Drop Questions",
+                            headerRight: () => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const quiz_id = (props.route.params as { quiz_id?: string })
+                                            ?.quiz_id;
+                                        if (quiz_id) {
+                                            handleSettingsPress(quiz_id);
+                                        }
+                                    }}
+                                >
+                                    <Ionicons name="settings-sharp" size={24} color="black" />
+                                </TouchableOpacity>
+                            ),
+                        })}
+                    />
+                    <Stack.Screen
+                        name="dndq-answer"
+                        options={{ headerTitle: "Drag and Drop Questions" }}
+                    />
 
-                <Stack.Screen name="create" options={{ headerTitle: "Create a Quiz" }} />
-            </Stack>
-            <GlobalLoadingModal />
-            <BottomSheet
-                ref={bottomSheetRef}
-                onChange={handleSheetChanges}
-                index={-1}
-                snapPoints={["60%"]}
-                enablePanDownToClose={true}
-                backdropComponent={renderBackdrop}
-                animationConfigs={{
-                    damping: 80,
-                    overshootClamping: true,
-                    restDisplacementThreshold: 0.1,
-                    restSpeedThreshold: 0.1,
-                    stiffness: 500,
-                }}
-            >
-                <BottomSheetView style={styles.contentContainer}>
-                    <Text style={styles.headerTitle}>Quiz Settings</Text>
+                    <Stack.Screen name="create" options={{ headerTitle: "Create a Quiz" }} />
+                </Stack>
+                <GlobalLoadingModal />
+                <BottomSheet
+                    ref={bottomSheetRef}
+                    onChange={handleSheetChanges}
+                    index={-1}
+                    snapPoints={["60%"]}
+                    enablePanDownToClose={true}
+                    backdropComponent={renderBackdrop}
+                    animationConfigs={{
+                        damping: 80,
+                        overshootClamping: true,
+                        restDisplacementThreshold: 0.1,
+                        restSpeedThreshold: 0.1,
+                        stiffness: 500,
+                    }}
+                >
+                    <BottomSheetView style={styles.contentContainer}>
+                        <Text style={styles.headerTitle}>Quiz Settings</Text>
 
-                    <TouchableOpacity style={styles.settingButton} onPress={handleEditQuiz}>
-                        <Ionicons name="create-outline" size={24} color="#4f46e5" />
-                        <Text style={styles.settingButtonText}>Edit Quiz</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity style={styles.settingButton} onPress={handleEditQuiz}>
+                            <Ionicons name="create-outline" size={24} color="#4f46e5" />
+                            <Text style={styles.settingButtonText}>Edit Quiz</Text>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.settingButton} onPress={handleShareQuiz}>
-                        <Ionicons name="share-outline" size={24} color="#10b981" />
-                        <Text style={[styles.settingButtonText, { color: "#10b981" }]}>
-                            Share Quiz
-                        </Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity style={styles.settingButton} onPress={handleShareQuiz}>
+                            <Ionicons name="share-outline" size={24} color="#10b981" />
+                            <Text style={[styles.settingButtonText, { color: "#10b981" }]}>
+                                Share Quiz
+                            </Text>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.settingButton} onPress={handleDeleteQuiz}>
-                        <Ionicons name="trash-outline" size={24} color="#ef4444" />
-                        <Text style={[styles.settingButtonText, { color: "#ef4444" }]}>
-                            Delete Quiz
-                        </Text>
-                    </TouchableOpacity>
-                </BottomSheetView>
-            </BottomSheet>
-        </GestureHandlerRootView>
+                        <TouchableOpacity style={styles.settingButton} onPress={handleDeleteQuiz}>
+                            <Ionicons name="trash-outline" size={24} color="#ef4444" />
+                            <Text style={[styles.settingButtonText, { color: "#ef4444" }]}>
+                                Delete Quiz
+                            </Text>
+                        </TouchableOpacity>
+                    </BottomSheetView>
+                </BottomSheet>
+            </GestureHandlerRootView>
+        </AuthProvider>
     );
 }
 

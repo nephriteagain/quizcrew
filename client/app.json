@@ -1,16 +1,17 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "review",
+    "slug": "review",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "client",
+    "scheme": "review",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.client"
+      "bundleIdentifier": "com.review.app",
+      "googleServicesFile": "GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +19,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.client"
+      "package": "com.review.app",
+      "googleServicesFile": "google-services.json"
     },
     "web": {
       "bundler": "metro",
