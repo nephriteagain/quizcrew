@@ -71,7 +71,7 @@ export default function QuizList({
         [emptyMessage, quizzes]
     );
 
-    if (isLoading && quizzes.length === 0) {
+    if (isLoading && (!quizzes || quizzes.length === 0)) {
         return (
             <View style={styles.loadingContainer}>
                 <Text style={styles.loadingText}>Loading quizzes...</Text>
@@ -81,7 +81,7 @@ export default function QuizList({
 
     return (
         <FlashList
-            data={quizzes}
+            data={quizzes || []}
             renderItem={renderQuizCard}
             keyExtractor={keyExtractor}
             getItemType={getItemType}
@@ -100,40 +100,41 @@ export default function QuizList({
             }
             // Performance optimizations
             drawDistance={400}
-            extraData={quizzes.length}
+            extraData={quizzes?.length || 0}
             {...rest}
         />
     );
 }
 
-const makeStyles = (theme: any) => StyleSheet.create({
-    contentContainer: {
-        paddingVertical: 8,
-    },
-    headerSpacer: {
-        height: 8,
-    },
-    footerSpacer: {
-        height: 16,
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingVertical: 60,
-    },
-    emptyText: {
-        fontSize: 16,
-        color: theme.colors.onSurfaceVariant,
-        textAlign: "center",
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    loadingText: {
-        fontSize: 16,
-        color: theme.colors.onSurfaceVariant,
-    },
-});
+const makeStyles = (theme: any) =>
+    StyleSheet.create({
+        contentContainer: {
+            paddingVertical: 8,
+        },
+        headerSpacer: {
+            height: 8,
+        },
+        footerSpacer: {
+            height: 16,
+        },
+        emptyContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 60,
+        },
+        emptyText: {
+            fontSize: 16,
+            color: theme.colors.onSurfaceVariant,
+            textAlign: "center",
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        loadingText: {
+            fontSize: 16,
+            color: theme.colors.onSurfaceVariant,
+        },
+    });

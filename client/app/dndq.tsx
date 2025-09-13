@@ -32,7 +32,7 @@ export default function DragAndDropQuiz() {
     };
     const params = useLocalSearchParams<{ quiz_id: string }>();
     const quiz_id = params.quiz_id;
-    const quizzes = reviewSelector.use.quizzes();
+    const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as DragAndDrop | undefined;
 
     const toggleIndividualAnswer = (questionIndex: number) => {

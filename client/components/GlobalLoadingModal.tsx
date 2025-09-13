@@ -5,8 +5,8 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 export default function GlobalLoadingModal() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const isVisible = utilsSelector.use.isLoading();
-    const text = utilsSelector.use.loadingText();
+    const isVisible = utilsSelector.use.useIsLoading();
+    const text = utilsSelector.use.useLoadingText();
 
     return (
         <Modal

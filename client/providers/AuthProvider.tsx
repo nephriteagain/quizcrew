@@ -2,14 +2,15 @@ import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizze
 import { anonSignin } from "@/store/user/actions/anonSignin";
 import { subscribeAuthState } from "@/store/user/actions/subscribeAuthState";
 import { subscribeUserData } from "@/store/user/actions/subscribeUserData";
-import userSelector from "@/store/user/user.store";
+import authSelector from "@/store/user/user.store";
 import utilsSelector from "@/store/utils/utils.store";
 import { ReactNode, useEffect } from "react";
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-    const user = userSelector.use.user();
+    const user = authSelector.use.useUser();
 
     useEffect(() => {
+        let unsub: () => void | undefined;
         if (!user?.uid) {
             utilsSelector.setState({ isLoading: true, loadingText: "Configuring..." });
             anonSignin();
@@ -18,11 +19,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             // fetch quizzes
             const quizzesUnsub = subscribeUserQuizzes(user.uid);
             const userDataUnsub = subscribeUserData(user.uid);
-            return () => {
+            unsub = () => {
                 quizzesUnsub();
                 userDataUnsub();
             };
         }
+        return () => {
+            unsub?.();
+        };
     }, [user?.uid]);
 
     useEffect(() => {

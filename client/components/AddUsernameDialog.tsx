@@ -1,7 +1,7 @@
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { ADD_USERNAME_RESULT, addUsername } from "@/store/user/actions/addUsername";
-import userSelector from "@/store/user/user.store";
+import authSelector from "@/store/user/user.store";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -21,11 +21,11 @@ interface UsernameDialogProps {
     onSuccess: (username: string) => void;
 }
 
-export default function UsernameDialog({ visible, onClose, onSuccess }: UsernameDialogProps) {
+export default function AddUsernameDialog({ visible, onClose, onSuccess }: UsernameDialogProps) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const [username, setUsername] = useState("");
-    const user = userSelector.use.user();
+    const user = authSelector.use.useUser();
     const [addUsernameFn, loading] = useAsyncStatus(addUsername);
 
     const validateUsername = (text: string) => {

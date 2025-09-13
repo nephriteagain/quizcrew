@@ -17,7 +17,7 @@ const routes: {
 export default function Index() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const reviewer = reviewSelector.use.quizzes();
+    const reviewer = reviewSelector.use.useQuizzes();
     const router = useRouter();
 
     const handlePress = useCallback(

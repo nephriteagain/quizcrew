@@ -1,6 +1,6 @@
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { ReactNode } from "react";
-import { StyleSheet, View, ViewProps } from "react-native";
+import { View, ViewProps } from "react-native";
 
 export interface ContainerProps extends ViewProps {
     children: ReactNode;

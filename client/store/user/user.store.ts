@@ -6,14 +6,14 @@ import { createZustandAsyncStorage } from "../persistence";
 
 interface UserStore {
     user: AuthUser | null;
-    userData: UserData|null
+    userData: UserData | null;
 }
 
-const useUser = create<UserStore>()(
+const useAuth = create<UserStore>()(
     persist(
         (_set) => ({
             user: null,
-            userData: null
+            userData: null,
         }),
         {
             name: "user-storage",
@@ -22,6 +22,6 @@ const useUser = create<UserStore>()(
     )
 );
 
-const userSelector = createSelectors(useUser);
+const authSelector = createSelectors(useAuth);
 
-export default userSelector;
+export default authSelector;
