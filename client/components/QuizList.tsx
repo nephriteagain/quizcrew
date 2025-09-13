@@ -1,19 +1,28 @@
 import { Quiz } from "@/types/review";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, FlashListProps } from "@shopify/flash-list";
 import React, { useCallback } from "react";
 import { RefreshControl, StyleSheet, Text, View } from "react-native";
 import QuizCard from "./QuizCard";
 
+type FlashListPropsFiltered = Omit<
+    FlashListProps<Quiz>,
+    | "data"
+    | "renderItem"
+    | "keyExtractor"
+    | "getItemType"
+    | "showsVerticalScrollIndicator"
+    | "ListEmptyComponent"
+    | "refreshControl"
+    | "drawResistance"
+    | "extraData"
+>;
+
 type QuizListProps = {
     quizzes: Quiz[];
     onQuizPress?: (quiz: Quiz) => void;
-    onRefresh?: () => void;
-    refreshing?: boolean;
-    isLoading?: boolean;
-    numColumns?: number;
     emptyMessage?: string;
-    scrollEnabled?: boolean;
-};
+    isLoading?: boolean;
+} & FlashListPropsFiltered;
 
 export default function QuizList({
     quizzes,
@@ -22,8 +31,20 @@ export default function QuizList({
     refreshing = false,
     isLoading = false,
     emptyMessage = "No quizzes available",
-    scrollEnabled,
-}: QuizListProps) {
+    contentContainerStyle,
+    ...rest
+}: Omit<
+    QuizListProps,
+    | "data"
+    | "renderItem"
+    | "keyExtractor"
+    | "getItemType"
+    | "showsVerticalScrollIndicator"
+    | "ListEmptyComponent"
+    | "refreshControl"
+    | "drawResistance"
+    | "extraData"
+>) {
     const renderQuizCard = useCallback(
         ({ item }: { item: Quiz }) => <QuizCard quiz={item} onPress={() => onQuizPress?.(item)} />,
         [onQuizPress]
@@ -47,10 +68,6 @@ export default function QuizList({
         [emptyMessage, quizzes]
     );
 
-    const renderHeader = useCallback(() => <View style={styles.headerSpacer} />, []);
-
-    const renderFooter = useCallback(() => <View style={styles.footerSpacer} />, []);
-
     if (isLoading && quizzes.length === 0) {
         return (
             <View style={styles.loadingContainer}>
@@ -65,15 +82,13 @@ export default function QuizList({
             renderItem={renderQuizCard}
             keyExtractor={keyExtractor}
             getItemType={getItemType}
-            contentContainerStyle={styles.contentContainer}
+            contentContainerStyle={[styles.contentContainer, contentContainerStyle]}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={renderEmpty}
-            ListHeaderComponent={renderHeader}
-            ListFooterComponent={renderFooter}
             refreshControl={
                 onRefresh ? (
                     <RefreshControl
-                        refreshing={refreshing}
+                        refreshing={Boolean(refreshing)}
                         onRefresh={onRefresh}
                         colors={["#007AFF"]}
                         tintColor="#007AFF"
@@ -83,7 +98,7 @@ export default function QuizList({
             // Performance optimizations
             drawDistance={400}
             extraData={quizzes.length}
-            scrollEnabled={scrollEnabled}
+            {...rest}
         />
     );
 }

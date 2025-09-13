@@ -49,7 +49,9 @@ export default function TrueOrFalseQuestions() {
     return (
         <View style={styles.container}>
             <View style={styles.toggleContainer}>
-                <Text style={styles.toggleText}>Show All Answers</Text>
+                <Text style={styles.toggleText}>
+                    {showAnswer ? "Hide All Answers" : "Show All Answers"}
+                </Text>
                 <Switch
                     trackColor={{ false: "#767577", true: "#81b0ff" }}
                     thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}

@@ -1,6 +1,8 @@
 import QuizList from "@/components/QuizList";
 import reviewSelector from "@/store/review/review.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link, LinkProps, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -8,7 +10,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 const routes: {
     name: LinkProps["href"];
     label: string;
-}[] = [{ name: "/quiz-types", label: "Create Quiz" }];
+}[] = [{ name: "/quiz-types", label: "Create New Quiz" }];
 
 export default function Index() {
     const reviewer = reviewSelector.use.quizzes();
@@ -48,7 +50,22 @@ export default function Index() {
                 {routes.map((route) => (
                     <Link href={route.name} asChild key={route.label}>
                         <Pressable style={styles.routeButton}>
-                            <Text style={styles.routeButtonText}>{route.label}</Text>
+                            <LinearGradient
+                                colors={["#667eea", "#764ba2"]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.gradientButton}
+                            >
+                                <View style={styles.buttonContent}>
+                                    <Ionicons
+                                        name="add-circle"
+                                        size={28}
+                                        color="white"
+                                        style={styles.buttonIcon}
+                                    />
+                                    <Text style={styles.routeButtonText}>{route.label}</Text>
+                                </View>
+                            </LinearGradient>
                         </Pressable>
                     </Link>
                 ))}
@@ -61,20 +78,41 @@ export default function Index() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
-        rowGap: 10,
+        padding: 16,
+        rowGap: 16,
     },
     routeButton: {
         width: "100%",
+        borderRadius: 16,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+        overflow: "hidden",
+    },
+    gradientButton: {
+        width: "100%",
+        paddingVertical: 18,
+        paddingHorizontal: 24,
+        borderRadius: 16,
+    },
+    buttonContent: {
+        flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        padding: 12,
-        borderRadius: 12,
-        backgroundColor: "#d81f1fff",
+    },
+    buttonIcon: {
+        marginRight: 12,
     },
     routeButtonText: {
-        fontSize: 24,
+        fontSize: 18,
         fontWeight: "700",
         color: "white",
+        letterSpacing: 0.5,
+        textTransform: "uppercase",
     },
 });

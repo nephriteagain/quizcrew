@@ -36,14 +36,39 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
         }
     }, [quiz]);
 
+    // Get quiz type color
+    const getQuizTypeColor = useCallback(() => {
+        switch (quiz.type) {
+            case "MCQ":
+                return { bg: "#E8F5E9", text: "#2E7D32", border: "#4CAF50" };
+            case "TOFQ":
+                return { bg: "#E3F2FD", text: "#1565C0", border: "#2196F3" };
+            case "DNDQ":
+                return { bg: "#FFF3E0", text: "#E65100", border: "#FF9800" };
+            default:
+                return { bg: "#F5F5F5", text: "#666", border: "#CCC" };
+        }
+    }, [quiz]);
+
     return (
         <Pressable style={styles.container} {...props} android_ripple={{ color: "#fff" }}>
             <View style={styles.header}>
                 <Text style={styles.title} numberOfLines={2}>
                     {quiz.title}
                 </Text>
-                <View style={styles.typeLabel}>
-                    <Text style={styles.typeText}>{getQuizTypeText()}</Text>
+                <View style={[
+                    styles.typeLabel,
+                    {
+                        backgroundColor: getQuizTypeColor().bg,
+                        borderColor: getQuizTypeColor().border,
+                    }
+                ]}>
+                    <Text style={[
+                        styles.typeText,
+                        { color: getQuizTypeColor().text }
+                    ]}>
+                        {getQuizTypeText()}
+                    </Text>
                 </View>
             </View>
 
@@ -71,8 +96,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#f1f5f9",
         borderRadius: 12,
         padding: 16,
-        marginHorizontal: 8,
-        marginVertical: 4,
+        marginVertical: 6,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -81,7 +105,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
-        aspectRatio: 1.6, // Makes it perfectly square
+        aspectRatio: 1.6,
         justifyContent: "space-between",
         width: "100%",
     },
@@ -101,14 +125,25 @@ const styles = StyleSheet.create({
     },
     typeLabel: {
         backgroundColor: "#f0f0f0",
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+        borderWidth: 1.5,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
     },
     typeText: {
-        fontSize: 10,
+        fontSize: 11,
         color: "#666",
-        fontWeight: "500",
+        fontWeight: "700",
+        letterSpacing: 0.5,
+        textTransform: "uppercase",
     },
     description: {
         fontSize: 14,

@@ -1,31 +1,43 @@
+import QuizList from "@/components/QuizList";
 import reviewSelector from "@/store/review/review.store";
 import userSelector from "@/store/user/user.store";
-import { QuizDoc } from "@/types/review";
-import { FlashList } from "@shopify/flash-list";
+import { Quiz, QUIZ_TYPE } from "@/types/review";
+import { useRouter } from "expo-router";
+import { useCallback } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function Profile() {
     const user = userSelector.use.user();
     const quizzes = reviewSelector.use.quizzes();
 
-    const renderQuizItem = ({ item }: { item: QuizDoc }) => (
-        <View style={styles.quizItem}>
-            <Text style={styles.quizTitle}>{item.title}</Text>
-            <Text style={styles.quizDescription}>{item.description}</Text>
-            <Text style={styles.quizType}>{item.type}</Text>
-            <Text style={styles.quizDate}>
-                Created: {new Date(item.createdAt).toLocaleDateString()}
-            </Text>
-            {item.tags && item.tags.length > 0 && (
-                <View style={styles.tagsContainer}>
-                    {item.tags.map((tag, index) => (
-                        <Text key={index} style={styles.tag}>
-                            #{tag}
-                        </Text>
-                    ))}
-                </View>
-            )}
-        </View>
+    const router = useRouter();
+
+    const handlePress = useCallback(
+        (quiz: Quiz) => {
+            if (quiz.type === QUIZ_TYPE.MCQ) {
+                router.push({
+                    pathname: "../mcq",
+                    params: {
+                        quiz_id: quiz.quiz_id,
+                    },
+                });
+            } else if (quiz.type === QUIZ_TYPE.TOFQ) {
+                router.push({
+                    pathname: "../tofq",
+                    params: {
+                        quiz_id: quiz.quiz_id,
+                    },
+                });
+            } else if (quiz.type === QUIZ_TYPE.DNDQ) {
+                router.push({
+                    pathname: "/dndq",
+                    params: {
+                        quiz_id: quiz.quiz_id,
+                    },
+                });
+            }
+        },
+        [router]
     );
 
     return (
@@ -37,12 +49,12 @@ export default function Profile() {
             </View>
 
             <View style={styles.quizzesSection}>
-                <Text style={styles.sectionTitle}>My Quizzes ({quizzes.length})</Text>
-                <FlashList
-                    data={quizzes}
-                    renderItem={renderQuizItem}
-                    keyExtractor={(item) => item.quiz_id}
-                    contentContainerStyle={styles.listContainer}
+                <QuizList
+                    onQuizPress={handlePress}
+                    quizzes={quizzes}
+                    ListHeaderComponent={
+                        <Text style={styles.sectionTitle}>My Quizzes ({quizzes.length})</Text>
+                    }
                 />
             </View>
         </View>
@@ -83,7 +95,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: "bold",
-        marginBottom: 16,
+        marginBottom: 8,
         color: "#333",
     },
     listContainer: {
