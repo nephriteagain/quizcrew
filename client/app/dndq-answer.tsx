@@ -490,9 +490,9 @@ function DraggableChip({
             // Start shake animation
             rotation.value = withRepeat(
                 withSequence(
-                    withTiming(-3, { duration: 50 }),
-                    withTiming(3, { duration: 100 }),
-                    withTiming(0, { duration: 50 })
+                    withTiming(-5, { duration: 100 }),
+                    withTiming(5, { duration: 200 }),
+                    withTiming(0, { duration: 100 })
                 ),
                 -1, // Infinite repeat
                 false

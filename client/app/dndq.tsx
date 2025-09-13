@@ -128,7 +128,7 @@ export default function DragAndDropQuiz() {
                                     android_ripple={{
                                         color: "#f0f0f0",
                                     }}
-                                    onLongPress={() => toggleIndividualAnswer(idx)}
+                                    onPress={() => toggleIndividualAnswer(idx)}
                                     style={styles.questionPressable}
                                 >
                                     <Text style={styles.questionText}>{q.question}</Text>
