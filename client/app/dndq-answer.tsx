@@ -217,15 +217,7 @@ export default function DragAndDropQuizAns() {
 
     if (!quiz_id) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    padding: 16,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <View style={styles.errorContainer}>
                 <Text>Invalid Quiz Id</Text>
             </View>
         );
@@ -233,15 +225,7 @@ export default function DragAndDropQuizAns() {
 
     if (!selectedQuiz) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    padding: 16,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <View style={styles.errorContainer}>
                 <Text>Quiz not found.</Text>
             </View>
         );
@@ -311,32 +295,16 @@ export default function DragAndDropQuizAns() {
                                             {/* user answer */}
                                             <View
                                                 style={[
-                                                    {
-                                                        paddingHorizontal: 12,
-                                                        paddingVertical: 8,
-                                                        borderRadius: 16,
-                                                        borderWidth: 2,
-                                                        alignSelf: "flex-start",
-                                                        borderColor: "transparent",
-                                                    },
+                                                    styles.userAnswerChip,
                                                     answers[idx] === q.answer
-                                                        ? {
-                                                              backgroundColor: "green",
-                                                          }
-                                                        : {
-                                                              backgroundColor: "red",
-                                                          },
+                                                        ? styles.correctAnswerBg
+                                                        : styles.incorrectAnswerBg,
                                                 ]}
                                             >
                                                 <Text
                                                     style={[
                                                         styles.answerText,
-                                                        answers[idx] !== undefined
-                                                            ? {
-                                                                  color: "white",
-                                                                  fontWeight: "600",
-                                                              }
-                                                            : {},
+                                                        answers[idx] !== undefined && styles.whiteAnswerText,
                                                     ]}
                                                 >
                                                     {answers[idx] ? answers[idx] : "No answer here"}
@@ -350,26 +318,14 @@ export default function DragAndDropQuizAns() {
                                                     </Text>
                                                     <View
                                                         style={[
-                                                            {
-                                                                paddingHorizontal: 12,
-                                                                paddingVertical: 8,
-                                                                borderRadius: 16,
-                                                                borderWidth: 2,
-                                                                alignSelf: "flex-start",
-                                                                borderColor: "transparent",
-                                                            },
-                                                            {
-                                                                backgroundColor: "green",
-                                                            },
+                                                            styles.userAnswerChip,
+                                                            styles.correctAnswerBg,
                                                         ]}
                                                     >
                                                         <Text
                                                             style={[
                                                                 styles.answerText,
-                                                                {
-                                                                    color: "white",
-                                                                    fontWeight: "600",
-                                                                },
+                                                                styles.whiteAnswerText,
                                                             ]}
                                                         >
                                                             {q.answer}
@@ -559,13 +515,20 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     chip: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 16,
-        borderWidth: 2,
-        borderColor: "transparent",
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 25,
+        borderWidth: 0,
         backgroundColor: "#4f46e5",
         zIndex: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
     },
     chipText: {
         color: "white",
@@ -621,17 +584,27 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     answerBox: {
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 25,
         borderWidth: 2,
-        borderColor: "transparent",
+        borderColor: "#e5e7eb",
         justifyContent: "center",
         alignSelf: "flex-start",
         maxWidth: "85%",
+        backgroundColor: "#f9fafb",
     },
     answerBoxFilled: {
         backgroundColor: "#4f46e5",
+        borderColor: "transparent",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
     },
     removeButton: {
         padding: 4,
@@ -661,5 +634,37 @@ const styles = StyleSheet.create({
         color: "white",
         fontWeight: "bold",
         fontSize: 16,
+    },
+    errorContainer: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    userAnswerChip: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 25,
+        borderWidth: 0,
+        alignSelf: "flex-start",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    correctAnswerBg: {
+        backgroundColor: "green",
+    },
+    incorrectAnswerBg: {
+        backgroundColor: "red",
+    },
+    whiteAnswerText: {
+        color: "white",
+        fontWeight: "600",
     },
 });

@@ -5,7 +5,7 @@ import userSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -147,7 +147,23 @@ export default function Profile() {
                         )}
                     </Pressable>
                 </View>
-                <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
+                <View>
+                    <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
+                    <View style={{ flexDirection: "row", columnGap: 8 }}>
+                        <Link href={"/connections"}>
+                            <Text style={{ color: "#000000bf" }}>
+                                <Text style={{ fontWeight: "600", color: "black" }}>10 </Text>
+                                connections
+                            </Text>
+                        </Link>
+                        <Link href={"/under-construction"}>
+                            <Text style={{ color: "#000000bf" }}>
+                                <Text style={{ fontWeight: "600", color: "black" }}>2 </Text>
+                                groups
+                            </Text>
+                        </Link>
+                    </View>
+                </View>
             </View>
 
             <View style={styles.quizzesSection}>

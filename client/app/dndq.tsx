@@ -203,6 +203,14 @@ function Chip({
                 color && {
                     backgroundColor: color.bg,
                     borderColor: color.border,
+                    shadowColor: "#000",
+                    shadowOffset: {
+                        width: 0,
+                        height: 2,
+                    },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 4,
+                    elevation: 3,
                 },
             ]}
             layout={LinearTransition.springify().damping(15).stiffness(100)}
@@ -243,16 +251,17 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     chip: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 25,
         margin: 4,
         zIndex: 10,
-        borderColor: "gray",
         borderWidth: 1,
+        borderColor: "#00000040",
+        backgroundColor: "white",
     },
     chipText: {
-        color: "black",
+        color: "#000000bf",
         fontWeight: "600",
     },
     questions: {
@@ -288,9 +297,18 @@ const styles = StyleSheet.create({
     },
     answerContainer: {
         marginTop: 8,
-        padding: 8,
-        borderRadius: 8,
-        borderWidth: 2,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 25,
+        borderWidth: 0,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
     },
     answerText: {
         fontSize: 14,

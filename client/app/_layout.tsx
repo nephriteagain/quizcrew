@@ -32,7 +32,11 @@ export default function RootLayout() {
         <AuthProvider>
             <GestureHandlerRootView>
                 <Stack initialRouteName="(tabs)">
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                    <Stack.Screen name="+not-found" options={{ headerShown: false }} />
+                    <Stack.Screen
+                        name="(tabs)"
+                        options={{ headerShown: true, title: "QuizCraft" }}
+                    />
                     <Stack.Screen
                         name="quiz-types"
                         options={{ headerTitle: "Select a Quiz Type" }}
