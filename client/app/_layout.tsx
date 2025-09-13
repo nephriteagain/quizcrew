@@ -1,3 +1,4 @@
+import CreateUsernameModal from "@/components/CreateUsernameModal";
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
 import SettingsBottomSheet from "@/components/SettingsBottomSheet";
 import AuthProvider from "@/providers/AuthProvider";
@@ -115,6 +116,7 @@ export default function RootLayout() {
                     quizId={quizId}
                     onSheetChanges={handleSheetChanges}
                 />
+                <CreateUsernameModal />
             </GestureHandlerRootView>
         </AuthProvider>
     );

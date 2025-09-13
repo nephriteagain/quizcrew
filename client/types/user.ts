@@ -6,3 +6,9 @@ export type AuthUser = {
         ? never
         : K]: FirebaseAuthTypes.User[K];
 };
+
+export type UserData = {
+    username?: string;
+    uid: string;
+    photoURL?: string;
+};

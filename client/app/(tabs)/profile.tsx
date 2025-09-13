@@ -1,14 +1,18 @@
 import QuizList from "@/components/QuizList";
+import { DEFAULT_USER } from "@/constants/values";
 import reviewSelector from "@/store/review/review.store";
 import userSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Profile() {
-    const user = userSelector.use.user();
     const quizzes = reviewSelector.use.quizzes();
+    const userData = userSelector.use.userData();
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
     const router = useRouter();
 
@@ -40,12 +44,110 @@ export default function Profile() {
         [router]
     );
 
+    const pickImageFromLibrary = useCallback(async () => {
+        setIsUploadingPhoto(true);
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: "images",
+                quality: 0.8,
+                allowsEditing: true,
+                aspect: [1, 1],
+                base64: true,
+            });
+
+            if (!result.canceled && result.assets[0]) {
+                const asset = result.assets[0];
+                // TODO: Upload to Firebase storage and update user profile
+                console.log("Selected image:", asset.uri);
+                Alert.alert("Photo Selected", "Photo upload functionality will be implemented");
+            }
+        } catch (error) {
+            console.error("Error picking image:", error);
+            Alert.alert("Error", "Failed to select image");
+        } finally {
+            setIsUploadingPhoto(false);
+        }
+    }, []);
+
+    const takePhoto = useCallback(async () => {
+        const status = await ImagePicker.getCameraPermissionsAsync();
+        if (!status.granted) {
+            const permission = await ImagePicker.requestCameraPermissionsAsync();
+            if (!permission.granted) {
+                Alert.alert("Permission Required", "Camera permission is required to take photos");
+                return;
+            }
+        }
+
+        setIsUploadingPhoto(true);
+        try {
+            const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: "images",
+                quality: 0.8,
+                allowsEditing: true,
+                aspect: [1, 1],
+                base64: true,
+                cameraType: ImagePicker.CameraType.front,
+            });
+
+            if (!result.canceled && result.assets[0]) {
+                const asset = result.assets[0];
+                // TODO: Upload to Firebase storage and update user profile
+                console.log("Captured photo:", asset.uri);
+                Alert.alert("Photo Captured", "Photo upload functionality will be implemented");
+            }
+        } catch (error) {
+            console.error("Error taking photo:", error);
+            Alert.alert("Error", "Failed to take photo");
+        } finally {
+            setIsUploadingPhoto(false);
+        }
+    }, []);
+
+    const showPhotoOptions = useCallback(() => {
+        Alert.alert(
+            "Update Profile Photo",
+            "Choose how you'd like to update your profile picture",
+            [
+                {
+                    text: "Camera",
+                    onPress: takePhoto,
+                },
+                {
+                    text: "Photo Library",
+                    onPress: pickImageFromLibrary,
+                },
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+            ]
+        );
+    }, [takePhoto, pickImageFromLibrary]);
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                {user?.photoURL && <Image source={{ uri: user.photoURL }} style={styles.avatar} />}
-                <Text style={styles.displayName}>{user?.displayName || "Anonymous User"}</Text>
-                <Text style={styles.email}>{user?.email}</Text>
+                <View style={styles.avatarContainer}>
+                    <Image
+                        source={{
+                            uri: userData?.photoURL ?? DEFAULT_USER,
+                        }}
+                        style={styles.avatar}
+                    />
+                    <Pressable
+                        style={styles.editPhotoButton}
+                        onPress={showPhotoOptions}
+                        disabled={isUploadingPhoto}
+                    >
+                        {isUploadingPhoto ? (
+                            <ActivityIndicator size="small" color="white" />
+                        ) : (
+                            <Ionicons name="camera" size={16} color="white" />
+                        )}
+                    </Pressable>
+                </View>
+                <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
             </View>
 
             <View style={styles.quizzesSection}>
@@ -68,16 +170,43 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: "center",
-        padding: 20,
         backgroundColor: "#fff",
         borderBottomWidth: 1,
         borderBottomColor: "#e0e0e0",
+        flexDirection: "row",
+        paddingTop: 32,
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+    },
+    avatarContainer: {
+        position: "relative",
+        marginRight: 16,
     },
     avatar: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        marginBottom: 10,
+    },
+    editPhotoButton: {
+        position: "absolute",
+        bottom: 0,
+        right: 0,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: "#007AFF",
+        justifyContent: "center",
+        alignItems: "center",
+        borderWidth: 2,
+        borderColor: "white",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3,
+        elevation: 5,
     },
     displayName: {
         fontSize: 24,
