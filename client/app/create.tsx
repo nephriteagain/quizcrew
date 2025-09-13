@@ -1,3 +1,4 @@
+import Container from "@/components/Container";
 import LoadingModal from "@/components/LoadingModal";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { createReviewer } from "@/store/review/actions/createReviewer";
@@ -121,7 +122,7 @@ export default function CreateQuiz() {
     }, [quizType, assets]);
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             {/* Header Section */}
             <View style={styles.header}>
                 <Text style={styles.title}>Create {QUIZ_LABEL[quizType]} Quiz</Text>
@@ -227,14 +228,12 @@ export default function CreateQuiz() {
                 isVisible={isSubmitting}
                 loadingText="Creating reviewer, please don't close the app..."
             />
-        </View>
+        </Container>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#f8f9fa",
         rowGap: 12,
     },
     header: {

@@ -1,7 +1,11 @@
+import { useAppTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
 import { Pressable, PressableProps, StyleSheet, Text, View, ViewProps } from "react-native";
 
 export function Radio({ isChecked, onPress, ...props }: { isChecked: boolean } & PressableProps) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
+
     return (
         <Pressable
             style={[styles.radio, isChecked && styles.checked]}
@@ -20,6 +24,8 @@ export function RadioGroup<T>({
     data: { label: string; value: T }[];
     onValueChange: (value: T | null) => void;
 } & ViewProps) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const [checked, setChecked] = useState<T | null>(null);
 
     return (
@@ -27,7 +33,7 @@ export function RadioGroup<T>({
             {data.map((d, i) => (
                 <View key={`${d.value}+${d.label}+${i}`} style={styles.radioContainer}>
                     <Radio
-                        isChecked={checked == d.value}
+                        isChecked={checked === d.value}
                         onPress={() => {
                             if (checked === d.value) {
                                 setChecked(null);
@@ -45,17 +51,17 @@ export function RadioGroup<T>({
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme: any) => StyleSheet.create({
     radio: {
         width: 20,
         height: 20,
         borderRadius: 4,
         borderWidth: 2,
-        borderColor: "gray",
+        borderColor: theme.colors.outline,
     },
     checked: {
-        backgroundColor: "#308630ff",
-        borderColor: "green",
+        backgroundColor: theme.colors.secondary,
+        borderColor: theme.colors.secondary,
     },
     radioContainer: {
         flexDirection: "row",
@@ -64,5 +70,6 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: "500",
+        color: theme.colors.onSurface,
     },
 });

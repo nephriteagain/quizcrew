@@ -5,6 +5,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
+import Container from "@/components/Container";
 import reviewSelector from "@/store/review/review.store";
 import { MultipleChoiceQ } from "@/types/review";
 import { useLocalSearchParams } from "expo-router";
@@ -123,7 +124,7 @@ export default function MultipleChoiceQuestionsAns() {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: "white" }}>
+        <Container style={{ flex: 1 }}>
             {/* MULTIPLE_CHOICE_QUESTIONS list */}
             <FlashList
                 ref={listRef}
@@ -261,6 +262,6 @@ export default function MultipleChoiceQuestionsAns() {
                 score={score}
                 totalQuestion={totalQuestion}
             />
-        </View>
+        </Container>
     );
 }

@@ -1,3 +1,4 @@
+import { useAppTheme } from "@/providers/ThemeProvider";
 import { forwardRef, ReactNode } from "react";
 import { View, ViewProps } from "react-native";
 
@@ -6,6 +7,8 @@ export interface CardProps extends ViewProps {
 }
 
 const Card = forwardRef<View, CardProps>(({ children, style, ...props }, ref) => {
+    const theme = useAppTheme();
+
     return (
         <View
             ref={ref}
@@ -14,8 +17,8 @@ const Card = forwardRef<View, CardProps>(({ children, style, ...props }, ref) =>
                     flex: 1,
                     borderRadius: 16,
                     padding: 20,
-                    backgroundColor: "#f9f9f9",
-                    shadowColor: "#000",
+                    backgroundColor: theme.colors.surface,
+                    shadowColor: theme.colors.onSurface,
                     shadowOpacity: 0.1,
                     shadowRadius: 6,
                     elevation: 4,

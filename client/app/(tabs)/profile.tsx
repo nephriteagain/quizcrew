@@ -1,3 +1,4 @@
+import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
 import { DEFAULT_USER } from "@/constants/values";
 import reviewSelector from "@/store/review/review.store";
@@ -126,7 +127,7 @@ export default function Profile() {
     }, [takePhoto, pickImageFromLibrary]);
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.avatarContainer}>
                     <Image
@@ -175,14 +176,12 @@ export default function Profile() {
                     }
                 />
             </View>
-        </View>
+        </Container>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#f5f5f5",
     },
     header: {
         alignItems: "center",

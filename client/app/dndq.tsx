@@ -1,5 +1,6 @@
 // app/DragAndDropQuiz.tsx
 // import { DRAG_AND_DROP } from "@/lib/data";
+import Container from "@/components/Container";
 import reviewSelector from "@/store/review/review.store";
 import { DragAndDrop } from "@/types/review";
 import { Link, useLocalSearchParams } from "expo-router";
@@ -66,7 +67,7 @@ export default function DragAndDropQuiz() {
     }
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             <View style={styles.switchContainer}>
                 <Text style={styles.switchLabel}>
                     {showAnswer ? "Hide All Answers" : "Show All Answers"}
@@ -185,7 +186,7 @@ export default function DragAndDropQuiz() {
                     </Pressable>
                 </Link>
             </View>
-        </View>
+        </Container>
     );
 }
 
@@ -223,7 +224,6 @@ function Chip({
 const styles = StyleSheet.create({
     container: {
         padding: 16,
-        flex: 1,
     },
     errorContainer: {
         flex: 1,

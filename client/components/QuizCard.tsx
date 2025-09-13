@@ -1,4 +1,6 @@
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback } from "react";
 import { Pressable, PressableProps, StyleSheet, Text, View } from "react-native";
 
@@ -7,6 +9,9 @@ type QuizCardProps = {
 } & PressableProps;
 
 export default function QuizCard({ quiz, ...props }: QuizCardProps) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
+
     // Format timestamp to readable date
     const formatDate = useCallback((timestamp: number) => {
         const date = new Date(timestamp);
@@ -40,135 +45,174 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
     const getQuizTypeColor = useCallback(() => {
         switch (quiz.type) {
             case "MCQ":
-                return { bg: "#E8F5E9", text: "#2E7D32", border: "#4CAF50" };
+                return {
+                    bg: theme.colors.secondaryContainer,
+                    text: theme.colors.secondary,
+                    border: theme.colors.secondary,
+                };
             case "TOFQ":
-                return { bg: "#E3F2FD", text: "#1565C0", border: "#2196F3" };
+                return {
+                    bg: theme.colors.tertiaryContainer,
+                    text: theme.colors.tertiary,
+                    border: theme.colors.tertiary,
+                };
             case "DNDQ":
-                return { bg: "#FFF3E0", text: "#E65100", border: "#FF9800" };
+                return {
+                    bg: theme.colors.errorContainer,
+                    text: theme.colors.error,
+                    border: theme.colors.error,
+                };
             default:
-                return { bg: "#F5F5F5", text: "#666", border: "#CCC" };
+                return {
+                    bg: theme.colors.surfaceVariant,
+                    text: theme.colors.onSurfaceVariant,
+                    border: theme.colors.outline,
+                };
         }
-    }, [quiz]);
+    }, [quiz, theme]);
 
     return (
-        <Pressable style={styles.container} {...props} android_ripple={{ color: "#fff" }}>
-            <View style={styles.header}>
-                <Text style={styles.title} numberOfLines={2}>
-                    {quiz.title}
-                </Text>
-                <View
-                    style={[
-                        styles.typeLabel,
-                        {
-                            backgroundColor: getQuizTypeColor().bg,
-                            borderColor: getQuizTypeColor().border,
-                        },
-                    ]}
-                >
-                    <Text style={[styles.typeText, { color: getQuizTypeColor().text }]}>
-                        {getQuizTypeText()}
+        <Pressable
+            style={styles.pressableContainer}
+            {...props}
+            android_ripple={{ color: theme.colors.onPrimary }}
+        >
+            <LinearGradient
+                colors={[
+                    theme.colors.primaryContainer,
+                    theme.colors.primaryContainer,
+                    theme.colors.inversePrimary,
+                ]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.container}
+            >
+                <View style={styles.header}>
+                    <Text style={styles.title} numberOfLines={2}>
+                        {quiz.title}
                     </Text>
+                    <View
+                        style={[
+                            styles.typeLabel,
+                            {
+                                backgroundColor: getQuizTypeColor().bg,
+                                borderColor: getQuizTypeColor().border,
+                            },
+                        ]}
+                    >
+                        <Text style={[styles.typeText, { color: getQuizTypeColor().text }]}>
+                            {getQuizTypeText()}
+                        </Text>
+                    </View>
                 </View>
-            </View>
 
-            <Text style={styles.description} numberOfLines={3}>
-                {quiz.description}
-            </Text>
+                <Text style={styles.description} numberOfLines={3}>
+                    {quiz.description}
+                </Text>
 
-            <View style={styles.footer}>
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Created:</Text>
-                    <Text style={styles.infoValue}>{formatDate(quiz.createdAt)}</Text>
+                <View style={styles.footer}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Created:</Text>
+                        <Text style={styles.infoValue}>{formatDate(quiz.createdAt)}</Text>
+                    </View>
+
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Questions:</Text>
+                        <Text style={styles.infoValue}>{getTotalQuestions()}</Text>
+                    </View>
                 </View>
-
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Questions:</Text>
-                    <Text style={styles.infoValue}>{getTotalQuestions()}</Text>
-                </View>
-            </View>
+            </LinearGradient>
         </Pressable>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "#f1f5f9",
-        borderRadius: 12,
-        padding: 16,
-        marginVertical: 6,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+const makeStyles = (theme: AppTheme) => {
+    const styles = StyleSheet.create({
+        pressableContainer: {
+            borderRadius: 12,
+            marginVertical: 6,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+            elevation: 3,
+            width: "100%",
+            overflow: "hidden",
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 3,
-        aspectRatio: 1.6,
-        justifyContent: "space-between",
-        width: "100%",
-    },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        marginBottom: 8,
-    },
-    title: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#1a1a1a",
-        flex: 1,
-        marginRight: 8,
-        lineHeight: 20,
-    },
-    typeLabel: {
-        backgroundColor: "#f0f0f0",
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 8,
-        borderWidth: 1.5,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
+        container: {
+            borderRadius: 12,
+            padding: 16,
+            aspectRatio: 1.6,
+            justifyContent: "space-between",
+            width: "100%",
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-    },
-    typeText: {
-        fontSize: 11,
-        color: "#666",
-        fontWeight: "700",
-        letterSpacing: 0.5,
-        textTransform: "uppercase",
-    },
-    description: {
-        fontSize: 14,
-        color: "#666",
-        lineHeight: 18,
-        flex: 1,
-    },
-    footer: {
-        marginTop: 8,
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    infoRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        columnGap: 6,
-    },
-    infoLabel: {
-        fontSize: 12,
-        color: "#999",
-        fontWeight: "500",
-    },
-    infoValue: {
-        fontSize: 12,
-        color: "#333",
-        fontWeight: "600",
-    },
-});
+        header: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 8,
+        },
+        title: {
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.colors.onSurface,
+            flex: 1,
+            marginRight: 8,
+            lineHeight: 20,
+        },
+        typeLabel: {
+            backgroundColor: theme.colors.surfaceVariant,
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 8,
+            borderWidth: 1.5,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 1,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+            elevation: 2,
+        },
+        typeText: {
+            fontSize: 11,
+            color: theme.colors.onSurfaceVariant,
+            fontWeight: "700",
+            letterSpacing: 0.5,
+            textTransform: "uppercase",
+        },
+        description: {
+            fontSize: 14,
+            color: theme.colors.onSurfaceVariant,
+            lineHeight: 18,
+            flex: 1,
+        },
+        footer: {
+            marginTop: 8,
+            flexDirection: "row",
+            justifyContent: "space-between",
+        },
+        infoRow: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            columnGap: 6,
+        },
+        infoLabel: {
+            fontSize: 12,
+            color: theme.colors.onSurfaceVariant,
+            fontWeight: "500",
+        },
+        infoValue: {
+            fontSize: 12,
+            color: theme.colors.onSurface,
+            fontWeight: "600",
+        },
+    });
+
+    return styles;
+};

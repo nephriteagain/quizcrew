@@ -1,3 +1,4 @@
+import { useAppTheme } from "@/providers/ThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
@@ -12,11 +13,14 @@ export default function UnderConstruction({
     title = "Under Construction",
     subtitle = "This page is currently being built. Check back soon!",
 }: UnderConstructionProps) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
+
     return (
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.iconContainer}>
-                    <Ionicons name="construct" size={64} color="#FF9500" />
+                    <Ionicons name="construct" size={64} color={theme.colors.error} />
                 </View>
 
                 <Text style={styles.title}>{title}</Text>
@@ -38,10 +42,10 @@ export default function UnderConstruction({
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme: any) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f9f9f9",
+        backgroundColor: theme.colors.surface,
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
@@ -52,10 +56,10 @@ const styles = StyleSheet.create({
         rowGap: 20,
     },
     iconContainer: {
-        backgroundColor: "white",
+        backgroundColor: theme.colors.surface,
         borderRadius: 50,
         padding: 20,
-        shadowColor: "#000",
+        shadowColor: theme.colors.onSurface,
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 4,
@@ -63,12 +67,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: "bold",
-        color: "#333",
+        color: theme.colors.onSurface,
         textAlign: "center",
     },
     subtitle: {
         fontSize: 16,
-        color: "#666",
+        color: theme.colors.onSurfaceVariant,
         textAlign: "center",
         lineHeight: 22,
     },
@@ -80,17 +84,17 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: "#FF9500",
+        backgroundColor: theme.colors.error,
         opacity: 0.6,
     },
     button: {
-        backgroundColor: "#007AFF",
+        backgroundColor: theme.colors.primary,
         borderRadius: 12,
         paddingVertical: 14,
         paddingHorizontal: 24,
         flexDirection: "row",
         alignItems: "center",
-        shadowColor: "#000",
+        shadowColor: theme.colors.onSurface,
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
@@ -101,6 +105,6 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 16,
         fontWeight: "600",
-        color: "white",
+        color: theme.colors.onPrimary,
     },
 });

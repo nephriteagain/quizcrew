@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View, SectionList, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import Container from "@/components/Container";
+
 interface Connection {
     id: string;
     name: string;
@@ -188,7 +190,7 @@ export default function Connections() {
     );
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             <SectionList
                 sections={sections}
                 keyExtractor={(item) => item.id}
@@ -197,14 +199,12 @@ export default function Connections() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />
-        </View>
+        </Container>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#f5f5f5",
     },
     listContainer: {
         paddingHorizontal: 16,

@@ -1,4 +1,6 @@
+import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
+import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,6 +15,8 @@ const routes: {
 }[] = [{ name: "/quiz-types", label: "Create New Quiz" }];
 
 export default function Index() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const reviewer = reviewSelector.use.quizzes();
     const router = useRouter();
 
@@ -45,13 +49,13 @@ export default function Index() {
     );
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             <View>
                 {routes.map((route) => (
                     <Link href={route.name} asChild key={route.label}>
                         <Pressable style={styles.routeButton}>
                             <LinearGradient
-                                colors={["#667eea", "#764ba2"]}
+                                colors={[theme.colors.inversePrimary, theme.colors?.primary]}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 1 }}
                                 style={styles.gradientButton}
@@ -60,7 +64,7 @@ export default function Index() {
                                     <Ionicons
                                         name="add-circle"
                                         size={28}
-                                        color="white"
+                                        color={theme.colors.onPrimary}
                                         style={styles.buttonIcon}
                                     />
                                     <Text style={styles.routeButtonText}>{route.label}</Text>
@@ -71,48 +75,48 @@ export default function Index() {
                 ))}
             </View>
             <QuizList quizzes={reviewer} onQuizPress={handlePress} />
-        </View>
+        </Container>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        rowGap: 16,
-    },
-    routeButton: {
-        width: "100%",
-        borderRadius: 16,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 4,
+const makeStyles = (theme: any) =>
+    StyleSheet.create({
+        container: {
+            padding: 16,
+            rowGap: 16,
         },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-        overflow: "hidden",
-    },
-    gradientButton: {
-        width: "100%",
-        paddingVertical: 18,
-        paddingHorizontal: 24,
-        borderRadius: 16,
-    },
-    buttonContent: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    buttonIcon: {
-        marginRight: 12,
-    },
-    routeButtonText: {
-        fontSize: 18,
-        fontWeight: "700",
-        color: "white",
-        letterSpacing: 0.5,
-        textTransform: "uppercase",
-    },
-});
+        routeButton: {
+            width: "100%",
+            borderRadius: 16,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 4,
+            },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8,
+            overflow: "hidden",
+        },
+        gradientButton: {
+            width: "100%",
+            paddingVertical: 18,
+            paddingHorizontal: 24,
+            borderRadius: 16,
+        },
+        buttonContent: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        buttonIcon: {
+            marginRight: 12,
+        },
+        routeButtonText: {
+            fontSize: 18,
+            fontWeight: "700",
+            color: theme.colors.onPrimary,
+            letterSpacing: 0.5,
+            textTransform: "uppercase",
+        },
+    });

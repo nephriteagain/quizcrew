@@ -18,6 +18,7 @@ export default function Layout() {
                 name="connections"
                 options={{
                     title: "Connections",
+                    headerShown: false,
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="people" size={size} color={color} />
                     ),

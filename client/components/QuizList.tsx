@@ -1,3 +1,4 @@
+import { useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
 import React, { useCallback } from "react";
@@ -45,6 +46,8 @@ export default function QuizList({
     | "drawResistance"
     | "extraData"
 >) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const renderQuizCard = useCallback(
         ({ item }: { item: Quiz }) => <QuizCard quiz={item} onPress={() => onQuizPress?.(item)} />,
         [onQuizPress]
@@ -90,8 +93,8 @@ export default function QuizList({
                     <RefreshControl
                         refreshing={Boolean(refreshing)}
                         onRefresh={onRefresh}
-                        colors={["#007AFF"]}
-                        tintColor="#007AFF"
+                        colors={[theme.colors.primary]}
+                        tintColor={theme.colors.primary}
                     />
                 ) : undefined
             }
@@ -103,7 +106,7 @@ export default function QuizList({
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme: any) => StyleSheet.create({
     contentContainer: {
         paddingVertical: 8,
     },
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: "#999",
+        color: theme.colors.onSurfaceVariant,
         textAlign: "center",
     },
     loadingContainer: {
@@ -131,6 +134,6 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         fontSize: 16,
-        color: "#666",
+        color: theme.colors.onSurfaceVariant,
     },
 });

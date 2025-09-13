@@ -1,5 +1,5 @@
 import UnderConstruction from "@/components/UnderConstruction";
 
-export default function () {
+export default function UnderConstructionPage() {
     return <UnderConstruction />;
 }

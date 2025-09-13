@@ -1,3 +1,4 @@
+import Container from "@/components/Container";
 import reviewSelector from "@/store/review/review.store";
 import { TrueOrFalseQ } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
@@ -47,7 +48,7 @@ export default function TrueOrFalseQuestions() {
     }
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             <View style={styles.toggleContainer}>
                 <Text style={styles.toggleText}>
                     {showAnswer ? "Hide All Answers" : "Show All Answers"}
@@ -139,15 +140,13 @@ export default function TrueOrFalseQuestions() {
                     </Pressable>
                 </Link>
             </View>
-        </View>
+        </Container>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         padding: 16,
-        backgroundColor: "white",
     },
     errorContainer: {
         flex: 1,

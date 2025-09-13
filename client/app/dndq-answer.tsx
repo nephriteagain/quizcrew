@@ -1,5 +1,6 @@
 // app/DragAndDropQuiz.tsx
 import Card from "@/components/Card";
+import Container from "@/components/Container";
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { WIDTH } from "@/constants/values";
 import { fontSizeScaler } from "@/lib/utils/fontSizeScaler";
@@ -145,7 +146,7 @@ export default function DragAndDropQuizAns() {
     }, []);
 
     const handleDropZones = useCallback(
-        (e: any) => {
+        (_e: any) => {
             setTimeout(() => {
                 recalibrateDropZones();
             }, 100);
@@ -233,13 +234,14 @@ export default function DragAndDropQuizAns() {
 
     return (
         <>
-            <GestureHandlerRootView style={styles.container}>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <Container style={styles.container}>
                 {/* Answers palette */}
                 <Animated.View
                     style={[styles.answersRow, isSubmitted && { height: 0, flexGrow: 0 }]}
                     layout={LinearTransition.springify().damping(15).stiffness(100)}
                 >
-                    {unselectedAnswers.map((ans, index) => {
+                    {unselectedAnswers.map((ans) => {
                         // const isSelected = Object.values(answers).includes(ans);
                         return (
                             <Animated.View
@@ -416,6 +418,7 @@ export default function DragAndDropQuizAns() {
                         </Pressable>
                     )}
                 </View>
+                </Container>
             </GestureHandlerRootView>
         </>
     );
@@ -505,7 +508,6 @@ function DraggableChip({
 }
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
     },
     answersRow: {
         flexDirection: "row",

@@ -1,4 +1,6 @@
 import Card from "@/components/Card";
+import Container from "@/components/Container";
+import { useAppTheme } from "@/providers/ThemeProvider";
 import { QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
@@ -30,6 +32,8 @@ const QUIZ_ARR = [
 ];
 
 export default function QuizTypes() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const router = useRouter();
 
     const handleSelect = (type: QUIZ_TYPE) => {
@@ -40,7 +44,7 @@ export default function QuizTypes() {
     };
 
     return (
-        <View style={styles.container}>
+        <Container style={styles.container}>
             <FlashList
                 data={QUIZ_ARR}
                 showsVerticalScrollIndicator={false}
@@ -49,10 +53,10 @@ export default function QuizTypes() {
                         <Card style={styles.cardContent}>
                             <View style={styles.header}>
                                 <View style={styles.iconContainer}>
-                                    <Ionicons name={item.icon} size={24} color="#4f46e5" />
+                                    <Ionicons name={item.icon} size={24} color={theme.colors.primary} />
                                 </View>
                                 <Text style={styles.label}>{item.label}</Text>
-                                <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+                                <Ionicons name="chevron-forward" size={20} color={theme.colors.onSurfaceVariant} />
                             </View>
                             <Text style={styles.description}>{item.description}</Text>
                         </Card>
@@ -60,15 +64,13 @@ export default function QuizTypes() {
                 )}
                 ItemSeparatorComponent={() => <View style={styles.separator} />}
             />
-        </View>
+        </Container>
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme: any) => StyleSheet.create({
     container: {
-        flex: 1,
         padding: 16,
-        backgroundColor: "#f9fafb",
     },
     quizTypeCard: {
         marginBottom: 12,
@@ -78,11 +80,11 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         padding: 16,
-        backgroundColor: "white",
+        backgroundColor: theme.colors.surface,
         borderRadius: 12,
         borderWidth: 2,
         borderColor: "transparent",
-        shadowColor: "#000",
+        shadowColor: theme.colors.onSurface,
         shadowOffset: {
             width: 0,
             height: 2,
@@ -101,29 +103,29 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: "#eef2ff",
+        backgroundColor: theme.colors.primaryContainer,
         alignItems: "center",
         justifyContent: "center",
     },
     selectedIconContainer: {
-        backgroundColor: "#4f46e5",
+        backgroundColor: theme.colors.primary,
     },
     label: {
         fontSize: 18,
         fontWeight: "bold",
-        color: "#1f2937",
+        color: theme.colors.onSurface,
         flex: 1,
     },
     selectedLabel: {
-        color: "#4f46e5",
+        color: theme.colors.primary,
     },
     description: {
         fontSize: 14,
-        color: "#6b7280",
+        color: theme.colors.onSurfaceVariant,
         lineHeight: 20,
     },
     selectedDescription: {
-        color: "#374151",
+        color: theme.colors.onSurface,
     },
     separator: {
         height: 8,

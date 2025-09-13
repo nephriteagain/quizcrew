@@ -5,6 +5,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
+import Container from "@/components/Container";
 import reviewSelector from "@/store/review/review.store";
 import { TrueOrFalseQ } from "@/types/review";
 import { useLocalSearchParams } from "expo-router";
@@ -87,7 +88,7 @@ export default function TrueOrFalseQuestionsAns() {
     }, []);
 
     return (
-        <View style={{ flex: 1, backgroundColor: "white" }}>
+        <Container style={{ flex: 1, backgroundColor: "white" }}>
             {/* TOF QUESTIONS list */}
             <FlashList
                 ref={listRef}
@@ -225,6 +226,6 @@ export default function TrueOrFalseQuestionsAns() {
                 score={score}
                 totalQuestion={totalQuestion}
             />
-        </View>
+        </Container>
     );
 }
