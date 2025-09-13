@@ -44,7 +44,7 @@ export default function QuizList({
                 <Text style={styles.emptyText}>{emptyMessage}</Text>
             </View>
         ),
-        [emptyMessage]
+        [emptyMessage, quizzes]
     );
 
     const renderHeader = useCallback(() => <View style={styles.headerSpacer} />, []);

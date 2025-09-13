@@ -5,14 +5,49 @@ import { DragAndDrop } from "@/types/review";
 import { Link, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import Animated, { FadeInLeft, FadeOutLeft, LinearTransition } from "react-native-reanimated";
+
+// Color palette for matching choices and answers
+const colors = [
+    { bg: "#E3F2FD", border: "#2196F3", text: "#1976D2" }, // Blue
+    { bg: "#E8F5E9", border: "#4CAF50", text: "#388E3C" }, // Green
+    { bg: "#FFF3E0", border: "#FF9800", text: "#F57C00" }, // Orange
+    { bg: "#F3E5F5", border: "#9C27B0", text: "#7B1FA2" }, // Purple
+    { bg: "#FFEBEE", border: "#F44336", text: "#D32F2F" }, // Red
+    { bg: "#E0F2F1", border: "#009688", text: "#00695C" }, // Teal
+    { bg: "#FFF8E1", border: "#FFC107", text: "#F9A825" }, // Amber
+    { bg: "#FCE4EC", border: "#E91E63", text: "#C2185B" }, // Pink
+];
 
 export default function DragAndDropQuiz() {
     const [showAnswer, setShowAnswer] = useState(false);
-    const toggleSwitch = () => setShowAnswer((previousState) => !previousState);
+    const [individualAnswers, setIndividualAnswers] = useState<Set<number>>(new Set());
+    const toggleSwitch = () => {
+        setShowAnswer((previousState) => !previousState);
+        setIndividualAnswers(new Set());
+    };
     const params = useLocalSearchParams<{ quiz_id: string }>();
     const quiz_id = params.quiz_id;
     const quizzes = reviewSelector.use.quizzes();
     const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as DragAndDrop | undefined;
+
+    const toggleIndividualAnswer = (questionIndex: number) => {
+        setIndividualAnswers((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(questionIndex)) {
+                newSet.delete(questionIndex);
+            } else {
+                newSet.add(questionIndex);
+            }
+            return newSet;
+        });
+    };
+
+    const getColorForAnswer = (answer: string) => {
+        if (!selectedQuiz) return colors[0];
+        const answerIndex = selectedQuiz.answers.indexOf(answer);
+        return colors[answerIndex % colors.length];
+    };
 
     if (!quiz_id) {
         return (
@@ -33,7 +68,9 @@ export default function DragAndDropQuiz() {
     return (
         <View style={styles.container}>
             <View style={styles.switchContainer}>
-                <Text style={styles.switchLabel}>Show answers</Text>
+                <Text style={styles.switchLabel}>
+                    {showAnswer ? "Hide All Answers" : "Show All Answers"}
+                </Text>
                 <Switch
                     trackColor={{ false: "#767577", true: "#81b0ff" }}
                     thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
@@ -49,22 +86,69 @@ export default function DragAndDropQuiz() {
                 showsVerticalScrollIndicator={false}
             >
                 <View style={styles.answersRow}>
-                    {selectedQuiz.answers.map((ans) => (
-                        <Chip key={ans} label={ans} />
-                    ))}
+                    {selectedQuiz.answers.map((ans, index) => {
+                        const isIndividuallyShown = individualAnswers.has(index);
+                        const shouldShowAnswer = showAnswer || isIndividuallyShown;
+                        return (
+                            <Chip
+                                key={ans}
+                                label={ans}
+                                color={shouldShowAnswer ? colors[index % colors.length] : undefined}
+                            />
+                        );
+                    })}
                 </View>
                 {/* Wrap ScrollView inside a View we can measure */}
                 <View style={styles.questions}>
-                    {selectedQuiz.questions.map((q, idx) => (
-                        <View key={idx} style={[styles.dropZone]}>
-                            <Text style={styles.questionText}>{q.question}</Text>
-                            {showAnswer && (
-                                <Text style={[styles.answerText, styles.visibleAnswer]}>
-                                    {q.answer}
-                                </Text>
-                            )}
-                        </View>
-                    ))}
+                    {selectedQuiz.questions.map((q, idx) => {
+                        const isIndividuallyShown = individualAnswers.has(idx);
+                        const shouldShowAnswer = showAnswer || isIndividuallyShown;
+
+                        return (
+                            <Animated.View
+                                key={idx}
+                                style={[styles.dropZone]}
+                                layout={LinearTransition.springify().damping(15).stiffness(100)}
+                            >
+                                <Pressable
+                                    android_ripple={{
+                                        color: "#f0f0f0",
+                                    }}
+                                    onLongPress={() => toggleIndividualAnswer(idx)}
+                                    style={styles.questionPressable}
+                                >
+                                    <Text style={styles.questionText}>{q.question}</Text>
+                                </Pressable>
+                                {shouldShowAnswer && (
+                                    <Pressable onPress={() => toggleIndividualAnswer(idx)}>
+                                        <Animated.View
+                                            style={[
+                                                styles.answerContainer,
+                                                {
+                                                    backgroundColor: getColorForAnswer(q.answer).bg,
+                                                    borderColor: getColorForAnswer(q.answer).border,
+                                                },
+                                            ]}
+                                            entering={FadeInLeft.duration(300)
+                                                .springify()
+                                                .delay(showAnswer ? idx * 50 : 0)}
+                                            exiting={FadeOutLeft.duration(200)}
+                                        >
+                                            <Animated.Text
+                                                style={[
+                                                    styles.answerText,
+                                                    styles.visibleAnswer,
+                                                    { color: getColorForAnswer(q.answer).text },
+                                                ]}
+                                            >
+                                                {q.answer}
+                                            </Animated.Text>
+                                        </Animated.View>
+                                    </Pressable>
+                                )}
+                            </Animated.View>
+                        );
+                    })}
                 </View>
             </ScrollView>
 
@@ -83,9 +167,7 @@ export default function DragAndDropQuiz() {
                         android_ripple={{ color: "#ccc", borderless: false }}
                         style={styles.quizButton}
                     >
-                        <Text style={styles.quizButtonText}>
-                            Take the Quiz
-                        </Text>
+                        <Text style={styles.quizButtonText}>Take the Quiz</Text>
                     </Pressable>
                 </Link>
             </View>
@@ -93,11 +175,26 @@ export default function DragAndDropQuiz() {
     );
 }
 
-function Chip({ label }: { label: string }) {
+function Chip({
+    label,
+    color,
+}: {
+    label: string;
+    color?: { bg: string; border: string; text: string };
+}) {
     return (
-        <View style={[styles.chip]}>
-            <Text style={styles.chipText}>{label}</Text>
-        </View>
+        <Animated.View
+            style={[
+                styles.chip,
+                color && {
+                    backgroundColor: color.bg,
+                    borderColor: color.border,
+                },
+            ]}
+            layout={LinearTransition.springify().damping(15).stiffness(100)}
+        >
+            <Text style={[styles.chipText, color && { color: color.text }]}>{label}</Text>
+        </Animated.View>
     );
 }
 
@@ -133,14 +230,15 @@ const styles = StyleSheet.create({
     },
     chip: {
         paddingHorizontal: 12,
-        paddingVertical: 8,
+        paddingVertical: 6,
         borderRadius: 16,
-        backgroundColor: "#4f46e5",
         margin: 4,
         zIndex: 10,
+        borderColor: "gray",
+        borderWidth: 1,
     },
     chipText: {
-        color: "white",
+        color: "black",
         fontWeight: "600",
     },
     questions: {
@@ -156,14 +254,34 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         marginBottom: 12,
     },
+    questionPressable: {
+        padding: 8,
+        marginBottom: 8,
+        borderRadius: 8,
+        backgroundColor: "rgba(0,0,0,0.02)",
+    },
     questionText: {
         fontSize: 16,
         fontWeight: "500",
         marginBottom: 6,
     },
+    individualAnswerHint: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#4CAF50",
+        marginTop: 4,
+        fontStyle: "italic",
+    },
+    answerContainer: {
+        marginTop: 8,
+        padding: 8,
+        borderRadius: 8,
+        borderWidth: 2,
+    },
     answerText: {
         fontSize: 14,
         color: "#6b7280",
+        textAlign: "center",
     },
     visibleAnswer: {
         color: "black",

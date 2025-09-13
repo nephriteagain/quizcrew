@@ -6,7 +6,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -70,11 +70,21 @@ export default function CreateQuiz() {
         setAssets((prev) => prev.filter((_, index) => index !== indexToRemove));
     }, []);
 
-    const [handleCreateQuizReviewer, { isLoading: isSubmitting }] = useAsyncAction(createReviewer, {
-        onComplete: () => {
-            router.back();
-        },
-    });
+    const asyncActionOptions = useMemo(
+        () => ({
+            onComplete: () => {
+                router.back();
+                router.back();
+                router.back();
+            },
+        }),
+        [router]
+    );
+
+    const [handleCreateQuizReviewer, { isLoading: isSubmitting }] = useAsyncAction(
+        createReviewer,
+        asyncActionOptions
+    );
 
     const onCreateQuizReviewer = useCallback(() => {
         Alert.alert("Create reviewer", "Create a quiz based on this assets.", [

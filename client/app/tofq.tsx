@@ -3,11 +3,28 @@ import { TrueOrFalseQ } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
 import { Link, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import Animated, { FadeInLeft, FadeOutLeft, LinearTransition } from "react-native-reanimated";
 
 export default function TrueOrFalseQuestions() {
     const [showAnswer, setShowAnswer] = useState(false);
-    const toggleSwitch = () => setShowAnswer((previousState) => !previousState);
+    const [individualAnswers, setIndividualAnswers] = useState<Set<number>>(new Set());
+    const toggleSwitch = () => {
+        setShowAnswer((previousState) => !previousState);
+        setIndividualAnswers(new Set());
+    };
+
+    const toggleIndividualAnswer = (questionIndex: number) => {
+        setIndividualAnswers((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(questionIndex)) {
+                newSet.delete(questionIndex);
+            } else {
+                newSet.add(questionIndex);
+            }
+            return newSet;
+        });
+    };
     const params = useLocalSearchParams<{ quiz_id: string }>();
     const quiz_id = params.quiz_id;
     const quizzes = reviewSelector.use.quizzes();
@@ -15,15 +32,7 @@ export default function TrueOrFalseQuestions() {
 
     if (!quiz_id) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    padding: 16,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <View style={styles.errorContainer}>
                 <Text>Invalid Quiz Id</Text>
             </View>
         );
@@ -31,33 +40,16 @@ export default function TrueOrFalseQuestions() {
 
     if (!selectedQuiz) {
         return (
-            <View
-                style={{
-                    flex: 1,
-                    padding: 16,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
+            <View style={styles.errorContainer}>
                 <Text>Quiz not found.</Text>
             </View>
         );
     }
 
     return (
-        <View style={{ flex: 1, padding: 16, backgroundColor: "white" }}>
-            {/* Sticky Header for Toggle */}
-            <View
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    backgroundColor: "white",
-                    zIndex: 10,
-                }}
-            >
-                <Text style={{ fontWeight: "600", fontSize: 16 }}>Show answers</Text>
+        <View style={styles.container}>
+            <View style={styles.toggleContainer}>
+                <Text style={styles.toggleText}>Show All Answers</Text>
                 <Switch
                     trackColor={{ false: "#767577", true: "#81b0ff" }}
                     thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
@@ -67,54 +59,67 @@ export default function TrueOrFalseQuestions() {
                 />
             </View>
 
-            {/* Questions List */}
             <FlashList
                 data={selectedQuiz.questions}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                    <View style={{ marginBottom: 24 }}>
-                        {/* Question */}
-                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                            {index + 1}. {item.question}
-                        </Text>
-                        <View style={{ flexDirection: "row", width: "100%", columnGap: 12 }}>
-                            {/* Choices: True / False */}
-                            {["True", "False"].map((choice, cIndex) => {
-                                const isCorrect =
-                                    choice.toLowerCase() === String(item.answer).toLowerCase();
-                                const shouldShowAnswer = showAnswer && isCorrect;
+                keyExtractor={(q) => q.answer.valueOf() + q.question.valueOf()}
+                renderItem={({ item, index }) => {
+                    const isIndividuallyShown = individualAnswers.has(index);
+                    const shouldShowAnswer = showAnswer || isIndividuallyShown;
 
-                                return (
-                                    <View
-                                        key={cIndex}
-                                        style={{
-                                            padding: 12,
-                                            marginVertical: 6,
-                                            borderRadius: 8,
-                                            borderWidth: 1,
-                                            borderColor: shouldShowAnswer ? "#4CAF50" : "#ccc",
-                                            backgroundColor: shouldShowAnswer ? "#E8F5E9" : "#fff",
-                                            flex: 1,
+                    return (
+                        <Animated.View
+                            style={styles.questionContainer}
+                            layout={LinearTransition.springify().damping(15).stiffness(100)}
+                        >
+                            <Pressable
+                                android_ripple={{
+                                    color: "#f0f0f0",
+                                }}
+                                onLongPress={() => toggleIndividualAnswer(index)}
+                                style={styles.questionPressable}
+                            >
+                                <Text style={styles.questionText}>
+                                    {index + 1}. {item.question}
+                                </Text>
+                            </Pressable>
+                            {shouldShowAnswer && (
+                                <Animated.View
+                                    style={styles.choicesRow}
+                                    entering={FadeInLeft.duration(300)
+                                        .springify()
+                                        .delay(showAnswer ? index * 150 : 0)}
+                                    exiting={FadeOutLeft.duration(200)}
+                                >
+                                    <Pressable
+                                        onPress={() => {
+                                            toggleIndividualAnswer(index);
                                         }}
                                     >
-                                        <Text style={{ fontSize: 14 }}>{choice}</Text>
-                                    </View>
-                                );
-                            })}
-                        </View>
-                    </View>
-                )}
+                                        <Animated.View
+                                            style={[
+                                                styles.choiceContainer,
+                                                item.answer
+                                                    ? styles.answerTrue
+                                                    : styles.answerFalse,
+                                            ]}
+                                            entering={FadeInLeft.delay(
+                                                showAnswer ? index * 150 + 150 : 0
+                                            ).duration(300)}
+                                        >
+                                            <Text style={styles.choiceText}>
+                                                {item.answer ? "True" : "False"}
+                                            </Text>
+                                        </Animated.View>
+                                    </Pressable>
+                                </Animated.View>
+                            )}
+                        </Animated.View>
+                    );
+                }}
+                ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
             />
 
-            {/* Bottom Button */}
-            <View
-                style={{
-                    padding: 16,
-                    borderTopWidth: 1,
-                    borderColor: "#eee",
-                    backgroundColor: "white",
-                }}
-            >
+            <View style={styles.footerContainer}>
                 <Link
                     href={{
                         pathname: "/tofq-answer",
@@ -126,25 +131,95 @@ export default function TrueOrFalseQuestions() {
                 >
                     <Pressable
                         android_ripple={{ color: "#ccc", borderless: false }}
-                        style={{
-                            backgroundColor: "#2196F3",
-                            padding: 16,
-                            borderRadius: 12,
-                            alignItems: "center",
-                        }}
+                        style={styles.takeQuizButton}
                     >
-                        <Text
-                            style={{
-                                color: "white",
-                                fontWeight: "bold",
-                                fontSize: 16,
-                            }}
-                        >
-                            Take the Quiz
-                        </Text>
+                        <Text style={styles.takeQuizText}>Take the Quiz</Text>
                     </Pressable>
                 </Link>
             </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: "white",
+    },
+    errorContainer: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    toggleContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        backgroundColor: "white",
+        zIndex: 10,
+    },
+    toggleText: {
+        fontWeight: "600",
+        fontSize: 16,
+    },
+    questionContainer: {},
+    itemSeparator: {
+        height: 8,
+    },
+    questionPressable: {
+        paddingVertical: 6,
+        borderRadius: 8,
+        backgroundColor: "rgba(0,0,0,0.02)",
+        marginBottom: 4,
+    },
+    questionText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        marginBottom: 0,
+    },
+    choicesRow: {
+        flexDirection: "row",
+        width: "100%",
+    },
+    choiceContainer: {
+        padding: 8,
+        marginVertical: 6,
+        borderRadius: 8,
+        borderWidth: 1,
+        width: 100,
+        alignItems: "center",
+        marginLeft: 14,
+    },
+    answerTrue: {
+        borderColor: "#4CAF50",
+        backgroundColor: "#E8F5E9",
+    },
+    answerFalse: {
+        borderColor: "#F44336",
+        backgroundColor: "#FFEBEE",
+    },
+    choiceText: {
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    footerContainer: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderColor: "#eee",
+        backgroundColor: "white",
+    },
+    takeQuizButton: {
+        backgroundColor: "#2196F3",
+        padding: 16,
+        borderRadius: 12,
+        alignItems: "center",
+    },
+    takeQuizText: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 16,
+    },
+});

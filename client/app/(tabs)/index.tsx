@@ -44,13 +44,15 @@ export default function Index() {
 
     return (
         <View style={styles.container}>
-            {routes.map((route) => (
-                <Link href={route.name} asChild key={route.label}>
-                    <Pressable style={styles.routeButton}>
-                        <Text style={styles.routeButtonText}>{route.label}</Text>
-                    </Pressable>
-                </Link>
-            ))}
+            <View>
+                {routes.map((route) => (
+                    <Link href={route.name} asChild key={route.label}>
+                        <Pressable style={styles.routeButton}>
+                            <Text style={styles.routeButtonText}>{route.label}</Text>
+                        </Pressable>
+                    </Link>
+                ))}
+            </View>
             <QuizList quizzes={reviewer} onQuizPress={handlePress} />
         </View>
     );
@@ -59,7 +61,6 @@ export default function Index() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "white",
         padding: 10,
         rowGap: 10,
     },

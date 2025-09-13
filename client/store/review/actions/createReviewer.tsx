@@ -38,7 +38,7 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
         ...quiz,
         createdBy: user?.uid ?? null,
         status: "LIVE",
-        privacy: "ALL",
+        privacy: "JUST_ME",
     };
 
     console.log("creating quiz...");
