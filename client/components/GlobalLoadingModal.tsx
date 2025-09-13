@@ -1,7 +1,10 @@
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import utilsSelector from "@/store/utils/utils.store";
 import { Modal, StyleSheet, Text, View } from "react-native";
 
 export default function GlobalLoadingModal() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const isVisible = utilsSelector.use.isLoading();
     const text = utilsSelector.use.loadingText();
 
@@ -14,19 +17,25 @@ export default function GlobalLoadingModal() {
             statusBarTranslucent
             style={{ flex: 1 }}
         >
-            <View
-                style={[
-                    StyleSheet.absoluteFill,
-                    {
-                        flex: 1,
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    },
-                ]}
-            >
-                <Text style={{ fontWeight: "600", fontSize: 20, textAlign: "center" }}>{text}</Text>
+            <View style={[styles.overlay, StyleSheet.absoluteFill]}>
+                <Text style={styles.text}>{text}</Text>
             </View>
         </Modal>
     );
 }
+
+const makeStyles = (theme: AppTheme) =>
+    StyleSheet.create({
+        overlay: {
+            flex: 1,
+            backgroundColor: `${theme.colors.onSurface}80`,
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        text: {
+            fontWeight: "600",
+            fontSize: 20,
+            textAlign: "center",
+            color: theme.colors.onPrimary,
+        },
+    });

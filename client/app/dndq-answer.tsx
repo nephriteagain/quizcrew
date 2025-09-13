@@ -4,6 +4,7 @@ import Container from "@/components/Container";
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { WIDTH } from "@/constants/values";
 import { fontSizeScaler } from "@/lib/utils/fontSizeScaler";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { DragAndDrop } from "@/types/review";
 import { AntDesign } from "@expo/vector-icons";
@@ -35,6 +36,8 @@ type DropZone = {
 };
 
 export default function DragAndDropQuizAns() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const params = useLocalSearchParams<{ quiz_id: string }>();
     const quiz_id = params.quiz_id;
     const quizzes = reviewSelector.use.quizzes();
@@ -236,188 +239,236 @@ export default function DragAndDropQuizAns() {
         <>
             <GestureHandlerRootView style={{ flex: 1 }}>
                 <Container style={styles.container}>
-                {/* Answers palette */}
-                <Animated.View
-                    style={[styles.answersRow, isSubmitted && { height: 0, flexGrow: 0 }]}
-                    layout={LinearTransition.springify().damping(15).stiffness(100)}
-                >
-                    {unselectedAnswers.map((ans) => {
-                        // const isSelected = Object.values(answers).includes(ans);
-                        return (
-                            <Animated.View
-                                key={`${ans}`}
-                                layout={LinearTransition.springify().damping(15).stiffness(100)}
-                                entering={FadeIn.duration(300)}
-                                exiting={FadeOut.duration(300)}
-                            >
-                                <DraggableChip
-                                    label={ans}
-                                    onDrop={handleDrop}
-                                    onHover={handleHover}
-                                    // isSelected={isSelected}
-                                    isDisabled={isSubmitted}
-                                />
-                            </Animated.View>
-                        );
-                    })}
-                </Animated.View>
-
-                {/* Container for FlashList */}
-                <View style={styles.scrollContainer} ref={registerContainer}>
-                    <FlashList
-                        ListFooterComponent={
-                            <QuizResultModal
-                                visible={resultModalVisible}
-                                onClose={() => setResultModalVisible(false)}
-                                score={score}
-                                totalQuestion={totalQuestion}
-                            />
-                        }
-                        ref={flashListRef}
-                        data={DRAG_AND_DROP.questions}
-                        horizontal={true}
-                        pagingEnabled={true}
-                        showsHorizontalScrollIndicator={false}
-                        scrollEventThrottle={16}
-                        onLayout={handleDropZones}
-                        onScroll={handleDropZones}
-                        // Remove conflicting style properties
-                        renderItem={({ item: q, index: idx }) => (
-                            <View style={styles.questionContainer} ref={setQuestionRef(idx)}>
-                                <Card
-                                    key={idx}
-                                    style={[
-                                        styles.dropZone,
-                                        hoveredIndex === idx && styles.dropZoneHovered,
-                                    ]}
+                    {/* Answers palette */}
+                    <Animated.View
+                        style={[styles.answersRow, isSubmitted && { height: 0, flexGrow: 0 }]}
+                        layout={LinearTransition.springify().damping(15).stiffness(100)}
+                    >
+                        {unselectedAnswers.map((ans) => {
+                            // const isSelected = Object.values(answers).includes(ans);
+                            return (
+                                <Animated.View
+                                    key={`${ans}`}
+                                    layout={LinearTransition.springify().damping(15).stiffness(100)}
+                                    entering={FadeIn.duration(300)}
+                                    exiting={FadeOut.duration(300)}
                                 >
-                                    <Text style={styles.questionText}>{q.question}</Text>
-                                    {isSubmitted ? (
-                                        <View style={styles.submittedAnswerContainer}>
-                                            {/* user answer */}
-                                            <View
-                                                style={[
-                                                    styles.userAnswerChip,
-                                                    answers[idx] === q.answer
-                                                        ? styles.correctAnswerBg
-                                                        : styles.incorrectAnswerBg,
-                                                ]}
-                                            >
-                                                <Text
+                                    <DraggableChip
+                                        label={ans}
+                                        onDrop={handleDrop}
+                                        onHover={handleHover}
+                                        // isSelected={isSelected}
+                                        isDisabled={isSubmitted}
+                                    />
+                                </Animated.View>
+                            );
+                        })}
+                    </Animated.View>
+
+                    {/* Container for FlashList */}
+                    <View style={styles.scrollContainer} ref={registerContainer}>
+                        <FlashList
+                            ListFooterComponent={
+                                <QuizResultModal
+                                    visible={resultModalVisible}
+                                    onClose={() => setResultModalVisible(false)}
+                                    score={score}
+                                    totalQuestion={totalQuestion}
+                                />
+                            }
+                            ref={flashListRef}
+                            data={DRAG_AND_DROP.questions}
+                            horizontal={true}
+                            pagingEnabled={true}
+                            showsHorizontalScrollIndicator={false}
+                            scrollEventThrottle={16}
+                            onLayout={handleDropZones}
+                            onScroll={handleDropZones}
+                            // Remove conflicting style properties
+                            renderItem={({ item: q, index: idx }) => (
+                                <View style={styles.questionContainer} ref={setQuestionRef(idx)}>
+                                    <Card
+                                        key={idx}
+                                        style={[
+                                            styles.dropZone,
+                                            hoveredIndex === idx && styles.dropZoneHovered,
+                                        ]}
+                                    >
+                                        <Text style={styles.questionText}>{q.question}</Text>
+                                        {isSubmitted ? (
+                                            <View style={styles.submittedAnswerContainer}>
+                                                {/* user answer */}
+                                                <View
                                                     style={[
-                                                        styles.answerText,
-                                                        answers[idx] !== undefined && styles.whiteAnswerText,
+                                                        styles.userAnswerChip,
+                                                        answers[idx] === q.answer
+                                                            ? {
+                                                                  backgroundColor:
+                                                                      theme.colors.secondary,
+                                                              }
+                                                            : {
+                                                                  backgroundColor:
+                                                                      theme.colors.error,
+                                                              },
                                                     ]}
                                                 >
-                                                    {answers[idx] ? answers[idx] : "No answer here"}
-                                                </Text>
-                                            </View>
-                                            {/* correct answer */}
-                                            {answers[idx] !== q.answer && (
-                                                <>
-                                                    <Text style={styles.correctAnswerLabel}>
-                                                        Correct Answer:
-                                                    </Text>
-                                                    <View
+                                                    <Text
                                                         style={[
-                                                            styles.userAnswerChip,
-                                                            styles.correctAnswerBg,
+                                                            styles.answerText,
+                                                            {
+                                                                color:
+                                                                    answers[idx] === q.answer
+                                                                        ? theme.colors.onSecondary
+                                                                        : theme.colors.onError,
+                                                                fontWeight: "600",
+                                                            },
                                                         ]}
                                                     >
+                                                        {answers[idx]
+                                                            ? answers[idx]
+                                                            : "No answer here"}
+                                                    </Text>
+                                                </View>
+                                                {/* correct answer */}
+                                                {answers[idx] !== q.answer && (
+                                                    <>
                                                         <Text
                                                             style={[
-                                                                styles.answerText,
-                                                                styles.whiteAnswerText,
+                                                                styles.correctAnswerLabel,
+                                                                { color: theme.colors.onSurface },
                                                             ]}
                                                         >
-                                                            {q.answer}
+                                                            Correct Answer:
                                                         </Text>
-                                                    </View>
-                                                </>
-                                            )}
-                                        </View>
-                                    ) : (
-                                        <View style={styles.answerInputContainer}>
-                                            <View
-                                                style={[
-                                                    styles.answerBox,
-                                                    answers[idx] && styles.answerBoxFilled,
-                                                ]}
-                                            >
-                                                <Text
+                                                        <View
+                                                            style={[
+                                                                styles.userAnswerChip,
+                                                                styles.correctAnswerBg,
+                                                            ]}
+                                                        >
+                                                            <Text
+                                                                style={[
+                                                                    styles.answerText,
+                                                                    styles.whiteAnswerText,
+                                                                ]}
+                                                            >
+                                                                {q.answer}
+                                                            </Text>
+                                                        </View>
+                                                    </>
+                                                )}
+                                            </View>
+                                        ) : (
+                                            <View style={styles.answerInputContainer}>
+                                                <View
                                                     style={[
-                                                        styles.answerText,
-                                                        answers[idx] !== undefined && {
-                                                            color: "white",
-                                                            fontWeight: "600",
+                                                        styles.answerBox,
+                                                        {
+                                                            borderColor: theme.colors.outline,
+                                                            backgroundColor:
+                                                                theme.colors.surfaceVariant,
+                                                        },
+                                                        answers[idx] && {
+                                                            backgroundColor: theme.colors.primary,
+                                                            borderColor: "transparent",
+                                                            shadowColor: theme.colors.onSurface,
                                                         },
                                                     ]}
                                                 >
-                                                    {answers[idx]
-                                                        ? answers[idx]
-                                                        : "Drop answer here"}
-                                                </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.answerText,
+                                                            answers[idx] !== undefined && {
+                                                                color: theme.colors.onPrimary,
+                                                                fontWeight: "600",
+                                                            },
+                                                            !answers[idx] && {
+                                                                color: theme.colors
+                                                                    .onSurfaceVariant,
+                                                            },
+                                                        ]}
+                                                    >
+                                                        {answers[idx]
+                                                            ? answers[idx]
+                                                            : "Drop answer here"}
+                                                    </Text>
+                                                </View>
+                                                {answers[idx] && (
+                                                    <TouchableOpacity
+                                                        hitSlop={10}
+                                                        onPress={() => {
+                                                            const copy = cloneDeep(answers);
+                                                            delete copy[idx];
+                                                            setAnswers(copy);
+                                                        }}
+                                                        style={styles.removeButton}
+                                                    >
+                                                        <AntDesign
+                                                            name="closesquare"
+                                                            size={24}
+                                                            color="#ff6b6b"
+                                                        />
+                                                    </TouchableOpacity>
+                                                )}
                                             </View>
-                                            {answers[idx] && (
-                                                <TouchableOpacity
-                                                    hitSlop={10}
-                                                    onPress={() => {
-                                                        const copy = cloneDeep(answers);
-                                                        delete copy[idx];
-                                                        setAnswers(copy);
-                                                    }}
-                                                    style={styles.removeButton}
-                                                >
-                                                    <AntDesign
-                                                        name="closesquare"
-                                                        size={24}
-                                                        color="#ff6b6b"
-                                                    />
-                                                </TouchableOpacity>
-                                            )}
-                                        </View>
-                                    )}
-                                </Card>
-                            </View>
-                        )}
-                    />
-                </View>
-                {/* Submit button at bottom */}
-                <View style={styles.submitContainer}>
-                    {!isSubmitted && (
-                        <Pressable
-                            android_ripple={
-                                isSubmitEnabled ? { color: "#ccc", borderless: false } : null
-                            }
-                            style={styles.submitButton}
-                            onPress={handleSubmit}
-                            disabled={!isSubmitEnabled}
-                        >
-                            <Text
+                                        )}
+                                    </Card>
+                                </View>
+                            )}
+                        />
+                    </View>
+                    {/* Submit button at bottom */}
+                    <View style={styles.submitContainer}>
+                        {!isSubmitted && (
+                            <Pressable
+                                android_ripple={
+                                    isSubmitEnabled ? { color: "#ccc", borderless: false } : null
+                                }
                                 style={[
-                                    styles.submitButtonText,
-                                    { opacity: isSubmitEnabled ? 1 : 0.6 },
+                                    styles.submitButton,
+                                    { backgroundColor: theme.colors.secondary },
                                 ]}
+                                onPress={handleSubmit}
+                                disabled={!isSubmitEnabled}
                             >
-                                Submit ({Object.keys(answers).length}/
-                                {DRAG_AND_DROP.questions.length})
-                            </Text>
-                        </Pressable>
-                    )}
-                    {isSubmitted && (
-                        <Pressable
-                            android_ripple={
-                                isSubmitEnabled ? { color: "#b8d418ff", borderless: false } : null
-                            }
-                            style={styles.resetButton}
-                            onPress={handleReset}
-                        >
-                            <Text style={styles.resetButtonText}>
-                                TRY AGAIN ({score}/{DRAG_AND_DROP.questions.length})
-                            </Text>
-                        </Pressable>
-                    )}
-                </View>
+                                <Text
+                                    style={[
+                                        styles.submitButtonText,
+                                        {
+                                            opacity: isSubmitEnabled ? 1 : 0.6,
+                                            color: theme.colors.onSecondary,
+                                        },
+                                    ]}
+                                >
+                                    Submit ({Object.keys(answers).length}/
+                                    {DRAG_AND_DROP.questions.length})
+                                </Text>
+                            </Pressable>
+                        )}
+                        {isSubmitted && (
+                            <Pressable
+                                android_ripple={
+                                    isSubmitEnabled
+                                        ? { color: "#b8d418ff", borderless: false }
+                                        : null
+                                }
+                                style={[
+                                    styles.resetButton,
+                                    { backgroundColor: theme.colors.primary },
+                                ]}
+                                onPress={handleReset}
+                            >
+                                <Text
+                                    style={[
+                                        styles.resetButtonText,
+                                        { color: theme.colors.onPrimary },
+                                    ]}
+                                >
+                                    TRY AGAIN ({score}/{DRAG_AND_DROP.questions.length})
+                                </Text>
+                            </Pressable>
+                        )}
+                    </View>
                 </Container>
             </GestureHandlerRootView>
         </>
@@ -437,6 +488,9 @@ function DraggableChip({
     onDrop: (x: number, y: number, ans: string) => void;
     onHover: (x: number, y: number) => void;
 }) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
+
     const offsetX = useSharedValue(0);
     const offsetY = useSharedValue(0);
     const rotation = useSharedValue(0);
@@ -487,17 +541,25 @@ function DraggableChip({
             <Animated.View
                 style={[
                     styles.chip,
+                    {
+                        backgroundColor: theme.colors.primary,
+                        shadowColor: theme.colors.onSurface,
+                    },
                     stylez,
                     isSelected && {
-                        borderColor: "#4f46e5",
-                        backgroundColor: "white",
+                        borderColor: theme.colors.primary,
+                        backgroundColor: theme.colors.surface,
                     },
                 ]}
             >
                 <Text
                     style={[
                         styles.chipText,
-                        isSelected && { color: "black", fontSize: fontSizeScaler(label) },
+                        { color: theme.colors.onPrimary },
+                        isSelected && {
+                            color: theme.colors.onSurface,
+                            fontSize: fontSizeScaler(label),
+                        },
                     ]}
                 >
                     {label}
@@ -506,167 +568,149 @@ function DraggableChip({
         </GestureDetector>
     );
 }
-const styles = StyleSheet.create({
-    container: {
-    },
-    answersRow: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 8,
-        padding: 8,
-        zIndex: 10,
-    },
-    chip: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 25,
-        borderWidth: 0,
-        backgroundColor: "#4f46e5",
-        zIndex: 10,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+
+const makeStyles = (theme: AppTheme) =>
+    StyleSheet.create({
+        container: {},
+        answersRow: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 8,
+            padding: 8,
+            zIndex: 10,
         },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    chipText: {
-        color: "white",
-        fontWeight: "600",
-    },
-    // New style for scroll container
-    scrollContainer: {
-        flex: 1,
-        justifyContent: "center",
-    },
-    // Updated style for question container
-    questionContainer: {
-        width: WIDTH,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    dropZone: {
-        borderWidth: 2,
-        borderColor: "#d1d5db",
-        borderRadius: 12,
-        minHeight: 144,
-        justifyContent: "center",
-        backgroundColor: "white",
-        padding: 16,
-    },
-    dropZoneHovered: {
-        borderColor: "#4f46e5",
-        backgroundColor: "#eef2ff",
-    },
-    questionText: {
-        fontSize: 16,
-        fontWeight: "500",
-        marginBottom: 8,
-    },
-    answerText: {
-        fontSize: 14,
-        color: "#6b7280",
-    },
-    submittedAnswerContainer: {
-        rowGap: 4,
-        alignItems: "center",
-    },
-    correctAnswerLabel: {
-        textAlign: "left",
-        width: "100%",
-        fontWeight: "600",
-    },
-    answerInputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        justifyContent: "center",
-    },
-    answerBox: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 25,
-        borderWidth: 2,
-        borderColor: "#e5e7eb",
-        justifyContent: "center",
-        alignSelf: "flex-start",
-        maxWidth: "85%",
-        backgroundColor: "#f9fafb",
-    },
-    answerBoxFilled: {
-        backgroundColor: "#4f46e5",
-        borderColor: "transparent",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+        chip: {
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 25,
+            borderWidth: 0,
+            zIndex: 10,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 3,
         },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    removeButton: {
-        padding: 4,
-    },
-    submitContainer: {
-        padding: 16,
-        borderColor: "#eee",
-    },
-    submitButton: {
-        backgroundColor: "#4CAF50",
-        padding: 16,
-        borderRadius: 12,
-        alignItems: "center",
-    },
-    submitButtonText: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 16,
-    },
-    resetButton: {
-        backgroundColor: "#c58142ff",
-        padding: 16,
-        borderRadius: 12,
-        alignItems: "center",
-    },
-    resetButtonText: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 16,
-    },
-    errorContainer: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: "white",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    userAnswerChip: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 25,
-        borderWidth: 0,
-        alignSelf: "flex-start",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+        chipText: {
+            fontWeight: "600",
         },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    correctAnswerBg: {
-        backgroundColor: "green",
-    },
-    incorrectAnswerBg: {
-        backgroundColor: "red",
-    },
-    whiteAnswerText: {
-        color: "white",
-        fontWeight: "600",
-    },
-});
+        // New style for scroll container
+        scrollContainer: {
+            flex: 1,
+            justifyContent: "center",
+        },
+        // Updated style for question container
+        questionContainer: {
+            width: WIDTH,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+        },
+        dropZone: {
+            borderWidth: 2,
+            borderRadius: 12,
+            minHeight: 144,
+            justifyContent: "center",
+            padding: 16,
+        },
+        dropZoneHovered: {
+            borderColor: theme.colors?.tertiary,
+            backgroundColor: theme.colors?.tertiaryContainer,
+        },
+        questionText: {
+            fontSize: 16,
+            fontWeight: "500",
+            marginBottom: 8,
+        },
+        answerText: {
+            fontSize: 14,
+        },
+        submittedAnswerContainer: {
+            rowGap: 4,
+            alignItems: "center",
+        },
+        correctAnswerLabel: {
+            textAlign: "left",
+            width: "100%",
+            fontWeight: "600",
+        },
+        answerInputContainer: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            justifyContent: "center",
+        },
+        answerBox: {
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 25,
+            borderWidth: 2,
+            justifyContent: "center",
+            alignSelf: "flex-start",
+            maxWidth: "85%",
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        removeButton: {
+            padding: 4,
+        },
+        submitContainer: {
+            padding: 16,
+        },
+        submitButton: {
+            padding: 16,
+            borderRadius: 12,
+            alignItems: "center",
+        },
+        submitButtonText: {
+            fontWeight: "bold",
+            fontSize: 16,
+        },
+        resetButton: {
+            padding: 16,
+            borderRadius: 12,
+            alignItems: "center",
+        },
+        resetButtonText: {
+            fontWeight: "bold",
+            fontSize: 16,
+        },
+        errorContainer: {
+            flex: 1,
+            padding: 16,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        userAnswerChip: {
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 25,
+            borderWidth: 0,
+            alignSelf: "flex-start",
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        correctAnswerBg: {
+            backgroundColor: theme.colors?.secondary,
+        },
+        incorrectAnswerBg: {
+            backgroundColor: theme.colors?.error,
+        },
+        whiteAnswerText: {
+            fontWeight: "600",
+            color: theme.colors?.onTertiary,
+        },
+    });

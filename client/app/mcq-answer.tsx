@@ -6,6 +6,7 @@ import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-nativ
 
 import Card from "@/components/Card";
 import Container from "@/components/Container";
+import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { MultipleChoiceQ } from "@/types/review";
 import { useLocalSearchParams } from "expo-router";
@@ -13,6 +14,7 @@ import { useLocalSearchParams } from "expo-router";
 const { width } = Dimensions.get("window");
 
 export default function MultipleChoiceQuestionsAns() {
+    const theme = useAppTheme();
     const listRef = useRef<FlashListRef<any>>(null);
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     /**only enable answer submission when user answers every choice */
@@ -97,12 +99,12 @@ export default function MultipleChoiceQuestionsAns() {
                 style={{
                     flex: 1,
                     padding: 16,
-                    backgroundColor: "white",
+                    backgroundColor: theme.colors.surface,
                     alignItems: "center",
                     justifyContent: "center",
                 }}
             >
-                <Text>Invalid Quiz Id</Text>
+                <Text style={{ color: theme.colors.onSurface }}>Invalid Quiz Id</Text>
             </View>
         );
     }
@@ -113,12 +115,12 @@ export default function MultipleChoiceQuestionsAns() {
                 style={{
                     flex: 1,
                     padding: 16,
-                    backgroundColor: "white",
+                    backgroundColor: theme.colors.surface,
                     alignItems: "center",
                     justifyContent: "center",
                 }}
             >
-                <Text>Quiz not found.</Text>
+                <Text style={{ color: theme.colors.onSurface }}>Quiz not found.</Text>
             </View>
         );
     }
@@ -152,6 +154,7 @@ export default function MultipleChoiceQuestionsAns() {
                                     fontWeight: "bold",
                                     marginBottom: 20,
                                     textAlign: "center",
+                                    color: theme.colors.onSurface,
                                 }}
                             >
                                 {index + 1}. {item.question}
@@ -175,16 +178,16 @@ export default function MultipleChoiceQuestionsAns() {
                                                 marginVertical: 8,
                                                 borderRadius: 12,
                                                 borderWidth: 2,
-                                                borderColor: selected ? "#4CAF50" : "#ddd",
-                                                backgroundColor: selected ? "#E8F5E9" : "#fff",
+                                                borderColor: selected ? theme.colors.secondary : theme.colors.outline,
+                                                backgroundColor: selected ? theme.colors.secondaryContainer : theme.colors.surface,
                                             },
                                             isIncorrect && {
-                                                borderColor: "#b44422ff",
-                                                backgroundColor: "#e0c2b5ff",
+                                                borderColor: theme.colors.error,
+                                                backgroundColor: theme.colors.errorContainer,
                                             },
                                         ]}
                                     >
-                                        <Text style={{ fontSize: 16, textAlign: "center" }}>
+                                        <Text style={{ fontSize: 16, textAlign: "center", color: selected ? theme.colors.onSecondaryContainer : theme.colors.onSurface }}>
                                             {choice}
                                         </Text>
                                     </TouchableOpacity>
@@ -200,8 +203,8 @@ export default function MultipleChoiceQuestionsAns() {
                 style={{
                     padding: 16,
                     borderTopWidth: 1,
-                    borderColor: "#eee",
-                    backgroundColor: "white",
+                    borderColor: theme.colors.outlineVariant,
+                    backgroundColor: theme.colors.surface,
                 }}
             >
                 {!isSubmitted && (
@@ -210,7 +213,7 @@ export default function MultipleChoiceQuestionsAns() {
                             isSubmitEnabled ? { color: "#ccc", borderless: false } : null
                         }
                         style={{
-                            backgroundColor: "#4CAF50",
+                            backgroundColor: theme.colors.secondary,
                             padding: 16,
                             borderRadius: 12,
                             alignItems: "center",
@@ -220,7 +223,7 @@ export default function MultipleChoiceQuestionsAns() {
                     >
                         <Text
                             style={{
-                                color: "white",
+                                color: theme.colors.onSecondary,
                                 fontWeight: "bold",
                                 fontSize: 16,
                                 opacity: isSubmitEnabled ? 1 : 0.6,
@@ -237,7 +240,7 @@ export default function MultipleChoiceQuestionsAns() {
                             isSubmitEnabled ? { color: "#b8d418ff", borderless: false } : null
                         }
                         style={{
-                            backgroundColor: "#c58142ff",
+                            backgroundColor: theme.colors.primary,
                             padding: 16,
                             borderRadius: 12,
                             alignItems: "center",
@@ -246,7 +249,7 @@ export default function MultipleChoiceQuestionsAns() {
                     >
                         <Text
                             style={{
-                                color: "white",
+                                color: theme.colors.onPrimary,
                                 fontWeight: "bold",
                                 fontSize: 16,
                             }}

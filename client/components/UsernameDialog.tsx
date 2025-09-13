@@ -1,4 +1,5 @@
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { ADD_USERNAME_RESULT, addUsername } from "@/store/user/actions/addUsername";
 import userSelector from "@/store/user/user.store";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +22,8 @@ interface UsernameDialogProps {
 }
 
 export default function UsernameDialog({ visible, onClose, onSuccess }: UsernameDialogProps) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const [username, setUsername] = useState("");
     const user = userSelector.use.user();
     const [addUsernameFn, loading] = useAsyncStatus(addUsername);
@@ -92,7 +95,7 @@ export default function UsernameDialog({ visible, onClose, onSuccess }: Username
             <View style={styles.overlay}>
                 <View style={styles.dialog}>
                     <View style={styles.header}>
-                        <Ionicons name="person-add" size={24} color="#007AFF" />
+                        <Ionicons name="person-add" size={24} color={theme.colors.primary} />
                         <Text style={styles.title}>Create Username</Text>
                     </View>
 
@@ -107,7 +110,7 @@ export default function UsernameDialog({ visible, onClose, onSuccess }: Username
                             value={username}
                             onChangeText={(text) => setUsername(text.toLowerCase())}
                             placeholder="Enter your username"
-                            placeholderTextColor="#999"
+                            placeholderTextColor={theme.colors.onSurfaceVariant}
                             autoCapitalize="none"
                             autoCorrect={false}
                             maxLength={20}
@@ -137,7 +140,7 @@ export default function UsernameDialog({ visible, onClose, onSuccess }: Username
                             disabled={!validateUsername(username) || loading}
                         >
                             {loading ? (
-                                <ActivityIndicator size="small" color="white" />
+                                <ActivityIndicator size="small" color={theme.colors.onPrimary} />
                             ) : (
                                 <Text style={styles.submitButtonText}>Create</Text>
                             )}
@@ -149,103 +152,106 @@ export default function UsernameDialog({ visible, onClose, onSuccess }: Username
     );
 }
 
-const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    dialog: {
-        backgroundColor: "white",
-        borderRadius: 16,
-        padding: 24,
-        width: "100%",
-        maxWidth: 400,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 4,
+const makeStyles = (theme: AppTheme) => {
+    return StyleSheet.create({
+        overlay: {
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 16,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#333",
-        marginLeft: 12,
-    },
-    description: {
-        fontSize: 16,
-        color: "#666",
-        lineHeight: 22,
-        marginBottom: 24,
-    },
-    inputContainer: {
-        marginBottom: 24,
-    },
-    inputLabel: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#333",
-        marginBottom: 8,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
-        backgroundColor: "#f9f9f9",
-        marginBottom: 8,
-    },
-    inputHint: {
-        fontSize: 12,
-        color: "#999",
-        fontStyle: "italic",
-    },
-    buttonContainer: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        gap: 12,
-    },
-    button: {
-        flex: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: 44,
-    },
-    cancelButton: {
-        backgroundColor: "#f0f0f0",
-        borderWidth: 1,
-        borderColor: "#ddd",
-    },
-    cancelButtonText: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#666",
-    },
-    submitButton: {
-        backgroundColor: "#007AFF",
-    },
-    submitButtonText: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "white",
-    },
-    disabledButton: {
-        backgroundColor: "#ccc",
-        opacity: 0.6,
-    },
-});
+        dialog: {
+            backgroundColor: theme.colors.surface,
+            borderRadius: 16,
+            padding: 24,
+            width: "100%",
+            maxWidth: 400,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 4,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 8,
+            elevation: 8,
+        },
+        header: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 16,
+        },
+        title: {
+            fontSize: 20,
+            fontWeight: "bold",
+            color: theme.colors.onSurface,
+            marginLeft: 12,
+        },
+        description: {
+            fontSize: 16,
+            color: theme.colors.onSurfaceVariant,
+            lineHeight: 22,
+            marginBottom: 24,
+        },
+        inputContainer: {
+            marginBottom: 24,
+        },
+        inputLabel: {
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.colors.onSurface,
+            marginBottom: 8,
+        },
+        input: {
+            borderWidth: 1,
+            borderColor: theme.colors.outline,
+            borderRadius: 8,
+            padding: 12,
+            fontSize: 16,
+            backgroundColor: theme.colors.surfaceVariant,
+            color: theme.colors.onSurface,
+            marginBottom: 8,
+        },
+        inputHint: {
+            fontSize: 12,
+            color: theme.colors.onSurfaceVariant,
+            fontStyle: "italic",
+        },
+        buttonContainer: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            gap: 12,
+        },
+        button: {
+            flex: 1,
+            paddingVertical: 12,
+            paddingHorizontal: 16,
+            borderRadius: 8,
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 44,
+        },
+        cancelButton: {
+            backgroundColor: theme.colors.surfaceVariant,
+            borderWidth: 1,
+            borderColor: theme.colors.outline,
+        },
+        cancelButtonText: {
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.colors.onSurfaceVariant,
+        },
+        submitButton: {
+            backgroundColor: theme.colors.primary,
+        },
+        submitButtonText: {
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.colors.onPrimary,
+        },
+        disabledButton: {
+            backgroundColor: theme.colors.surfaceVariant,
+            opacity: 0.6,
+        },
+    });
+};

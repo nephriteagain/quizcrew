@@ -1,6 +1,7 @@
 import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
 import { DEFAULT_USER } from "@/constants/values";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import userSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
@@ -11,6 +12,8 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Profile() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const quizzes = reviewSelector.use.quizzes();
     const userData = userSelector.use.userData();
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
@@ -152,14 +155,18 @@ export default function Profile() {
                     <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
                     <View style={{ flexDirection: "row", columnGap: 8 }}>
                         <Link href={"/connections"}>
-                            <Text style={{ color: "#000000bf" }}>
-                                <Text style={{ fontWeight: "600", color: "black" }}>10 </Text>
+                            <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                                <Text style={{ fontWeight: "600", color: theme.colors.onSurface }}>
+                                    10{" "}
+                                </Text>
                                 connections
                             </Text>
                         </Link>
                         <Link href={"/under-construction"}>
-                            <Text style={{ color: "#000000bf" }}>
-                                <Text style={{ fontWeight: "600", color: "black" }}>2 </Text>
+                            <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                                <Text style={{ fontWeight: "600", color: theme.colors.onSurface }}>
+                                    2{" "}
+                                </Text>
                                 groups
                             </Text>
                         </Link>
@@ -180,115 +187,117 @@ export default function Profile() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-    },
-    header: {
-        alignItems: "center",
-        backgroundColor: "#fff",
-        borderBottomWidth: 1,
-        borderBottomColor: "#e0e0e0",
-        flexDirection: "row",
-        paddingTop: 32,
-        paddingHorizontal: 16,
-        paddingBottom: 16,
-    },
-    avatarContainer: {
-        position: "relative",
-        marginRight: 16,
-    },
-    avatar: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-    },
-    editPhotoButton: {
-        position: "absolute",
-        bottom: 0,
-        right: 0,
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: "#007AFF",
-        justifyContent: "center",
-        alignItems: "center",
-        borderWidth: 2,
-        borderColor: "white",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+const makeStyles = (theme: AppTheme) => {
+    return StyleSheet.create({
+        container: {},
+        header: {
+            alignItems: "center",
+            backgroundColor: theme.colors.surface,
+            borderBottomWidth: 1,
+            borderBottomColor: theme.colors.outline,
+            flexDirection: "row",
+            paddingTop: 32,
+            paddingHorizontal: 16,
+            paddingBottom: 16,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 3,
-        elevation: 5,
-    },
-    displayName: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginBottom: 5,
-    },
-    email: {
-        fontSize: 16,
-        color: "#666",
-    },
-    quizzesSection: {
-        flex: 1,
-        padding: 16,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 8,
-        color: "#333",
-    },
-    listContainer: {
-        paddingBottom: 20,
-    },
-    quizItem: {
-        backgroundColor: "#fff",
-        padding: 16,
-        marginBottom: 12,
-        borderRadius: 8,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+        avatarContainer: {
+            position: "relative",
+            marginRight: 16,
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    quizTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 8,
-        color: "#333",
-    },
-    quizDescription: {
-        fontSize: 14,
-        color: "#666",
-        marginBottom: 8,
-    },
-    quizType: {
-        fontSize: 12,
-        fontWeight: "bold",
-        color: "#007AFF",
-        marginBottom: 4,
-    },
-    quizDate: {
-        fontSize: 12,
-        color: "#999",
-        marginBottom: 8,
-    },
-    tagsContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-    },
-    tag: {
-        fontSize: 12,
-        color: "#007AFF",
-        marginRight: 8,
-        marginBottom: 4,
-    },
-});
+        avatar: {
+            width: 80,
+            height: 80,
+            borderRadius: 40,
+        },
+        editPhotoButton: {
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            backgroundColor: theme.colors.primary,
+            justifyContent: "center",
+            alignItems: "center",
+            borderWidth: 2,
+            borderColor: theme.colors.surface,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3,
+            elevation: 5,
+        },
+        displayName: {
+            fontSize: 24,
+            fontWeight: "bold",
+            marginBottom: 5,
+            color: theme.colors.onSurface,
+        },
+        email: {
+            fontSize: 16,
+            color: theme.colors.onSurfaceVariant,
+        },
+        quizzesSection: {
+            flex: 1,
+            padding: 16,
+        },
+        sectionTitle: {
+            fontSize: 18,
+            fontWeight: "bold",
+            marginBottom: 8,
+            color: theme.colors.onSurface,
+        },
+        listContainer: {
+            paddingBottom: 20,
+        },
+        quizItem: {
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+            marginBottom: 12,
+            borderRadius: 8,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        quizTitle: {
+            fontSize: 18,
+            fontWeight: "bold",
+            marginBottom: 8,
+            color: theme.colors.onSurface,
+        },
+        quizDescription: {
+            fontSize: 14,
+            color: theme.colors.onSurfaceVariant,
+            marginBottom: 8,
+        },
+        quizType: {
+            fontSize: 12,
+            fontWeight: "bold",
+            color: theme.colors.primary,
+            marginBottom: 4,
+        },
+        quizDate: {
+            fontSize: 12,
+            color: theme.colors.onSurfaceVariant,
+            marginBottom: 8,
+        },
+        tagsContainer: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+        },
+        tag: {
+            fontSize: 12,
+            color: theme.colors.primary,
+            marginRight: 8,
+            marginBottom: 4,
+        },
+    });
+};

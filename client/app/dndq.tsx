@@ -1,6 +1,7 @@
 // app/DragAndDropQuiz.tsx
 // import { DRAG_AND_DROP } from "@/lib/data";
 import Container from "@/components/Container";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { DragAndDrop } from "@/types/review";
 import { Link, useLocalSearchParams } from "expo-router";
@@ -21,6 +22,8 @@ const colors = [
 ];
 
 export default function DragAndDropQuiz() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const [showAnswer, setShowAnswer] = useState(false);
     const [individualAnswers, setIndividualAnswers] = useState<Set<number>>(new Set());
     const toggleSwitch = () => {
@@ -73,9 +76,9 @@ export default function DragAndDropQuiz() {
                     {showAnswer ? "Hide All Answers" : "Show All Answers"}
                 </Text>
                 <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
+                    trackColor={{ false: theme.colors.outline, true: theme.colors.primary }}
+                    thumbColor={showAnswer ? theme.colors.onPrimary : theme.colors.surface}
+                    ios_backgroundColor={theme.colors.outline}
                     onValueChange={toggleSwitch}
                     value={showAnswer}
                 />
@@ -127,7 +130,7 @@ export default function DragAndDropQuiz() {
                             >
                                 <Pressable
                                     android_ripple={{
-                                        color: "#f0f0f0",
+                                        color: theme.colors.surfaceVariant,
                                     }}
                                     onPress={() => toggleIndividualAnswer(idx)}
                                     style={styles.questionPressable}
@@ -197,6 +200,9 @@ function Chip({
     label: string;
     color?: { bg: string; border: string; text: string };
 }) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
+
     return (
         <Animated.View
             style={[
@@ -204,7 +210,7 @@ function Chip({
                 color && {
                     backgroundColor: color.bg,
                     borderColor: color.border,
-                    shadowColor: "#000",
+                    shadowColor: theme.colors.onSurface,
                     shadowOffset: {
                         width: 0,
                         height: 2,
@@ -221,119 +227,122 @@ function Chip({
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-    },
-    errorContainer: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: "white",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    switchContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        zIndex: 10,
-    },
-    switchLabel: {
-        fontWeight: "600",
-        fontSize: 16,
-    },
-    scrollView: {
-        flex: 1,
-    },
-    answersRow: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        marginBottom: 20,
-    },
-    chip: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 25,
-        margin: 4,
-        zIndex: 10,
-        borderWidth: 1,
-        borderColor: "#00000040",
-        backgroundColor: "white",
-    },
-    chipText: {
-        color: "#000000bf",
-        fontWeight: "600",
-    },
-    questions: {
-        gap: 12,
-    },
-    dropZone: {
-        padding: 16,
-        borderWidth: 2,
-        borderColor: "#d1d5db",
-        borderRadius: 12,
-        minHeight: 70,
-        justifyContent: "center",
-        backgroundColor: "white",
-        marginBottom: 12,
-    },
-    questionPressable: {
-        padding: 8,
-        marginBottom: 8,
-        borderRadius: 8,
-        backgroundColor: "rgba(0,0,0,0.02)",
-    },
-    questionText: {
-        fontSize: 16,
-        fontWeight: "500",
-        marginBottom: 6,
-    },
-    individualAnswerHint: {
-        fontSize: 14,
-        fontWeight: "600",
-        color: "#4CAF50",
-        marginTop: 4,
-        fontStyle: "italic",
-    },
-    answerContainer: {
-        marginTop: 8,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 25,
-        borderWidth: 0,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+const makeStyles = (theme: AppTheme) =>
+    StyleSheet.create({
+        container: {
+            padding: 16,
         },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    answerText: {
-        fontSize: 14,
-        color: "#6b7280",
-        textAlign: "center",
-    },
-    visibleAnswer: {
-        color: "black",
-        fontWeight: "600",
-    },
-    bottomContainer: {
-        padding: 16,
-        borderTopWidth: 1,
-        borderColor: "#eee",
-        backgroundColor: "white",
-    },
-    quizButton: {
-        backgroundColor: "#2196F3",
-        padding: 16,
-        borderRadius: 12,
-        alignItems: "center",
-    },
-    quizButtonText: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 16,
-    },
-});
+        errorContainer: {
+            flex: 1,
+            padding: 16,
+            backgroundColor: theme.colors.surface,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        switchContainer: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            zIndex: 10,
+        },
+        switchLabel: {
+            fontWeight: "600",
+            fontSize: 16,
+            color: theme.colors.onSurface,
+        },
+        scrollView: {
+            flex: 1,
+        },
+        answersRow: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            marginBottom: 20,
+        },
+        chip: {
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 25,
+            margin: 4,
+            zIndex: 10,
+            borderWidth: 1,
+            borderColor: theme.colors.outline,
+            backgroundColor: theme.colors.surface,
+        },
+        chipText: {
+            color: theme.colors.onSurfaceVariant,
+            fontWeight: "600",
+        },
+        questions: {
+            gap: 12,
+        },
+        dropZone: {
+            padding: 16,
+            borderWidth: 2,
+            borderColor: theme.colors.outline,
+            borderRadius: 12,
+            minHeight: 70,
+            justifyContent: "center",
+            backgroundColor: theme.colors.surface,
+            marginBottom: 12,
+        },
+        questionPressable: {
+            padding: 8,
+            marginBottom: 8,
+            borderRadius: 8,
+            backgroundColor: "rgba(0,0,0,0.02)",
+        },
+        questionText: {
+            fontSize: 16,
+            fontWeight: "500",
+            marginBottom: 6,
+            color: theme.colors.onSurface,
+        },
+        individualAnswerHint: {
+            fontSize: 14,
+            fontWeight: "600",
+            color: theme.colors.secondary,
+            marginTop: 4,
+            fontStyle: "italic",
+        },
+        answerContainer: {
+            marginTop: 8,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 25,
+            borderWidth: 0,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        answerText: {
+            fontSize: 14,
+            color: theme.colors.onSurfaceVariant,
+            textAlign: "center",
+        },
+        visibleAnswer: {
+            color: theme.colors.onSurface,
+            fontWeight: "600",
+        },
+        bottomContainer: {
+            padding: 16,
+            borderTopWidth: 1,
+            borderColor: theme.colors.outline,
+            backgroundColor: theme.colors.surface,
+        },
+        quizButton: {
+            backgroundColor: theme.colors.error,
+            padding: 16,
+            borderRadius: 12,
+            alignItems: "center",
+        },
+        quizButtonText: {
+            color: theme.colors.onError,
+            fontWeight: "bold",
+            fontSize: 16,
+        },
+    });

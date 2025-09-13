@@ -1,4 +1,5 @@
 import Container from "@/components/Container";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { TrueOrFalseQ } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
@@ -8,6 +9,8 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import Animated, { FadeInLeft, FadeOutLeft, LinearTransition } from "react-native-reanimated";
 
 export default function TrueOrFalseQuestions() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const [showAnswer, setShowAnswer] = useState(false);
     const [individualAnswers, setIndividualAnswers] = useState<Set<number>>(new Set());
     const toggleSwitch = () => {
@@ -54,9 +57,9 @@ export default function TrueOrFalseQuestions() {
                     {showAnswer ? "Hide All Answers" : "Show All Answers"}
                 </Text>
                 <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={showAnswer ? "#f5dd4b" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
+                    trackColor={{ false: theme.colors.outline, true: theme.colors.primary }}
+                    thumbColor={showAnswer ? theme.colors.onPrimary : theme.colors.surface}
+                    ios_backgroundColor={theme.colors.outline}
                     onValueChange={toggleSwitch}
                     value={showAnswer}
                 />
@@ -76,7 +79,7 @@ export default function TrueOrFalseQuestions() {
                         >
                             <Pressable
                                 android_ripple={{
-                                    color: "#f0f0f0",
+                                    color: theme.colors.surfaceVariant,
                                 }}
                                 onPress={() => toggleIndividualAnswer(index)}
                                 style={styles.questionPressable}
@@ -144,83 +147,87 @@ export default function TrueOrFalseQuestions() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-    },
-    errorContainer: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: "white",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    toggleContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        backgroundColor: "white",
-        zIndex: 10,
-    },
-    toggleText: {
-        fontWeight: "600",
-        fontSize: 16,
-    },
-    questionContainer: {},
-    itemSeparator: {
-        height: 8,
-    },
-    questionPressable: {
-        paddingVertical: 6,
-        borderRadius: 8,
-        backgroundColor: "rgba(0,0,0,0.02)",
-        marginBottom: 4,
-    },
-    questionText: {
-        fontSize: 16,
-        fontWeight: "bold",
-        marginBottom: 0,
-    },
-    choicesRow: {
-        flexDirection: "row",
-        width: "100%",
-    },
-    choiceContainer: {
-        padding: 8,
-        marginVertical: 6,
-        borderRadius: 8,
-        borderWidth: 1,
-        width: 100,
-        alignItems: "center",
-        marginLeft: 14,
-    },
-    answerTrue: {
-        borderColor: "#4CAF50",
-        backgroundColor: "#E8F5E9",
-    },
-    answerFalse: {
-        borderColor: "#F44336",
-        backgroundColor: "#FFEBEE",
-    },
-    choiceText: {
-        fontSize: 14,
-        fontWeight: "600",
-    },
-    footerContainer: {
-        padding: 16,
-        borderTopWidth: 1,
-        borderColor: "#eee",
-        backgroundColor: "white",
-    },
-    takeQuizButton: {
-        backgroundColor: "#2196F3",
-        padding: 16,
-        borderRadius: 12,
-        alignItems: "center",
-    },
-    takeQuizText: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 16,
-    },
-});
+const makeStyles = (theme: AppTheme) =>
+    StyleSheet.create({
+        container: {
+            padding: 16,
+        },
+        errorContainer: {
+            flex: 1,
+            padding: 16,
+            backgroundColor: theme.colors.surface,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        toggleContainer: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            backgroundColor: theme.colors.surface,
+            zIndex: 10,
+        },
+        toggleText: {
+            fontWeight: "600",
+            fontSize: 16,
+            color: theme.colors.onSurface,
+        },
+        questionContainer: {},
+        itemSeparator: {
+            height: 8,
+        },
+        questionPressable: {
+            paddingVertical: 6,
+            borderRadius: 8,
+            backgroundColor: "rgba(0,0,0,0.02)",
+            marginBottom: 4,
+        },
+        questionText: {
+            fontSize: 16,
+            fontWeight: "bold",
+            marginBottom: 0,
+            color: theme.colors.onSurface,
+        },
+        choicesRow: {
+            flexDirection: "row",
+            width: "100%",
+        },
+        choiceContainer: {
+            padding: 8,
+            marginVertical: 6,
+            borderRadius: 8,
+            borderWidth: 1,
+            width: 100,
+            alignItems: "center",
+            marginLeft: 14,
+        },
+        answerTrue: {
+            borderColor: theme.colors.secondary,
+            backgroundColor: theme.colors.secondaryContainer,
+        },
+        answerFalse: {
+            borderColor: theme.colors.error,
+            backgroundColor: theme.colors.errorContainer,
+        },
+        choiceText: {
+            fontSize: 14,
+            fontWeight: "600",
+            color: theme.colors.onSurface,
+        },
+        footerContainer: {
+            padding: 16,
+            borderTopWidth: 1,
+            borderColor: theme.colors.outline,
+            backgroundColor: theme.colors.surface,
+        },
+        takeQuizButton: {
+            backgroundColor: theme.colors.tertiary,
+            padding: 16,
+            borderRadius: 12,
+            alignItems: "center",
+        },
+        takeQuizText: {
+            color: theme.colors.onTertiary,
+            fontWeight: "bold",
+            fontSize: 16,
+        },
+    });

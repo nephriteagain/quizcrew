@@ -1,4 +1,5 @@
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { deleteQuiz } from "@/store/review/actions/deleteQuiz";
 import { QuizDoc } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +17,8 @@ interface SettingsBottomSheetProps {
 
 const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
     ({ reviews, quizId, onSheetChanges }, ref) => {
+        const theme = useAppTheme();
+        const styles = makeStyles(theme);
         const router = useRouter();
         const onComplete = useCallback(() => {
             (ref as any)?.current?.close();
@@ -97,20 +100,33 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
                         <Text style={styles.headerTitle}>Quiz Settings</Text>
 
                         <TouchableOpacity style={styles.settingButton} onPress={handleEditQuiz}>
-                            <Ionicons name="create-outline" size={24} color="#4f46e5" />
+                            <Ionicons
+                                name="create-outline"
+                                size={24}
+                                color={theme.colors.primary}
+                            />
                             <Text style={styles.settingButtonText}>Edit Quiz</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.settingButton} onPress={handleShareQuiz}>
-                            <Ionicons name="share-outline" size={24} color="#10b981" />
-                            <Text style={[styles.settingButtonText, { color: "#10b981" }]}>
+                            <Ionicons
+                                name="share-outline"
+                                size={24}
+                                color={theme.colors.secondary}
+                            />
+                            <Text
+                                style={[
+                                    styles.settingButtonText,
+                                    { color: theme.colors.secondary },
+                                ]}
+                            >
                                 Share Quiz
                             </Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.settingButton} onPress={handleDeleteQuiz}>
-                            <Ionicons name="trash-outline" size={24} color="#ef4444" />
-                            <Text style={[styles.settingButtonText, { color: "#ef4444" }]}>
+                            <Ionicons name="trash-outline" size={24} color={theme.colors.error} />
+                            <Text style={[styles.settingButtonText, { color: theme.colors.error }]}>
                                 Delete Quiz
                             </Text>
                         </TouchableOpacity>
@@ -122,37 +138,40 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
     }
 );
 
+SettingsBottomSheet.displayName = "SettingsBottomSheet";
+
 export default memo(SettingsBottomSheet);
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "grey",
-    },
-    contentContainer: {
-        flex: 1,
-        padding: 24,
-        alignItems: "center",
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#1f2937",
-        marginBottom: 24,
-    },
-    settingButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 16,
-        backgroundColor: "#f9fafb",
-        borderRadius: 12,
-        marginBottom: 12,
-        width: "100%",
-        columnGap: 12,
-    },
-    settingButtonText: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#4f46e5",
-    },
-});
+const makeStyles = (theme: AppTheme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: theme.colors.onSurfaceVariant,
+        },
+        contentContainer: {
+            flex: 1,
+            padding: 24,
+            alignItems: "center",
+        },
+        headerTitle: {
+            fontSize: 20,
+            fontWeight: "bold",
+            color: theme.colors.onSurface,
+            marginBottom: 24,
+        },
+        settingButton: {
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 16,
+            backgroundColor: theme.colors.surface,
+            borderRadius: 12,
+            marginBottom: 12,
+            width: "100%",
+            columnGap: 12,
+        },
+        settingButtonText: {
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.colors.primary,
+        },
+    });

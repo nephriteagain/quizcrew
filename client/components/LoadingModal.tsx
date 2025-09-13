@@ -1,4 +1,5 @@
-import { Modal, Text, View } from "react-native";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { Modal, StyleSheet, Text, View } from "react-native";
 
 export default function LoadingModal({
     isVisible,
@@ -7,38 +8,40 @@ export default function LoadingModal({
     isVisible: boolean;
     loadingText: string;
 }) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
+
     return (
         <Modal
             visible={isVisible}
             transparent
             animationType="fade"
-            // onRequestClose={onClose}
             statusBarTranslucent
             style={{ flex: 1 }}
         >
-            <View
-                style={[
-                    // StyleSheet.absoluteFill,
-                    {
-                        flex: 1,
-                        backgroundColor: "rgba(0,0,0,0.5)",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    },
-                ]}
-            >
-                <Text
-                    style={{
-                        fontWeight: "600",
-                        fontSize: 20,
-                        textAlign: "center",
-                        color: "white",
-                        zIndex: 10,
-                    }}
-                >
+            <View style={styles.backdrop}>
+                <Text style={styles.loadingText}>
                     {loadingText}
                 </Text>
             </View>
         </Modal>
     );
 }
+
+const makeStyles = (theme: AppTheme) => {
+    return StyleSheet.create({
+        backdrop: {
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+        },
+        loadingText: {
+            fontWeight: "600",
+            fontSize: 20,
+            textAlign: "center",
+            color: theme.colors.onPrimary,
+            zIndex: 10,
+        },
+    });
+};

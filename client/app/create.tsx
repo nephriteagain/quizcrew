@@ -1,6 +1,7 @@
 import Container from "@/components/Container";
 import LoadingModal from "@/components/LoadingModal";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { createReviewer } from "@/store/review/actions/createReviewer";
 import { QUIZ_TYPE } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
@@ -20,6 +21,8 @@ const QUIZ_LABEL = {
 };
 
 export default function CreateQuiz() {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     /** note: format in base64 */
     const [assets, setAssets] = useState<ImagePicker.ImagePickerAsset[]>([]);
     const router = useRouter();
@@ -232,157 +235,158 @@ export default function CreateQuiz() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        rowGap: 12,
-    },
-    header: {
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 16,
-        backgroundColor: "white",
-        borderBottomWidth: 1,
-        borderBottomColor: "#e9ecef",
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: "700",
-        color: "#212529",
-        marginBottom: 4,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: "#6c757d",
-        fontWeight: "400",
-    },
-    buttonContainer: {
-        paddingHorizontal: 20,
-        columnGap: 12,
-        flexDirection: "row",
-        width: "100%",
-    },
-    button: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 16,
-        borderRadius: 16,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+const makeStyles = (theme: AppTheme) =>
+    StyleSheet.create({
+        container: {
+            rowGap: 12,
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        flexGrow: 1,
-    },
-    primaryButton: {
-        backgroundColor: "#007bff",
-    },
-    secondaryButton: {
-        backgroundColor: "white",
-        borderWidth: 2,
-        borderColor: "#007bff",
-    },
-    buttonPressed: {
-        transform: [{ scale: 0.98 }],
-        opacity: 0.9,
-    },
-    buttonIcon: {
-        fontSize: 20,
-        marginRight: 12,
-    },
-    primaryButtonText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    secondaryButtonText: {
-        color: "#007bff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    imagesSection: {
-        flex: 1,
-        padding: 20,
-    },
-    imagesSectionHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 16,
-    },
-    imagesSectionTitle: {
-        fontSize: 18,
-        fontWeight: "600",
-        color: "#212529",
-    },
-    clearAllText: {
-        color: "#dc3545",
-        fontSize: 14,
-        fontWeight: "500",
-    },
-    listContainer: {
-        paddingBottom: 20,
-    },
-    emptyState: {
-        alignItems: "center",
-        paddingVertical: 60,
-        paddingHorizontal: 40,
-    },
-    emptyStateIcon: {
-        fontSize: 48,
-        marginBottom: 16,
-    },
-    emptyStateTitle: {
-        fontSize: 20,
-        fontWeight: "600",
-        color: "#495057",
-        marginBottom: 8,
-        textAlign: "center",
-    },
-    emptyStateText: {
-        fontSize: 16,
-        color: "#6c757d",
-        textAlign: "center",
-        lineHeight: 24,
-    },
-    imageContainer: {
-        marginHorizontal: 8,
-        marginBottom: 16,
-        paddingTop: 8,
-        paddingRight: 8,
-    },
-    image: {
-        width: imageSize,
-        height: imageSize,
-        borderRadius: 12,
-        backgroundColor: "#e9ecef",
-    },
-    removeButton: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: "#dc3545",
-        justifyContent: "center",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
+        header: {
+            paddingHorizontal: 20,
+            paddingTop: 20,
+            paddingBottom: 16,
+            backgroundColor: theme.colors.surface,
+            borderBottomWidth: 1,
+            borderBottomColor: theme.colors.outline,
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 3,
-        elevation: 5,
-    },
-    removeButtonText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "600",
-        lineHeight: 16,
-    },
-});
+        title: {
+            fontSize: 28,
+            fontWeight: "700",
+            color: theme.colors.onSurface,
+            marginBottom: 4,
+        },
+        subtitle: {
+            fontSize: 16,
+            color: theme.colors.onSurfaceVariant,
+            fontWeight: "400",
+        },
+        buttonContainer: {
+            paddingHorizontal: 20,
+            columnGap: 12,
+            flexDirection: "row",
+            width: "100%",
+        },
+        button: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            borderRadius: 16,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+            flexGrow: 1,
+        },
+        primaryButton: {
+            backgroundColor: theme.colors.primary,
+        },
+        secondaryButton: {
+            backgroundColor: theme.colors.surface,
+            borderWidth: 2,
+            borderColor: theme.colors.primary,
+        },
+        buttonPressed: {
+            transform: [{ scale: 0.98 }],
+            opacity: 0.9,
+        },
+        buttonIcon: {
+            fontSize: 20,
+            marginRight: 12,
+        },
+        primaryButtonText: {
+            color: theme.colors.onPrimary,
+            fontSize: 16,
+            fontWeight: "600",
+        },
+        secondaryButtonText: {
+            color: theme.colors.primary,
+            fontSize: 16,
+            fontWeight: "600",
+        },
+        imagesSection: {
+            flex: 1,
+            padding: 20,
+        },
+        imagesSectionHeader: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
+        },
+        imagesSectionTitle: {
+            fontSize: 18,
+            fontWeight: "600",
+            color: theme.colors.onSurface,
+        },
+        clearAllText: {
+            color: theme.colors.error,
+            fontSize: 14,
+            fontWeight: "500",
+        },
+        listContainer: {
+            paddingBottom: 20,
+        },
+        emptyState: {
+            alignItems: "center",
+            paddingVertical: 60,
+            paddingHorizontal: 40,
+        },
+        emptyStateIcon: {
+            fontSize: 48,
+            marginBottom: 16,
+        },
+        emptyStateTitle: {
+            fontSize: 20,
+            fontWeight: "600",
+            color: theme.colors.onSurface,
+            marginBottom: 8,
+            textAlign: "center",
+        },
+        emptyStateText: {
+            fontSize: 16,
+            color: theme.colors.onSurfaceVariant,
+            textAlign: "center",
+            lineHeight: 24,
+        },
+        imageContainer: {
+            marginHorizontal: 8,
+            marginBottom: 16,
+            paddingTop: 8,
+            paddingRight: 8,
+        },
+        image: {
+            width: imageSize,
+            height: imageSize,
+            borderRadius: 12,
+            backgroundColor: theme.colors.surfaceVariant,
+        },
+        removeButton: {
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: 24,
+            height: 24,
+            borderRadius: 12,
+            backgroundColor: theme.colors.error,
+            justifyContent: "center",
+            alignItems: "center",
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3,
+            elevation: 5,
+        },
+        removeButtonText: {
+            color: theme.colors.onError,
+            fontSize: 16,
+            fontWeight: "600",
+            lineHeight: 16,
+        },
+    });

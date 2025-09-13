@@ -1,4 +1,5 @@
 import { WIDTH } from "@/constants/values";
+import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { AudioPlayer, useAudioPlayer } from "expo-audio";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
@@ -17,6 +18,8 @@ const APPLAUSE3 = require("@/assets/sounds/applause3.wav");
 const APPLAUSE4 = require("@/assets/sounds/applause4.wav"); // lowest
 
 export function QuizResultModal({ score, totalQuestion, visible, onClose }: QuizResultModalProps) {
+    const theme = useAppTheme();
+    const styles = makeStyles(theme);
     const scorePercent = useMemo(() => {
         return score / totalQuestion;
     }, [score, totalQuestion]);
@@ -110,11 +113,11 @@ export function QuizResultModal({ score, totalQuestion, visible, onClose }: Quiz
     );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (theme: AppTheme) => StyleSheet.create({
     modal: { flex: 1 },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0,0,0,0.6)",
+        backgroundColor: `${theme.colors.onSurface}99`,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -122,26 +125,28 @@ const styles = StyleSheet.create({
         width: "80%",
         padding: 24,
         borderRadius: 16,
-        backgroundColor: "white",
+        backgroundColor: theme.colors.surface,
         alignItems: "center",
     },
     scoreText: {
         fontSize: 24,
         fontWeight: "bold",
         marginBottom: 12,
+        color: theme.colors.onSurface,
     },
     resultText: {
         fontSize: 18,
         marginBottom: 20,
+        color: theme.colors.onSurface,
     },
     closeButton: {
-        backgroundColor: "#4CAF50",
+        backgroundColor: theme.colors.secondary,
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 12,
     },
     closeButtonText: {
-        color: "white",
+        color: theme.colors.onPrimary,
         fontWeight: "bold",
         fontSize: 16,
     },

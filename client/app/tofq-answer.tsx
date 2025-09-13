@@ -6,6 +6,7 @@ import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-nativ
 
 import Card from "@/components/Card";
 import Container from "@/components/Container";
+import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { TrueOrFalseQ } from "@/types/review";
 import { useLocalSearchParams } from "expo-router";
@@ -13,6 +14,7 @@ import { useLocalSearchParams } from "expo-router";
 const { width } = Dimensions.get("window");
 
 export default function TrueOrFalseQuestionsAns() {
+    const theme = useAppTheme();
     const listRef = useRef<FlashListRef<any>>(null);
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     const [resultModalVisible, setResultModalVisible] = useState(false);
@@ -88,7 +90,7 @@ export default function TrueOrFalseQuestionsAns() {
     }, []);
 
     return (
-        <Container style={{ flex: 1, backgroundColor: "white" }}>
+        <Container style={{ flex: 1, backgroundColor: theme.colors.surface }}>
             {/* TOF QUESTIONS list */}
             <FlashList
                 ref={listRef}
@@ -115,6 +117,7 @@ export default function TrueOrFalseQuestionsAns() {
                                     fontWeight: "bold",
                                     marginBottom: 20,
                                     textAlign: "center",
+                                    color: theme.colors.onSurface,
                                 }}
                             >
                                 {index + 1}. {item.question}
@@ -140,16 +143,16 @@ export default function TrueOrFalseQuestionsAns() {
                                                 marginVertical: 8,
                                                 borderRadius: 12,
                                                 borderWidth: 2,
-                                                borderColor: selected ? "#2196F3" : "#ddd",
-                                                backgroundColor: selected ? "#E3F2FD" : "#fff",
+                                                borderColor: selected ? theme.colors.tertiary : theme.colors.outline,
+                                                backgroundColor: selected ? theme.colors.tertiaryContainer : theme.colors.surface,
                                             },
                                             isIncorrect && {
-                                                borderColor: "#b44422ff",
-                                                backgroundColor: "#e0c2b5ff",
+                                                borderColor: theme.colors.error,
+                                                backgroundColor: theme.colors.errorContainer,
                                             },
                                         ]}
                                     >
-                                        <Text style={{ fontSize: 16, textAlign: "center" }}>
+                                        <Text style={{ fontSize: 16, textAlign: "center", color: selected ? theme.colors.onTertiaryContainer : theme.colors.onSurface }}>
                                             {choice}
                                         </Text>
                                     </TouchableOpacity>
@@ -165,8 +168,8 @@ export default function TrueOrFalseQuestionsAns() {
                 style={{
                     padding: 16,
                     borderTopWidth: 1,
-                    borderColor: "#eee",
-                    backgroundColor: "white",
+                    borderColor: theme.colors.outlineVariant,
+                    backgroundColor: theme.colors.surface,
                 }}
             >
                 {!isSubmitted && (
@@ -175,7 +178,7 @@ export default function TrueOrFalseQuestionsAns() {
                             isSubmitEnabled ? { color: "#ccc", borderless: false } : null
                         }
                         style={{
-                            backgroundColor: "#2196F3",
+                            backgroundColor: theme.colors.tertiary,
                             padding: 16,
                             borderRadius: 12,
                             alignItems: "center",
@@ -185,7 +188,7 @@ export default function TrueOrFalseQuestionsAns() {
                     >
                         <Text
                             style={{
-                                color: "white",
+                                color: theme.colors.onTertiary,
                                 fontWeight: "bold",
                                 fontSize: 16,
                                 opacity: isSubmitEnabled ? 1 : 0.6,
@@ -199,7 +202,7 @@ export default function TrueOrFalseQuestionsAns() {
                     <Pressable
                         android_ripple={{ color: "#b8d418ff", borderless: false }}
                         style={{
-                            backgroundColor: "#c58142ff",
+                            backgroundColor: theme.colors.secondary,
                             padding: 16,
                             borderRadius: 12,
                             alignItems: "center",
@@ -208,7 +211,7 @@ export default function TrueOrFalseQuestionsAns() {
                     >
                         <Text
                             style={{
-                                color: "white",
+                                color: theme.colors.onSecondary,
                                 fontWeight: "bold",
                                 fontSize: 16,
                             }}
