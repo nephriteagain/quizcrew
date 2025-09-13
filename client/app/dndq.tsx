@@ -90,11 +90,25 @@ export default function DragAndDropQuiz() {
                         const isIndividuallyShown = individualAnswers.has(index);
                         const shouldShowAnswer = showAnswer || isIndividuallyShown;
                         return (
-                            <Chip
+                            <Animated.View
                                 key={ans}
-                                label={ans}
-                                color={shouldShowAnswer ? colors[index % colors.length] : undefined}
-                            />
+                                entering={
+                                    shouldShowAnswer
+                                        ? FadeInLeft.duration(300)
+                                              .springify()
+                                              .delay(index * 100)
+                                        : undefined
+                                }
+                                exiting={FadeOutLeft.duration(200)}
+                                layout={LinearTransition.springify().damping(15).stiffness(100)}
+                            >
+                                <Chip
+                                    label={ans}
+                                    color={
+                                        shouldShowAnswer ? colors[index % colors.length] : undefined
+                                    }
+                                />
+                            </Animated.View>
                         );
                     })}
                 </View>
@@ -131,7 +145,7 @@ export default function DragAndDropQuiz() {
                                             ]}
                                             entering={FadeInLeft.duration(300)
                                                 .springify()
-                                                .delay(showAnswer ? idx * 50 : 0)}
+                                                .delay(showAnswer ? idx * 100 : 0)}
                                             exiting={FadeOutLeft.duration(200)}
                                         >
                                             <Animated.Text
