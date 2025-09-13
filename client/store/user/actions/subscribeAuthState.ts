@@ -1,7 +1,7 @@
 import { auth } from "@/firebase";
 import { extractAuthUser } from "@/lib/utils/extraAuthUser";
 import { onAuthStateChanged } from "@react-native-firebase/auth";
-import userSelector from "../user.store";
+import authSelector from "../user.store";
 
 export function subscribeAuthState() {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -14,9 +14,9 @@ export function subscribeAuthState() {
         }
         if (user) {
             const extracted = extractAuthUser(user);
-            userSelector.setState({ user: extracted });
+            authSelector.setState({ user: extracted });
         } else {
-            userSelector.setState({ user: null });
+            authSelector.setState({ user: null });
         }
     });
     return unsub;

@@ -3,7 +3,7 @@ import { auth, db } from "@/firebase";
 import { extractAuthUser } from "@/lib/utils/extraAuthUser";
 import { signInAnonymously } from "@react-native-firebase/auth";
 import { doc, setDoc } from "@react-native-firebase/firestore";
-import userSelector from "../user.store";
+import authSelector from "../user.store";
 
 export async function anonSignin() {
     const result = await signInAnonymously(auth);
@@ -16,7 +16,7 @@ export async function anonSignin() {
     if (isNewUser) {
         console.log("new user detected, creating firestore user document.");
         await setDoc(userRef, authUser);
-        userSelector.setState({
+        authSelector.setState({
             user: authUser,
         });
     }

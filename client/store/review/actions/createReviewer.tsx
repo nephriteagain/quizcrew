@@ -1,13 +1,13 @@
 import { COL } from "@/constants/collections";
 import { db } from "@/firebase";
-import userSelector from "@/store/user/user.store";
+import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE, QuizDoc } from "@/types/review";
 import { doc, setDoc } from "@react-native-firebase/firestore";
 import reviewSelector from "../review.store";
 
 export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
     const url = `${process.env.EXPO_PUBLIC_API_URL}/quiz/from-images`;
-    const user = userSelector.getState().user;
+    const user = authSelector.getState().user;
 
     console.log("creating reviewer...");
     const response = await fetch(url, {

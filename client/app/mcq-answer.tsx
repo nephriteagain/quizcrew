@@ -23,7 +23,7 @@ export default function MultipleChoiceQuestionsAns() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const params = useLocalSearchParams<{ quiz_id: string }>();
     const quiz_id = params.quiz_id;
-    const quizzes = reviewSelector.use.quizzes();
+    const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as MultipleChoiceQ | undefined;
 
     const MULTIPLE_CHOICE_QUESTIONS = useMemo(() => {
@@ -178,8 +178,12 @@ export default function MultipleChoiceQuestionsAns() {
                                                 marginVertical: 8,
                                                 borderRadius: 12,
                                                 borderWidth: 2,
-                                                borderColor: selected ? theme.colors.secondary : theme.colors.outline,
-                                                backgroundColor: selected ? theme.colors.secondaryContainer : theme.colors.surface,
+                                                borderColor: selected
+                                                    ? theme.colors.secondary
+                                                    : theme.colors.outline,
+                                                backgroundColor: selected
+                                                    ? theme.colors.secondaryContainer
+                                                    : theme.colors.surface,
                                             },
                                             isIncorrect && {
                                                 borderColor: theme.colors.error,
@@ -187,7 +191,15 @@ export default function MultipleChoiceQuestionsAns() {
                                             },
                                         ]}
                                     >
-                                        <Text style={{ fontSize: 16, textAlign: "center", color: selected ? theme.colors.onSecondaryContainer : theme.colors.onSurface }}>
+                                        <Text
+                                            style={{
+                                                fontSize: 16,
+                                                textAlign: "center",
+                                                color: selected
+                                                    ? theme.colors.onSecondaryContainer
+                                                    : theme.colors.onSurface,
+                                            }}
+                                        >
                                             {choice}
                                         </Text>
                                     </TouchableOpacity>

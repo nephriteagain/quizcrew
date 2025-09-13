@@ -3,7 +3,7 @@ import QuizList from "@/components/QuizList";
 import { DEFAULT_USER } from "@/constants/values";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
-import userSelector from "@/store/user/user.store";
+import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -14,8 +14,8 @@ import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } fr
 export default function Profile() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const quizzes = reviewSelector.use.quizzes();
-    const userData = userSelector.use.userData();
+    const quizzes = reviewSelector.use.useQuizzes();
+    const userData = authSelector.use.useUserData();
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
     const router = useRouter();

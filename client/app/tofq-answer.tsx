@@ -22,7 +22,7 @@ export default function TrueOrFalseQuestionsAns() {
 
     const params = useLocalSearchParams<{ quiz_id: string }>();
     const quiz_id = params.quiz_id;
-    const quizzes = reviewSelector.use.quizzes();
+    const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as TrueOrFalseQ | undefined;
 
     const TOF_QUESTIONS = useMemo(() => {
@@ -143,8 +143,12 @@ export default function TrueOrFalseQuestionsAns() {
                                                 marginVertical: 8,
                                                 borderRadius: 12,
                                                 borderWidth: 2,
-                                                borderColor: selected ? theme.colors.tertiary : theme.colors.outline,
-                                                backgroundColor: selected ? theme.colors.tertiaryContainer : theme.colors.surface,
+                                                borderColor: selected
+                                                    ? theme.colors.tertiary
+                                                    : theme.colors.outline,
+                                                backgroundColor: selected
+                                                    ? theme.colors.tertiaryContainer
+                                                    : theme.colors.surface,
                                             },
                                             isIncorrect && {
                                                 borderColor: theme.colors.error,
@@ -152,7 +156,15 @@ export default function TrueOrFalseQuestionsAns() {
                                             },
                                         ]}
                                     >
-                                        <Text style={{ fontSize: 16, textAlign: "center", color: selected ? theme.colors.onTertiaryContainer : theme.colors.onSurface }}>
+                                        <Text
+                                            style={{
+                                                fontSize: 16,
+                                                textAlign: "center",
+                                                color: selected
+                                                    ? theme.colors.onTertiaryContainer
+                                                    : theme.colors.onSurface,
+                                            }}
+                                        >
                                             {choice}
                                         </Text>
                                     </TouchableOpacity>
