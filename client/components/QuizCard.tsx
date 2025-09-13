@@ -56,17 +56,16 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
                 <Text style={styles.title} numberOfLines={2}>
                     {quiz.title}
                 </Text>
-                <View style={[
-                    styles.typeLabel,
-                    {
-                        backgroundColor: getQuizTypeColor().bg,
-                        borderColor: getQuizTypeColor().border,
-                    }
-                ]}>
-                    <Text style={[
-                        styles.typeText,
-                        { color: getQuizTypeColor().text }
-                    ]}>
+                <View
+                    style={[
+                        styles.typeLabel,
+                        {
+                            backgroundColor: getQuizTypeColor().bg,
+                            borderColor: getQuizTypeColor().border,
+                        },
+                    ]}
+                >
+                    <Text style={[styles.typeText, { color: getQuizTypeColor().text }]}>
                         {getQuizTypeText()}
                     </Text>
                 </View>
@@ -153,12 +152,14 @@ const styles = StyleSheet.create({
     },
     footer: {
         marginTop: 8,
+        flexDirection: "row",
+        justifyContent: "space-between",
     },
     infoRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 4,
+        columnGap: 6,
     },
     infoLabel: {
         fontSize: 12,
