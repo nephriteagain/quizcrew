@@ -2,6 +2,7 @@
 import Card from "@/components/Card";
 import Container from "@/components/Container";
 import { QuizResultModal } from "@/components/QuizResultModal";
+import { StartQuizModal } from "@/components/StartQuizModal";
 import { WIDTH } from "@/constants/values";
 import { fontSizeScaler } from "@/lib/utils/fontSizeScaler";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
@@ -244,12 +245,20 @@ export default function DragAndDropQuizAns() {
                     <View style={styles.scrollContainer} ref={registerContainer}>
                         <FlashList
                             ListFooterComponent={
-                                <QuizResultModal
-                                    visible={resultModalVisible}
-                                    onClose={() => setResultModalVisible(false)}
-                                    score={score}
-                                    totalQuestion={totalQuestion}
-                                />
+                                //for some reason modal won't show if i don't place it here...
+                                <>
+                                    <QuizResultModal
+                                        visible={resultModalVisible}
+                                        onClose={() => setResultModalVisible(false)}
+                                        score={score}
+                                        totalQuestion={totalQuestion}
+                                    />
+                                    <StartQuizModal
+                                        title={selectedQuiz.title}
+                                        description={selectedQuiz.description}
+                                        totalQuestions={totalQuestion}
+                                    />
+                                </>
                             }
                             ref={flashListRef}
                             data={DRAG_AND_DROP.questions}

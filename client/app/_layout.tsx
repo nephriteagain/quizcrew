@@ -144,6 +144,11 @@ function RootLayoutContent() {
                     />
 
                     <Stack.Screen name="create" options={{ headerTitle: "Create a Quiz" }} />
+                    <Stack.Screen
+                        name="add-connections"
+                        options={{ headerTitle: "Find New Connections" }}
+                    />
+                    <Stack.Screen name="profile/[uid]" options={{ headerTitle: "Profile" }} />
                 </Stack>
                 <GlobalLoadingModal />
                 <SettingsBottomSheet

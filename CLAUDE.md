@@ -1,0 +1,1 @@
+- avoid using margins, always use parent container to determine child item spacing

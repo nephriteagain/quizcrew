@@ -6,6 +6,7 @@ import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-nativ
 
 import Card from "@/components/Card";
 import Container from "@/components/Container";
+import { StartQuizModal } from "@/components/StartQuizModal";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { TrueOrFalseQ } from "@/types/review";
@@ -228,6 +229,11 @@ export default function TrueOrFalseQuestionsAns() {
                 onClose={() => setResultModalVisible(false)}
                 score={score}
                 totalQuestion={totalQuestion}
+            />
+            <StartQuizModal
+                title={selectedQuiz?.title ?? ""}
+                description={selectedQuiz?.description ?? ""}
+                totalQuestions={totalQuestion}
             />
         </Container>
     );

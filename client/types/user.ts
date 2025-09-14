@@ -12,3 +12,22 @@ export type UserData = {
     uid: string;
     photoURL?: string;
 };
+
+export interface Connection {
+    id: string;
+    name: string;
+    avatar: string;
+    status: "online" | "offline" | "away";
+    lastSeen?: string;
+    mutualFriends?: number;
+}
+
+export interface Group {
+    id: string;
+    name: string;
+    avatar: string;
+    memberCount: number;
+    lastActivity: string;
+    unreadMessages?: number;
+    description: string;
+}

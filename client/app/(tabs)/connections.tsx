@@ -2,28 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { Connection, Group } from "@/types/user";
+import { useRouter } from "expo-router";
 import { FAB } from "react-native-paper";
-
-interface Connection {
-    id: string;
-    name: string;
-    avatar: string;
-    status: "online" | "offline" | "away";
-    lastSeen?: string;
-    mutualFriends?: number;
-}
-
-interface Group {
-    id: string;
-    name: string;
-    avatar: string;
-    memberCount: number;
-    lastActivity: string;
-    unreadMessages?: number;
-    description: string;
-}
 
 interface SectionData {
     title: string;
@@ -101,41 +85,29 @@ const mockConnections: Connection[] = [
     },
 ];
 
+const sections: SectionData[] = [
+    {
+        title: "Groups",
+        data: mockGroups,
+        type: "groups",
+    },
+    {
+        title: "Connections",
+        data: mockConnections,
+        type: "connections",
+    },
+];
+
 export default function Connections() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
+    const router = useRouter();
 
     const [state, setState] = useState({ open: false });
 
     const onStateChange = ({ open }: { open: boolean }) => setState({ open });
 
     const { open } = state;
-
-    const sections: SectionData[] = [
-        {
-            title: "Groups",
-            data: mockGroups,
-            type: "groups",
-        },
-        {
-            title: "Connections",
-            data: mockConnections,
-            type: "connections",
-        },
-    ];
-
-    const getStatusColor = (status: Connection["status"]) => {
-        switch (status) {
-            case "online":
-                return "#4CAF50";
-            case "away":
-                return "#FF9800";
-            case "offline":
-                return "#9E9E9E";
-            default:
-                return "#9E9E9E";
-        }
-    };
 
     const renderGroupItem = (item: Group) => (
         <TouchableOpacity style={styles.itemContainer}>
@@ -161,37 +133,7 @@ export default function Connections() {
         </TouchableOpacity>
     );
 
-    const renderConnectionItem = (item: Connection) => (
-        <TouchableOpacity style={styles.itemContainer}>
-            <View style={styles.avatarContainer}>
-                <Image source={{ uri: item.avatar }} style={styles.connectionAvatar} />
-                <View
-                    style={[
-                        styles.statusIndicator,
-                        { backgroundColor: getStatusColor(item.status) },
-                    ]}
-                />
-            </View>
-            <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <View style={styles.connectionMeta}>
-                    <Text style={styles.statusText}>
-                        {item.status === "online"
-                            ? "Online"
-                            : item.status === "away"
-                              ? `Away • ${item.lastSeen}`
-                              : `Last seen ${item.lastSeen}`}
-                    </Text>
-                    {item.mutualFriends && (
-                        <Text style={styles.mutualFriends}>
-                            {item.mutualFriends} mutual friends
-                        </Text>
-                    )}
-                </View>
-            </View>
-            <Ionicons name="chatbubble-outline" size={20} color={theme.colors.primary} />
-        </TouchableOpacity>
-    );
+    const renderConnectionItem = (item: Connection) => <ConnectionCard {...item} />;
 
     const renderItem = ({ item, section }: { item: Group | Connection; section: SectionData }) => {
         if (section.type === "groups") {
@@ -227,7 +169,7 @@ export default function Connections() {
                     {
                         icon: "account-plus",
                         label: "ADD CONNECTION",
-                        onPress: () => console.log("Pressed star"),
+                        onPress: () => router.push("/add-connections"),
                         labelTextColor: theme.colors.tertiary,
                     },
                     {
@@ -252,32 +194,33 @@ const makeStyles = (theme: AppTheme) =>
     StyleSheet.create({
         container: {},
         listContainer: {
-            paddingHorizontal: 16,
-            paddingBottom: 20,
+            padding: 16,
+            gap: 12,
         },
         sectionHeader: {
             flexDirection: "row",
             alignItems: "center",
-            paddingVertical: 12,
-            paddingTop: 20,
-            // backgroundColor: theme.colors.surfaceVariant,
+            paddingVertical: 8,
+            paddingHorizontal: 12,
+            backgroundColor: theme.colors.primary,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            gap: 8,
         },
         sectionTitle: {
             fontSize: 18,
             fontWeight: "bold",
-            color: theme.colors.onSurface,
+            color: theme.colors.surface,
         },
         sectionCount: {
             fontSize: 16,
-            color: theme.colors.onSurfaceVariant,
-            marginLeft: 8,
+            color: theme.colors.surface,
         },
         itemContainer: {
             flexDirection: "row",
             alignItems: "center",
             backgroundColor: theme.colors.surface,
             padding: 16,
-            marginBottom: 8,
             borderRadius: 12,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
@@ -287,10 +230,10 @@ const makeStyles = (theme: AppTheme) =>
             shadowOpacity: 0.05,
             shadowRadius: 2,
             elevation: 2,
+            gap: 12,
         },
         avatarContainer: {
             position: "relative",
-            marginRight: 12,
         },
         groupAvatar: {
             width: 50,
@@ -331,21 +274,21 @@ const makeStyles = (theme: AppTheme) =>
         },
         itemInfo: {
             flex: 1,
+            gap: 4,
         },
         itemName: {
             fontSize: 16,
             fontWeight: "600",
             color: theme.colors.onSurface,
-            marginBottom: 4,
         },
         itemDescription: {
             fontSize: 14,
             color: theme.colors.onSurfaceVariant,
-            marginBottom: 4,
         },
         groupMeta: {
             flexDirection: "row",
             alignItems: "center",
+            gap: 4,
         },
         memberCount: {
             fontSize: 12,
@@ -355,7 +298,6 @@ const makeStyles = (theme: AppTheme) =>
         lastActivity: {
             fontSize: 12,
             color: theme.colors.onSurfaceVariant,
-            marginLeft: 4,
         },
         connectionMeta: {
             flexDirection: "column",
@@ -363,7 +305,6 @@ const makeStyles = (theme: AppTheme) =>
         statusText: {
             fontSize: 13,
             color: theme.colors.onSurfaceVariant,
-            marginBottom: 2,
         },
         mutualFriends: {
             fontSize: 12,
@@ -391,8 +332,8 @@ const makeStyles = (theme: AppTheme) =>
             elevation: 8,
         },
         fabOptionsContainer: {
-            marginBottom: 12,
             alignItems: "flex-end",
+            gap: 12,
         },
         fabOption: {
             flexDirection: "row",
@@ -400,7 +341,6 @@ const makeStyles = (theme: AppTheme) =>
             paddingHorizontal: 16,
             paddingVertical: 12,
             borderRadius: 24,
-            marginBottom: 8,
             minWidth: 160,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
@@ -410,11 +350,11 @@ const makeStyles = (theme: AppTheme) =>
             shadowOpacity: 0.15,
             shadowRadius: 4,
             elevation: 4,
+            gap: 8,
         },
         fabOptionText: {
             fontSize: 14,
             fontWeight: "600",
-            marginLeft: 8,
         },
         fabBackdrop: {
             position: "absolute",

@@ -6,6 +6,7 @@ import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-nativ
 
 import Card from "@/components/Card";
 import Container from "@/components/Container";
+import { StartQuizModal } from "@/components/StartQuizModal";
 import { useBeforeRemove } from "@/hooks/useBeforeRemove";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
@@ -278,6 +279,11 @@ export default function MultipleChoiceQuestionsAns() {
                 description={`You have answered ${Object.keys(answers).length} out of ${MULTIPLE_CHOICE_QUESTIONS.length} questions. Your progress will be lost if you exit.`}
                 cancelText="Continue Quiz"
                 confirmText="Exit Quiz"
+            />
+            <StartQuizModal
+                title={selectedQuiz.title}
+                description={selectedQuiz.description}
+                totalQuestions={totalQuestion}
             />
         </Container>
     );
