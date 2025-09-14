@@ -83,34 +83,18 @@ export default function MultipleChoiceQuestions() {
                                     </View>
                                     <View style={styles.questionContent}>
                                         <Text style={styles.questionText}>{item.question}</Text>
-                                        {shouldShowAnswer ? (
-                                            <View
-                                                style={[
-                                                    styles.tapHint,
-                                                    showAnswer && { opacity: 0 },
-                                                ]}
-                                            >
-                                                <Ionicons
-                                                    name="eye"
-                                                    size={14}
-                                                    color={theme.colors.onSurfaceVariant}
-                                                />
-                                                <Text style={styles.tapHintText}>
-                                                    Tap to hide answer
-                                                </Text>
-                                            </View>
-                                        ) : (
-                                            <View style={styles.tapHint}>
-                                                <Ionicons
-                                                    name="eye"
-                                                    size={14}
-                                                    color={theme.colors.onSurfaceVariant}
-                                                />
-                                                <Text style={styles.tapHintText}>
-                                                    Tap to reveal answer
-                                                </Text>
-                                            </View>
-                                        )}
+                                        <View
+                                            style={[styles.tapHint, showAnswer && { opacity: 0 }]}
+                                        >
+                                            <Ionicons
+                                                name={shouldShowAnswer ? "eye-off" : "eye"}
+                                                size={14}
+                                                color={theme.colors.onSurfaceVariant}
+                                            />
+                                            <Text style={styles.tapHintText}>
+                                                Tap to {shouldShowAnswer ? "hide" : "reveal"} answer
+                                            </Text>
+                                        </View>
                                     </View>
                                     <Ionicons
                                         name={shouldShowAnswer ? "chevron-up" : "chevron-down"}
@@ -134,7 +118,7 @@ export default function MultipleChoiceQuestions() {
                                             choice === selectedQuiz.questions[index].answer;
                                         return (
                                             <Animated.View
-                                                key={cIndex}
+                                                key={`${choice + item.question}`}
                                                 entering={FadeInLeft.delay(
                                                     showAnswer
                                                         ? index * 50 + cIndex * 25
@@ -438,7 +422,7 @@ const makeStyles = (theme: AppTheme) =>
             width: 24,
         },
         choiceText: {
-            fontSize: 16,
+            fontSize: 14,
             color: theme.colors.onSurface,
             flex: 1,
             lineHeight: 22,

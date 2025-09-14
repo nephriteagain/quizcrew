@@ -3,7 +3,6 @@ import QuizList from "@/components/QuizList";
 import { DEFAULT_USER } from "@/constants/values";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
-import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -17,7 +16,6 @@ export default function Profile() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const quizzes = reviewSelector.use.useQuizzes();
-    const userData = authSelector.use.useUserData();
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
     const router = useRouter();
@@ -134,7 +132,7 @@ export default function Profile() {
                 <View style={styles.avatarContainer}>
                     <Image
                         source={{
-                            uri: userData?.photoURL ?? DEFAULT_USER,
+                            uri: DEFAULT_USER,
                         }}
                         style={styles.avatar}
                     />
@@ -151,7 +149,7 @@ export default function Profile() {
                     </Pressable>
                 </View>
                 <View>
-                    <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
+                    <Text style={styles.displayName}>{uid}</Text>
                     <View style={{ flexDirection: "row", columnGap: 8 }}>
                         <Link href={"/connections"}>
                             <Text style={{ color: theme.colors.onSurfaceVariant }}>

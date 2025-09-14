@@ -80,18 +80,18 @@ export default function TrueOrFalseQuestions() {
                                     </View>
                                     <View style={styles.questionContent}>
                                         <Text style={styles.questionText}>{item.question}</Text>
-                                        {!shouldShowAnswer && (
-                                            <View style={styles.tapHint}>
-                                                <Ionicons
-                                                    name="eye"
-                                                    size={14}
-                                                    color={theme.colors.onSurfaceVariant}
-                                                />
-                                                <Text style={styles.tapHintText}>
-                                                    Tap to reveal answer
-                                                </Text>
-                                            </View>
-                                        )}
+                                        <View
+                                            style={[styles.tapHint, showAnswer && { opacity: 0 }]}
+                                        >
+                                            <Ionicons
+                                                name={shouldShowAnswer ? "eye-off" : "eye"}
+                                                size={14}
+                                                color={theme.colors.onSurfaceVariant}
+                                            />
+                                            <Text style={styles.tapHintText}>
+                                                Tap to {shouldShowAnswer ? "hide" : "reveal"} answer
+                                            </Text>
+                                        </View>
                                     </View>
                                     <Ionicons
                                         name={shouldShowAnswer ? "chevron-up" : "chevron-down"}
