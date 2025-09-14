@@ -178,7 +178,7 @@ export default function Profile() {
                     onQuizPress={handlePress}
                     quizzes={quizzes}
                     ListHeaderComponent={
-                        <Text style={styles.sectionTitle}>My Quizzes ({quizzes.length})</Text>
+                        <Text style={styles.sectionTitle}>Quizzes ({quizzes.length})</Text>
                     }
                 />
             </View>

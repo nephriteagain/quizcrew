@@ -1,9 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SectionList, StyleSheet, Text, View } from "react-native";
 
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
+import GroupCard from "@/components/GroupCard";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Connection, Group } from "@/types/user";
 import { useRouter } from "expo-router";
@@ -109,31 +109,21 @@ export default function Connections() {
 
     const { open } = state;
 
-    const renderGroupItem = (item: Group) => (
-        <TouchableOpacity style={styles.itemContainer}>
-            <View style={styles.avatarContainer}>
-                <Image source={{ uri: item.avatar }} style={styles.groupAvatar} />
-                {item.unreadMessages && item.unreadMessages > 0 && (
-                    <View style={styles.unreadBadge}>
-                        <Text style={styles.unreadText}>
-                            {item.unreadMessages > 99 ? "99+" : item.unreadMessages}
-                        </Text>
-                    </View>
-                )}
-            </View>
-            <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemDescription}>{item.description}</Text>
-                <View style={styles.groupMeta}>
-                    <Text style={styles.memberCount}>{item.memberCount} members</Text>
-                    <Text style={styles.lastActivity}>• {item.lastActivity}</Text>
-                </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={theme.colors.outline} />
-        </TouchableOpacity>
-    );
+    const renderGroupItem = (item: Group) => <GroupCard {...item} />;
 
-    const renderConnectionItem = (item: Connection) => <ConnectionCard {...item} />;
+    const renderConnectionItem = (item: Connection) => (
+        <ConnectionCard
+            {...item}
+            handlePress={() => {
+                router.push({
+                    pathname: "/profile/[uid]",
+                    params: {
+                        uid: item.id,
+                    },
+                });
+            }}
+        />
+    );
 
     const renderItem = ({ item, section }: { item: Group | Connection; section: SectionData }) => {
         if (section.type === "groups") {
