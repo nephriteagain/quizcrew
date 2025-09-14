@@ -165,7 +165,7 @@ export default function Connections() {
                     {
                         icon: "account-group",
                         label: "ADD GROUP",
-                        onPress: () => console.log("Pressed email"),
+                        onPress: () => router.push("/add-groups"),
                         labelTextColor: theme.colors.tertiary,
                     },
                 ]}

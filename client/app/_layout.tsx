@@ -148,7 +148,12 @@ function RootLayoutContent() {
                         name="add-connections"
                         options={{ headerTitle: "Find New Connections" }}
                     />
+                    <Stack.Screen name="add-groups" options={{ headerTitle: "Find Groups" }} />
                     <Stack.Screen name="profile/[uid]" options={{ headerTitle: "Profile" }} />
+                    <Stack.Screen
+                        name="group-profile/[gid]"
+                        options={{ headerTitle: "Group Profile" }}
+                    />
                 </Stack>
                 <GlobalLoadingModal />
                 <SettingsBottomSheet

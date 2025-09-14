@@ -8,12 +8,16 @@ export interface GroupCardProps extends Group {
     handlePress?: () => void;
 }
 
-export default function GroupCard(item: GroupCardProps) {
+export default function GroupCard({ handlePress, ...item }: GroupCardProps) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
 
     return (
-        <Pressable style={styles.itemContainer} android_ripple={{ color: theme.colors?.primary }}>
+        <Pressable
+            style={styles.itemContainer}
+            android_ripple={{ color: theme.colors?.primary }}
+            onPress={handlePress}
+        >
             <View style={styles.avatarContainer}>
                 <Image source={{ uri: item.avatar }} style={styles.groupAvatar} />
                 {item.unreadMessages && item.unreadMessages > 0 && (

@@ -64,4 +64,6 @@ export type QuizDoc = Quiz & {
     privacy: QuizDocPrivacy;
     updatedAt?: Timestamp;
     tags?: string[];
+    /** if quiz is shared in a group, used along with QuizDocPrivacy(ALL) */
+    gids?: string[];
 };
