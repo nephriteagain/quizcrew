@@ -217,16 +217,16 @@ export default function DragAndDropQuizAns() {
                     {/* Answers palette */}
                     <Animated.View
                         style={[styles.answersRow, isSubmitted && { height: 0, flexGrow: 0 }]}
-                        layout={LinearTransition.springify().damping(15).stiffness(100)}
+                        layout={LinearTransition.duration(200)}
                     >
                         {unselectedAnswers.map((ans) => {
                             // const isSelected = Object.values(answers).includes(ans);
                             return (
                                 <Animated.View
                                     key={`${ans}`}
-                                    layout={LinearTransition.springify().damping(15).stiffness(100)}
-                                    entering={FadeIn.duration(300)}
-                                    exiting={FadeOut.duration(300)}
+                                    layout={LinearTransition.duration(200)}
+                                    entering={FadeIn.duration(150)}
+                                    exiting={FadeOut.duration(150)}
                                 >
                                     <DraggableChip
                                         label={ans}
@@ -478,9 +478,9 @@ function DraggableChip({
             // Start shake animation
             rotation.value = withRepeat(
                 withSequence(
-                    withTiming(-5, { duration: 100 }),
-                    withTiming(5, { duration: 200 }),
-                    withTiming(0, { duration: 100 })
+                    withTiming(-3, { duration: 50 }),
+                    withTiming(3, { duration: 100 }),
+                    withTiming(0, { duration: 50 })
                 ),
                 -1, // Infinite repeat
                 false
@@ -494,7 +494,7 @@ function DraggableChip({
         .onEnd((e) => {
             isDragging.value = false;
             // Stop shake animation
-            rotation.value = withTiming(0, { duration: 150 });
+            rotation.value = withTiming(0, { duration: 100 });
 
             runOnJS(onDrop)(e.absoluteX, e.absoluteY, label);
 

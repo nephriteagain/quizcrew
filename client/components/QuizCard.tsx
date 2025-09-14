@@ -1,6 +1,5 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Pressable, PressableProps, StyleSheet, Text, View } from "react-native";
 
@@ -73,55 +72,44 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
 
     return (
         <Pressable
-            style={styles.pressableContainer}
+            style={[styles.pressableContainer, styles.container]}
             {...props}
             android_ripple={{ color: theme.colors.onPrimary }}
         >
-            <LinearGradient
-                colors={[
-                    theme.colors.primaryContainer,
-                    theme.colors.primaryContainer,
-                    theme.colors.inversePrimary,
-                ]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={styles.container}
-            >
-                <View style={styles.header}>
-                    <Text style={styles.title} numberOfLines={2}>
-                        {quiz.title}
-                    </Text>
-                    <View
-                        style={[
-                            styles.typeLabel,
-                            {
-                                backgroundColor: getQuizTypeColor().bg,
-                                borderColor: getQuizTypeColor().border,
-                            },
-                        ]}
-                    >
-                        <Text style={[styles.typeText, { color: getQuizTypeColor().text }]}>
-                            {getQuizTypeText()}
-                        </Text>
-                    </View>
-                </View>
-
-                <Text style={styles.description} numberOfLines={3}>
-                    {quiz.description}
+            <View style={styles.header}>
+                <Text style={styles.title} numberOfLines={2}>
+                    {quiz.title}
                 </Text>
-
-                <View style={styles.footer}>
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Created:</Text>
-                        <Text style={styles.infoValue}>{formatDate(quiz.createdAt)}</Text>
-                    </View>
-
-                    <View style={styles.infoRow}>
-                        <Text style={styles.infoLabel}>Questions:</Text>
-                        <Text style={styles.infoValue}>{getTotalQuestions()}</Text>
-                    </View>
+                <View
+                    style={[
+                        styles.typeLabel,
+                        {
+                            backgroundColor: getQuizTypeColor().bg,
+                            borderColor: getQuizTypeColor().border,
+                        },
+                    ]}
+                >
+                    <Text style={[styles.typeText, { color: getQuizTypeColor().text }]}>
+                        {getQuizTypeText()}
+                    </Text>
                 </View>
-            </LinearGradient>
+            </View>
+
+            <Text style={styles.description} numberOfLines={3}>
+                {quiz.description}
+            </Text>
+
+            <View style={styles.footer}>
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Created:</Text>
+                    <Text style={styles.infoValue}>{formatDate(quiz.createdAt)}</Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Questions:</Text>
+                    <Text style={styles.infoValue}>{getTotalQuestions()}</Text>
+                </View>
+            </View>
         </Pressable>
     );
 }
@@ -141,6 +129,7 @@ const makeStyles = (theme: AppTheme) => {
             elevation: 3,
             width: "100%",
             overflow: "hidden",
+            backgroundColor: theme.colors.background,
         },
         container: {
             borderRadius: 12,

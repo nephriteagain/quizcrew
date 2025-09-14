@@ -81,7 +81,7 @@ export default function TrueOrFalseQuestionsAns() {
     };
 
     return (
-        <Container style={{ flex: 1, backgroundColor: theme.colors.surface }}>
+        <Container style={{ flex: 1 }}>
             {/* TOF QUESTIONS list */}
             <FlashList
                 ref={listRef}
@@ -170,9 +170,6 @@ export default function TrueOrFalseQuestionsAns() {
             <View
                 style={{
                     padding: 16,
-                    borderTopWidth: 1,
-                    borderColor: theme.colors.outlineVariant,
-                    backgroundColor: theme.colors.surface,
                 }}
             >
                 {!isSubmitted && (

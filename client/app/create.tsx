@@ -125,7 +125,7 @@ export default function CreateQuiz() {
         <Container style={styles.container}>
             {/* Header Section */}
             <View style={styles.header}>
-                <Text style={styles.title}>Create {QUIZ_LABEL[quizType]} Quiz</Text>
+                <Text style={styles.title}>{QUIZ_LABEL[quizType]} Quiz</Text>
                 <Text style={styles.subtitle}>Upload your study materials to get started</Text>
             </View>
 
@@ -239,11 +239,8 @@ const makeStyles = (theme: AppTheme) =>
         },
         header: {
             paddingHorizontal: 20,
-            paddingTop: 20,
-            paddingBottom: 16,
-            backgroundColor: theme.colors.surface,
-            borderBottomWidth: 1,
-            borderBottomColor: theme.colors.outline,
+            paddingTop: 8,
+            paddingBottom: 8,
         },
         title: {
             fontSize: 28,

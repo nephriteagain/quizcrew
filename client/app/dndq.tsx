@@ -98,13 +98,11 @@ export default function DragAndDropQuiz() {
                                 key={ans}
                                 entering={
                                     shouldShowAnswer
-                                        ? FadeInLeft.duration(300)
-                                              .springify()
-                                              .delay(index * 100)
+                                        ? FadeInLeft.duration(150).delay(index * 50)
                                         : undefined
                                 }
-                                exiting={FadeOutLeft.duration(200)}
-                                layout={LinearTransition.springify().damping(15).stiffness(100)}
+                                exiting={FadeOutLeft.duration(100)}
+                                layout={LinearTransition.duration(200)}
                             >
                                 <Chip
                                     label={ans}
@@ -126,7 +124,7 @@ export default function DragAndDropQuiz() {
                             <Animated.View
                                 key={idx}
                                 style={[styles.dropZone]}
-                                layout={LinearTransition.springify().damping(15).stiffness(100)}
+                                layout={LinearTransition.duration(200)}
                             >
                                 <Pressable
                                     android_ripple={{
@@ -147,10 +145,10 @@ export default function DragAndDropQuiz() {
                                                     borderColor: getColorForAnswer(q.answer).border,
                                                 },
                                             ]}
-                                            entering={FadeInLeft.duration(300)
-                                                .springify()
-                                                .delay(showAnswer ? idx * 100 : 0)}
-                                            exiting={FadeOutLeft.duration(200)}
+                                            entering={FadeInLeft.duration(150).delay(
+                                                showAnswer ? idx * 50 : 0
+                                            )}
+                                            exiting={FadeOutLeft.duration(100)}
                                         >
                                             <Animated.Text
                                                 style={[
@@ -220,7 +218,7 @@ function Chip({
                     elevation: 3,
                 },
             ]}
-            layout={LinearTransition.springify().damping(15).stiffness(100)}
+            layout={LinearTransition.duration(200)}
         >
             <Text style={[styles.chipText, color && { color: color.text }]}>{label}</Text>
         </Animated.View>
@@ -295,7 +293,6 @@ const makeStyles = (theme: AppTheme) =>
             fontSize: 16,
             fontWeight: "500",
             marginBottom: 6,
-            color: theme.colors.onSurface,
         },
         individualAnswerHint: {
             fontSize: 14,
@@ -329,10 +326,7 @@ const makeStyles = (theme: AppTheme) =>
             fontWeight: "600",
         },
         bottomContainer: {
-            padding: 16,
-            borderTopWidth: 1,
-            borderColor: theme.colors.outline,
-            backgroundColor: theme.colors.surface,
+            paddingVertical: 16,
         },
         quizButton: {
             backgroundColor: theme.colors.error,

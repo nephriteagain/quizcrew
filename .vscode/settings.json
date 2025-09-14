@@ -5,6 +5,19 @@
     "source.sortMembers": "explicit"
   },
   "editor.formatOnSave": true,
+  "eslint.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
+    "./client"
+  ],
+  "eslint.useFlatConfig": true,
+  "problems.decorations.enabled": true,
+  "editor.suggest.showSnippets": true,
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

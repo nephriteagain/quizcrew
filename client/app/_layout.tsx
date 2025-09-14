@@ -10,17 +10,24 @@ import { Stack } from "expo-router";
 import { useRef, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 function RootLayoutContent() {
     const [quizId, setQuizId] = useState<string | null>(null);
     const theme = useAppTheme();
     const bottomSheetRef = useRef<BottomSheet>(null);
     const reviews = reviewSelector.use.useQuizzes();
+    const rotation = useSharedValue(0);
 
     // callbacks
     const handleSheetChanges = (index: number) => {
         if (index === -1) {
+            // Bottom sheet is closing - spin back
+            rotation.value = withTiming(0, { duration: 1_000 });
             setQuizId(null);
+        } else {
+            // Bottom sheet is opening - spin forward
+            rotation.value = withTiming(360, { duration: 1_000 });
         }
     };
 
@@ -28,6 +35,12 @@ function RootLayoutContent() {
         bottomSheetRef.current?.expand();
         setQuizId(quiz_id);
     };
+
+    const animatedIconStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ rotate: `${rotation.value}deg` }],
+        };
+    });
 
     return (
         <AuthProvider>
@@ -60,11 +73,13 @@ function RootLayoutContent() {
                                         }
                                     }}
                                 >
-                                    <Ionicons
-                                        name="settings-sharp"
-                                        size={24}
-                                        color={theme.colors.onSurface}
-                                    />
+                                    <Animated.View style={animatedIconStyle}>
+                                        <Ionicons
+                                            name="settings-sharp"
+                                            size={24}
+                                            color={theme.colors.onSurface}
+                                        />
+                                    </Animated.View>
                                 </TouchableOpacity>
                             ),
                         })}
@@ -83,11 +98,13 @@ function RootLayoutContent() {
                                         }
                                     }}
                                 >
-                                    <Ionicons
-                                        name="settings-sharp"
-                                        size={24}
-                                        color={theme.colors.onSurface}
-                                    />
+                                    <Animated.View style={animatedIconStyle}>
+                                        <Ionicons
+                                            name="settings-sharp"
+                                            size={24}
+                                            color={theme.colors.onSurface}
+                                        />
+                                    </Animated.View>
                                 </TouchableOpacity>
                             ),
                         })}
@@ -110,11 +127,13 @@ function RootLayoutContent() {
                                         }
                                     }}
                                 >
-                                    <Ionicons
-                                        name="settings-sharp"
-                                        size={24}
-                                        color={theme.colors.onSurface}
-                                    />
+                                    <Animated.View style={animatedIconStyle}>
+                                        <Ionicons
+                                            name="settings-sharp"
+                                            size={24}
+                                            color={theme.colors.onSurface}
+                                        />
+                                    </Animated.View>
                                 </TouchableOpacity>
                             ),
                         })}

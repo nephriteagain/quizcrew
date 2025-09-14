@@ -189,13 +189,9 @@ const makeStyles = (theme: AppTheme) => {
         container: {},
         header: {
             alignItems: "center",
-            backgroundColor: theme.colors.surface,
-            borderBottomWidth: 1,
-            borderBottomColor: theme.colors.outline,
             flexDirection: "row",
-            paddingTop: 32,
+            paddingTop: 16,
             paddingHorizontal: 16,
-            paddingBottom: 16,
         },
         avatarContainer: {
             position: "relative",

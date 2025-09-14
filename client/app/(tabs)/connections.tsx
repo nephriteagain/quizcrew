@@ -1,7 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Pressable, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
 import { useState } from "react";
+import {
+    Image,
+    Pressable,
+    SectionList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    withTiming,
+} from "react-native-reanimated";
 
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
@@ -121,7 +134,7 @@ export default function Connections() {
     };
 
     const handleAddConnection = () => {
-        console.log('Add Connection pressed');
+        console.log("Add Connection pressed");
         setFabExpanded(false);
         fabRotation.value = withSpring(0);
         optionsOpacity.value = withTiming(0, { duration: 200 });
@@ -129,7 +142,7 @@ export default function Connections() {
     };
 
     const handleAddCircle = () => {
-        console.log('Add Circle pressed');
+        console.log("Add Circle pressed");
         setFabExpanded(false);
         fabRotation.value = withSpring(0);
         optionsOpacity.value = withTiming(0, { duration: 200 });
@@ -290,9 +303,7 @@ export default function Connections() {
             </View>
 
             {/* Backdrop overlay when FAB is expanded */}
-            {fabExpanded && (
-                <Pressable style={styles.fabBackdrop} onPress={toggleFab} />
-            )}
+            {fabExpanded && <Pressable style={styles.fabBackdrop} onPress={toggleFab} />}
         </Container>
     );
 }
@@ -309,7 +320,7 @@ const makeStyles = (theme: AppTheme) =>
             alignItems: "center",
             paddingVertical: 12,
             paddingTop: 20,
-            backgroundColor: theme.colors.surfaceVariant,
+            // backgroundColor: theme.colors.surfaceVariant,
         },
         sectionTitle: {
             fontSize: 18,
@@ -419,17 +430,17 @@ const makeStyles = (theme: AppTheme) =>
             color: theme.colors.onSurfaceVariant,
         },
         fabContainer: {
-            position: 'absolute',
+            position: "absolute",
             bottom: 20,
             right: 20,
-            alignItems: 'flex-end',
+            alignItems: "flex-end",
         },
         fab: {
             width: 56,
             height: 56,
             borderRadius: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
+            alignItems: "center",
+            justifyContent: "center",
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
                 width: 0,
@@ -441,11 +452,11 @@ const makeStyles = (theme: AppTheme) =>
         },
         fabOptionsContainer: {
             marginBottom: 12,
-            alignItems: 'flex-end',
+            alignItems: "flex-end",
         },
         fabOption: {
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             paddingHorizontal: 16,
             paddingVertical: 12,
             borderRadius: 24,
@@ -462,15 +473,15 @@ const makeStyles = (theme: AppTheme) =>
         },
         fabOptionText: {
             fontSize: 14,
-            fontWeight: '600',
+            fontWeight: "600",
             marginLeft: 8,
         },
         fabBackdrop: {
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
         },
     });

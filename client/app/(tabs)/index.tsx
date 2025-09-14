@@ -81,6 +81,7 @@ const makeStyles = (theme: any) =>
         container: {
             padding: 16,
             rowGap: 16,
+            paddingBottom: 0,
         },
         routeButton: {
             width: "100%",
