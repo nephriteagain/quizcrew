@@ -1,4 +1,4 @@
-import { memo, ReactNode } from "react";
+import { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 import { MD3LightTheme, PaperProvider, useTheme } from "react-native-paper";
 
@@ -62,4 +62,4 @@ function ThemeProvider({ children }: { children: ReactNode }) {
     return <PaperProvider theme={theme}>{children}</PaperProvider>;
 }
 
-export default memo(ThemeProvider);
+export default ThemeProvider;

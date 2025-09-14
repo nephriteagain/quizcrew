@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from "react-native-reanimated";
+import { useState } from "react";
 
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
@@ -102,9 +104,50 @@ const mockConnections: Connection[] = [
 export default function Connections() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
+    const [fabExpanded, setFabExpanded] = useState(false);
+
+    // Animation values
+    const fabRotation = useSharedValue(0);
+    const optionsOpacity = useSharedValue(0);
+    const optionsScale = useSharedValue(0.5);
+
+    const toggleFab = () => {
+        const newExpanded = !fabExpanded;
+        setFabExpanded(newExpanded);
+
+        fabRotation.value = withSpring(newExpanded ? 45 : 0);
+        optionsOpacity.value = withTiming(newExpanded ? 1 : 0, { duration: 200 });
+        optionsScale.value = withSpring(newExpanded ? 1 : 0.5);
+    };
+
+    const handleAddConnection = () => {
+        console.log('Add Connection pressed');
+        setFabExpanded(false);
+        fabRotation.value = withSpring(0);
+        optionsOpacity.value = withTiming(0, { duration: 200 });
+        optionsScale.value = withSpring(0.5);
+    };
+
+    const handleAddCircle = () => {
+        console.log('Add Circle pressed');
+        setFabExpanded(false);
+        fabRotation.value = withSpring(0);
+        optionsOpacity.value = withTiming(0, { duration: 200 });
+        optionsScale.value = withSpring(0.5);
+    };
+
+    // Animated styles
+    const fabAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${fabRotation.value}deg` }],
+    }));
+
+    const optionsAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: optionsOpacity.value,
+        transform: [{ scale: optionsScale.value }],
+    }));
     const sections: SectionData[] = [
         {
-            title: "Groups",
+            title: "Circles",
             data: mockGroups,
             type: "groups",
         },
@@ -209,6 +252,47 @@ export default function Connections() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />
+
+            {/* Floating Action Button */}
+            <View style={styles.fabContainer}>
+                {/* FAB Options */}
+                <Animated.View style={[styles.fabOptionsContainer, optionsAnimatedStyle]}>
+                    <Pressable
+                        style={[styles.fabOption, { backgroundColor: theme.colors.secondary }]}
+                        onPress={handleAddConnection}
+                    >
+                        <Ionicons name="person-add" size={20} color={theme.colors.onSecondary} />
+                        <Text style={[styles.fabOptionText, { color: theme.colors.onSecondary }]}>
+                            Add Connection
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={[styles.fabOption, { backgroundColor: theme.colors.tertiary }]}
+                        onPress={handleAddCircle}
+                    >
+                        <Ionicons name="people" size={20} color={theme.colors.onTertiary} />
+                        <Text style={[styles.fabOptionText, { color: theme.colors.onTertiary }]}>
+                            Add Circle
+                        </Text>
+                    </Pressable>
+                </Animated.View>
+
+                {/* Main FAB Button */}
+                <Pressable
+                    style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+                    onPress={toggleFab}
+                >
+                    <Animated.View style={fabAnimatedStyle}>
+                        <Ionicons name="add" size={28} color={theme.colors.onPrimary} />
+                    </Animated.View>
+                </Pressable>
+            </View>
+
+            {/* Backdrop overlay when FAB is expanded */}
+            {fabExpanded && (
+                <Pressable style={styles.fabBackdrop} onPress={toggleFab} />
+            )}
         </Container>
     );
 }
@@ -333,5 +417,60 @@ const makeStyles = (theme: AppTheme) =>
         mutualFriends: {
             fontSize: 12,
             color: theme.colors.onSurfaceVariant,
+        },
+        fabContainer: {
+            position: 'absolute',
+            bottom: 20,
+            right: 20,
+            alignItems: 'flex-end',
+        },
+        fab: {
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 4,
+            },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8,
+        },
+        fabOptionsContainer: {
+            marginBottom: 12,
+            alignItems: 'flex-end',
+        },
+        fabOption: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 24,
+            marginBottom: 8,
+            minWidth: 160,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 4,
+        },
+        fabOptionText: {
+            fontSize: 14,
+            fontWeight: '600',
+            marginLeft: 8,
+        },
+        fabBackdrop: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
         },
     });

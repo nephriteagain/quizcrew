@@ -6,7 +6,7 @@ import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, LinkProps, useRouter } from "expo-router";
-import { useCallback } from "react";
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const routes: {
@@ -20,33 +20,30 @@ export default function Index() {
     const reviewer = reviewSelector.use.useQuizzes();
     const router = useRouter();
 
-    const handlePress = useCallback(
-        (quiz: Quiz) => {
-            if (quiz.type === QUIZ_TYPE.MCQ) {
-                router.push({
-                    pathname: "../mcq",
-                    params: {
-                        quiz_id: quiz.quiz_id,
-                    },
-                });
-            } else if (quiz.type === QUIZ_TYPE.TOFQ) {
-                router.push({
-                    pathname: "../tofq",
-                    params: {
-                        quiz_id: quiz.quiz_id,
-                    },
-                });
-            } else if (quiz.type === QUIZ_TYPE.DNDQ) {
-                router.push({
-                    pathname: "/dndq",
-                    params: {
-                        quiz_id: quiz.quiz_id,
-                    },
-                });
-            }
-        },
-        [router]
-    );
+    const handlePress = (quiz: Quiz) => {
+        if (quiz.type === QUIZ_TYPE.MCQ) {
+            router.push({
+                pathname: "../mcq",
+                params: {
+                    quiz_id: quiz.quiz_id,
+                },
+            });
+        } else if (quiz.type === QUIZ_TYPE.TOFQ) {
+            router.push({
+                pathname: "../tofq",
+                params: {
+                    quiz_id: quiz.quiz_id,
+                },
+            });
+        } else if (quiz.type === QUIZ_TYPE.DNDQ) {
+            router.push({
+                pathname: "/dndq",
+                params: {
+                    quiz_id: quiz.quiz_id,
+                },
+            });
+        }
+    };
 
     return (
         <Container style={styles.container}>

@@ -1,7 +1,7 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useCallback } from "react";
+import React from "react";
 import { Pressable, PressableProps, StyleSheet, Text, View } from "react-native";
 
 type QuizCardProps = {
@@ -13,22 +13,22 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
     const styles = makeStyles(theme);
 
     // Format timestamp to readable date
-    const formatDate = useCallback((timestamp: number) => {
+    const formatDate = (timestamp: number) => {
         const date = new Date(timestamp);
         return date.toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
             year: "numeric",
         });
-    }, []);
+    };
 
     // Get total number of questions
-    const getTotalQuestions = useCallback(() => {
+    const getTotalQuestions = () => {
         return quiz.questions.length;
-    }, [quiz]);
+    };
 
     // Get quiz type display text
-    const getQuizTypeText = useCallback(() => {
+    const getQuizTypeText = () => {
         switch (quiz.type) {
             case "MCQ":
                 return "Multiple Choice";
@@ -39,10 +39,10 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
             default:
                 return "Quiz";
         }
-    }, [quiz]);
+    };
 
     // Get quiz type color
-    const getQuizTypeColor = useCallback(() => {
+    const getQuizTypeColor = () => {
         switch (quiz.type) {
             case "MCQ":
                 return {
@@ -69,7 +69,7 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
                     border: theme.colors.outline,
                 };
         }
-    }, [quiz, theme]);
+    };
 
     return (
         <Pressable

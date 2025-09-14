@@ -1,7 +1,7 @@
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
-import React, { useCallback } from "react";
+import React from "react";
 import { RefreshControl, StyleSheet, Text, View } from "react-native";
 import QuizCard from "./QuizCard";
 
@@ -48,27 +48,23 @@ export default function QuizList({
 >) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const renderQuizCard = useCallback(
-        ({ item }: { item: Quiz }) => <QuizCard quiz={item} onPress={() => onQuizPress?.(item)} />,
-        [onQuizPress]
+    const renderQuizCard = ({ item }: { item: Quiz }) => (
+        <QuizCard quiz={item} onPress={() => onQuizPress?.(item)} />
     );
 
-    const keyExtractor = useCallback((item: Quiz) => {
+    const keyExtractor = (item: Quiz) => {
         // Use a combination of type, title, and createdAt as unique key
         return `${item.quiz_id}`;
-    }, []);
+    };
 
-    const getItemType = useCallback((item: Quiz) => {
+    const getItemType = (item: Quiz) => {
         return item.type;
-    }, []);
+    };
 
-    const renderEmpty = useCallback(
-        () => (
-            <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>{emptyMessage}</Text>
-            </View>
-        ),
-        [emptyMessage, quizzes]
+    const renderEmpty = () => (
+        <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>{emptyMessage}</Text>
+        </View>
     );
 
     if (isLoading && (!quizzes || quizzes.length === 0)) {

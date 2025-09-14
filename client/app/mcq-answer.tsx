@@ -1,7 +1,7 @@
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { cloneDeep, debounce } from "lodash";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
@@ -26,17 +26,11 @@ export default function MultipleChoiceQuestionsAns() {
     const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as MultipleChoiceQ | undefined;
 
-    const MULTIPLE_CHOICE_QUESTIONS = useMemo(() => {
-        if (!selectedQuiz) return [];
-        return selectedQuiz.questions;
-    }, [selectedQuiz]);
+    const MULTIPLE_CHOICE_QUESTIONS = selectedQuiz?.questions || [];
 
-    const isSubmitEnabled = useMemo(
-        () => Object.keys(answers).length === MULTIPLE_CHOICE_QUESTIONS.length,
-        [answers]
-    );
+    const isSubmitEnabled = Object.keys(answers).length === MULTIPLE_CHOICE_QUESTIONS.length;
 
-    const score = useMemo(() => {
+    const score = (() => {
         let total: number = 0;
         for (let i = 0; i < MULTIPLE_CHOICE_QUESTIONS.length; ++i) {
             const q = MULTIPLE_CHOICE_QUESTIONS[i];
@@ -47,51 +41,45 @@ export default function MultipleChoiceQuestionsAns() {
             }
         }
         return total;
-    }, [answers]);
+    })();
 
-    const totalQuestion = useMemo(
-        () => MULTIPLE_CHOICE_QUESTIONS.length,
-        [MULTIPLE_CHOICE_QUESTIONS]
-    );
+    const totalQuestion = MULTIPLE_CHOICE_QUESTIONS.length;
 
-    const handleSelect = useCallback(
-        (questionIndex: number, choice: string) => {
-            const prevAnswer = answers[questionIndex];
-            if (prevAnswer === choice) {
-                const clone = cloneDeep(answers);
-                // unset previouse choice
-                delete clone[questionIndex];
-                setAnswers(clone);
-            } else {
-                setAnswers((prev) => ({
-                    ...prev,
-                    [questionIndex]: choice,
-                }));
+    const handleSelect = (questionIndex: number, choice: string) => {
+        const prevAnswer = answers[questionIndex];
+        if (prevAnswer === choice) {
+            const clone = cloneDeep(answers);
+            // unset previouse choice
+            delete clone[questionIndex];
+            setAnswers(clone);
+        } else {
+            setAnswers((prev) => ({
+                ...prev,
+                [questionIndex]: choice,
+            }));
 
-                // ✅ auto-scroll to next question if not the last
-                if (!listRef.current) return;
-                const delayedScrollToIndex = debounce(listRef?.current?.scrollToIndex, 100);
-                if (questionIndex < MULTIPLE_CHOICE_QUESTIONS.length - 1) {
-                    delayedScrollToIndex({
-                        index: questionIndex + 1,
-                        animated: true,
-                    });
-                }
+            // ✅ auto-scroll to next question if not the last
+            if (!listRef.current) return;
+            const delayedScrollToIndex = debounce(listRef?.current?.scrollToIndex, 100);
+            if (questionIndex < MULTIPLE_CHOICE_QUESTIONS.length - 1) {
+                delayedScrollToIndex({
+                    index: questionIndex + 1,
+                    animated: true,
+                });
             }
-        },
-        [setAnswers, answers]
-    );
+        }
+    };
 
-    const handleSubmit = useCallback(() => {
+    const handleSubmit = () => {
         setResultModalVisible(true);
         setIsSubmitted(true);
-    }, [setResultModalVisible]);
+    };
 
-    const handleReset = useCallback(() => {
+    const handleReset = () => {
         setIsSubmitted(false);
         setAnswers({});
         listRef.current?.scrollToIndex({ index: 0, animated: true });
-    }, [setIsSubmitted]);
+    };
 
     if (!quiz_id) {
         return (
@@ -249,7 +237,7 @@ export default function MultipleChoiceQuestionsAns() {
                 {isSubmitted && (
                     <Pressable
                         android_ripple={
-                            isSubmitEnabled ? { color: "#b8d418ff", borderless: false } : null
+                            isSubmitEnabled ? { color: "#631d76", borderless: false } : null
                         }
                         style={{
                             backgroundColor: theme.colors.primary,

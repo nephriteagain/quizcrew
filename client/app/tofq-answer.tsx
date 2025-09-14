@@ -1,7 +1,7 @@
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { cloneDeep, debounce } from "lodash";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 import Card from "@/components/Card";
@@ -25,18 +25,12 @@ export default function TrueOrFalseQuestionsAns() {
     const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as TrueOrFalseQ | undefined;
 
-    const TOF_QUESTIONS = useMemo(() => {
-        if (!selectedQuiz) return [];
-        return selectedQuiz.questions;
-    }, [selectedQuiz]);
+    const TOF_QUESTIONS = selectedQuiz?.questions || [];
 
     /** only enable submission when all questions are answered */
-    const isSubmitEnabled = useMemo(
-        () => Object.keys(answers).length === TOF_QUESTIONS.length,
-        [answers]
-    );
+    const isSubmitEnabled = Object.keys(answers).length === TOF_QUESTIONS.length;
 
-    const score = useMemo(() => {
+    const score = (() => {
         let total = 0;
         for (let i = 0; i < TOF_QUESTIONS.length; ++i) {
             const q = TOF_QUESTIONS[i];
@@ -47,47 +41,44 @@ export default function TrueOrFalseQuestionsAns() {
             }
         }
         return total;
-    }, [answers]);
+    })();
 
-    const totalQuestion = useMemo(() => TOF_QUESTIONS.length, []);
+    const totalQuestion = TOF_QUESTIONS.length;
 
-    const handleSelect = useCallback(
-        (questionIndex: number, choice: string) => {
-            const prevAnswer = answers[questionIndex];
-            if (prevAnswer === choice) {
-                const clone = cloneDeep(answers);
-                delete clone[questionIndex];
-                setAnswers(clone);
-            } else {
-                setAnswers((prev) => ({
-                    ...prev,
-                    [questionIndex]: choice,
-                }));
+    const handleSelect = (questionIndex: number, choice: string) => {
+        const prevAnswer = answers[questionIndex];
+        if (prevAnswer === choice) {
+            const clone = cloneDeep(answers);
+            delete clone[questionIndex];
+            setAnswers(clone);
+        } else {
+            setAnswers((prev) => ({
+                ...prev,
+                [questionIndex]: choice,
+            }));
 
-                // ✅ auto-scroll to next question if not last
-                if (!listRef.current) return;
-                const delayedScrollToIndex = debounce(listRef?.current?.scrollToIndex, 100);
-                if (questionIndex < TOF_QUESTIONS.length - 1) {
-                    delayedScrollToIndex({
-                        index: questionIndex + 1,
-                        animated: true,
-                    });
-                }
+            // ✅ auto-scroll to next question if not last
+            if (!listRef.current) return;
+            const delayedScrollToIndex = debounce(listRef?.current?.scrollToIndex, 100);
+            if (questionIndex < TOF_QUESTIONS.length - 1) {
+                delayedScrollToIndex({
+                    index: questionIndex + 1,
+                    animated: true,
+                });
             }
-        },
-        [setAnswers, answers]
-    );
+        }
+    };
 
-    const handleSubmit = useCallback(() => {
+    const handleSubmit = () => {
         setResultModalVisible(true);
         setIsSubmitted(true);
-    }, []);
+    };
 
-    const handleReset = useCallback(() => {
+    const handleReset = () => {
         setIsSubmitted(false);
         setAnswers({});
         listRef.current?.scrollToIndex({ index: 0, animated: true });
-    }, []);
+    };
 
     return (
         <Container style={{ flex: 1, backgroundColor: theme.colors.surface }}>
@@ -212,7 +203,7 @@ export default function TrueOrFalseQuestionsAns() {
                 )}
                 {isSubmitted && (
                     <Pressable
-                        android_ripple={{ color: "#b8d418ff", borderless: false }}
+                        android_ripple={{ color: "#631d76", borderless: false }}
                         style={{
                             backgroundColor: theme.colors.secondary,
                             padding: 16,
