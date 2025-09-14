@@ -1,4 +1,4 @@
-import { router, useFocusEffect, useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
 
@@ -48,20 +48,30 @@ export const useBeforeRemove = ({
     onConfirm,
 }: UseBackButtonConfirmationOptions) => {
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+    const [pendingAction, setPendingAction] = useState<any>(null);
     const theme = useAppTheme();
     const navigation = useNavigation();
+    const router = useRouter();
 
     const handleExitConfirm = () => {
         setShowExitConfirmation(false);
         if (onConfirm) {
             onConfirm();
+        } else if (pendingAction) {
+            // Dispatch the original navigation action that was prevented
+            navigation.dispatch(pendingAction.data.action);
+            setPendingAction(null);
         } else {
-            router.back(); // Default navigation back
+            // Fallback to router.back()
+            setTimeout(() => {
+                router.back();
+            }, 100);
         }
     };
 
     const handleExitCancel = () => {
         setShowExitConfirmation(false);
+        setPendingAction(null);
     };
 
     // Set up back button handler
@@ -75,6 +85,9 @@ export const useBeforeRemove = ({
 
                 // Prevent default behavior of leaving the screen
                 e.preventDefault();
+
+                // Store the pending action for later execution
+                setPendingAction(e);
 
                 // Show confirmation modal
                 setShowExitConfirmation(true);

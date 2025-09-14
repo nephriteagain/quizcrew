@@ -3,6 +3,7 @@ import Card from "@/components/Card";
 import Container from "@/components/Container";
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { StartQuizModal } from "@/components/StartQuizModal";
+import { useBeforeRemove } from "@/hooks/useBeforeRemove";
 import { WIDTH } from "@/constants/values";
 import { fontSizeScaler } from "@/lib/utils/fontSizeScaler";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
@@ -72,6 +73,11 @@ export default function DragAndDropQuizAns() {
     })();
 
     const totalQuestion = DRAG_AND_DROP.questions.length;
+
+    // Back button confirmation hook
+    const { ConfirmationModal } = useBeforeRemove({
+        shouldShowConfirmation: () => !isSubmitted && Object.keys(answers).length > 0,
+    });
 
     const containerOffset = useRef({ x: 0, y: 0 });
     const flashListRef = useRef<FlashListRef<(typeof DRAG_AND_DROP.questions)[0]>>(null);
@@ -451,6 +457,14 @@ export default function DragAndDropQuizAns() {
                             </Pressable>
                         )}
                     </View>
+
+                    {/* Back Button Confirmation Modal */}
+                    <ConfirmationModal
+                        title="Exit Quiz?"
+                        description={`You have answered ${Object.keys(answers).length} out of ${DRAG_AND_DROP.questions.length} questions. Your progress will be lost if you exit.`}
+                        cancelText="Continue Quiz"
+                        confirmText="Exit Quiz"
+                    />
                 </Container>
             </GestureHandlerRootView>
         </>
