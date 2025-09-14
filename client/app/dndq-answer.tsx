@@ -423,9 +423,7 @@ export default function DragAndDropQuizAns() {
                         {isSubmitted && (
                             <Pressable
                                 android_ripple={
-                                    isSubmitEnabled
-                                        ? { color: "#631d76", borderless: false }
-                                        : null
+                                    isSubmitEnabled ? { color: "#631d76", borderless: false } : null
                                 }
                                 style={[
                                     styles.resetButton,

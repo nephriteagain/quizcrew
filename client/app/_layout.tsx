@@ -57,12 +57,12 @@ function RootLayoutContent() {
                     />
                     <Stack.Screen
                         name="mcq-answer"
-                        options={{ headerTitle: "Multiple Choice Question" }}
+                        options={{ headerTitle: "Multiple Choice Quiz" }}
                     />
                     <Stack.Screen
                         name="mcq"
                         options={(props) => ({
-                            headerTitle: "Multiple Choice Questions",
+                            headerTitle: "Multiple Choice Quiz",
                             headerRight: () => (
                                 <TouchableOpacity
                                     onPress={() => {
@@ -87,7 +87,7 @@ function RootLayoutContent() {
                     <Stack.Screen
                         name="tofq"
                         options={(props) => ({
-                            headerTitle: "True or False Questions",
+                            headerTitle: "True or False Quiz",
                             headerRight: () => (
                                 <TouchableOpacity
                                     onPress={() => {
@@ -111,12 +111,12 @@ function RootLayoutContent() {
                     />
                     <Stack.Screen
                         name="tofq-answer"
-                        options={{ headerTitle: "True of False Questions" }}
+                        options={{ headerTitle: "True of False Quiz" }}
                     />
                     <Stack.Screen
                         name="dndq"
                         options={(props) => ({
-                            headerTitle: "Drag and Drop Questions",
+                            headerTitle: "Drag and Drop Quiz",
                             headerRight: () => (
                                 <TouchableOpacity
                                     onPress={() => {
@@ -140,7 +140,7 @@ function RootLayoutContent() {
                     />
                     <Stack.Screen
                         name="dndq-answer"
-                        options={{ headerTitle: "Drag and Drop Questions" }}
+                        options={{ headerTitle: "Drag and Drop Quiz" }}
                     />
 
                     <Stack.Screen name="create" options={{ headerTitle: "Create a Quiz" }} />

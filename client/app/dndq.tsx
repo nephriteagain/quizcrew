@@ -1,9 +1,8 @@
-// app/DragAndDropQuiz.tsx
-// import { DRAG_AND_DROP } from "@/lib/data";
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { DragAndDrop } from "@/types/review";
+import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
@@ -71,50 +70,84 @@ export default function DragAndDropQuiz() {
 
     return (
         <Container style={styles.container}>
-            <View style={styles.switchContainer}>
-                <Text style={styles.switchLabel}>
-                    {showAnswer ? "Hide All Answers" : "Show All Answers"}
-                </Text>
-                <Switch
-                    trackColor={{ false: theme.colors.outline, true: theme.colors.primary }}
-                    thumbColor={showAnswer ? theme.colors.onPrimary : theme.colors.surface}
-                    ios_backgroundColor={theme.colors.outline}
-                    onValueChange={toggleSwitch}
-                    value={showAnswer}
-                />
-            </View>
-            {/* Answers palette */}
+            {/* Enhanced Questions Section */}
             <ScrollView
-                contentContainerStyle={styles.answersRow}
-                style={styles.scrollView}
+                style={styles.questionsScrollView}
+                contentContainerStyle={styles.scrollContainer}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.answersRow}>
-                    {selectedQuiz.answers.map((ans, index) => {
-                        const isIndividuallyShown = individualAnswers.has(index);
-                        const shouldShowAnswer = showAnswer || isIndividuallyShown;
-                        return (
-                            <Animated.View
-                                key={ans}
-                                entering={
-                                    shouldShowAnswer
-                                        ? FadeInLeft.duration(150).delay(index * 50)
-                                        : undefined
-                                }
-                                exiting={FadeOutLeft.duration(100)}
-                                layout={LinearTransition.duration(200)}
-                            >
-                                <Chip
-                                    label={ans}
-                                    color={
-                                        shouldShowAnswer ? colors[index % colors.length] : undefined
-                                    }
-                                />
-                            </Animated.View>
-                        );
-                    })}
+                {/* Enhanced Header Section */}
+                <View style={styles.headerSection}>
+                    <View style={styles.quizInfo}>
+                        <View style={styles.iconContainer}>
+                            <Ionicons name="layers" size={24} color={theme.colors.primary} />
+                        </View>
+                        <View style={styles.quizDetails}>
+                            <Text style={styles.quizTitle}>{selectedQuiz.title}</Text>
+                            <Text style={styles.questionCount}>{selectedQuiz.description}</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.toggleCard}>
+                        <Ionicons
+                            name={showAnswer ? "eye-off" : "eye"}
+                            size={20}
+                            color={theme.colors.primary}
+                            style={styles.toggleIcon}
+                        />
+                        <Text style={styles.toggleText}>
+                            {showAnswer ? "Hide Answers" : "Show Answers"}
+                        </Text>
+                        <Switch
+                            trackColor={{
+                                false: theme.colors.outline,
+                                true: theme.colors.primary,
+                            }}
+                            thumbColor={showAnswer ? theme.colors.onPrimary : theme.colors.surface}
+                            ios_backgroundColor={theme.colors.outline}
+                            onValueChange={toggleSwitch}
+                            value={showAnswer}
+                            style={styles.switch}
+                        />
+                    </View>
                 </View>
-                {/* Wrap ScrollView inside a View we can measure */}
+                {/* Enhanced Answers Palette */}
+                <View style={styles.answersSection}>
+                    <View style={styles.answersSectionHeader}>
+                        <Ionicons name="color-palette" size={20} color={theme.colors.primary} />
+                        <Text style={styles.answersSectionTitle}>Answer Options</Text>
+                    </View>
+                    <View style={styles.answersScrollView}>
+                        <View style={styles.answersRow}>
+                            {selectedQuiz.answers.map((ans, index) => {
+                                const isIndividuallyShown = individualAnswers.has(index);
+                                const shouldShowAnswer = showAnswer || isIndividuallyShown;
+                                return (
+                                    <Animated.View
+                                        key={ans}
+                                        entering={
+                                            shouldShowAnswer
+                                                ? FadeInLeft.duration(150).delay(index * 50)
+                                                : undefined
+                                        }
+                                        exiting={FadeOutLeft.duration(100)}
+                                        layout={LinearTransition.duration(200)}
+                                    >
+                                        <Chip
+                                            label={ans}
+                                            color={
+                                                shouldShowAnswer
+                                                    ? colors[index % colors.length]
+                                                    : undefined
+                                            }
+                                        />
+                                    </Animated.View>
+                                );
+                            })}
+                        </View>
+                    </View>
+                </View>
+
                 <View style={styles.questions}>
                     {selectedQuiz.questions.map((q, idx) => {
                         const isIndividuallyShown = individualAnswers.has(idx);
@@ -123,44 +156,85 @@ export default function DragAndDropQuiz() {
                         return (
                             <Animated.View
                                 key={idx}
-                                style={[styles.dropZone]}
+                                style={styles.questionCard}
                                 layout={LinearTransition.duration(200)}
                             >
                                 <Pressable
                                     android_ripple={{
-                                        color: theme.colors.surfaceVariant,
+                                        color: theme.colors.surfaceVariant + "40",
+                                        borderless: false,
                                     }}
                                     onPress={() => toggleIndividualAnswer(idx)}
                                     style={styles.questionPressable}
                                 >
-                                    <Text style={styles.questionText}>{q.question}</Text>
-                                </Pressable>
-                                {shouldShowAnswer && (
-                                    <Pressable onPress={() => toggleIndividualAnswer(idx)}>
-                                        <Animated.View
-                                            style={[
-                                                styles.answerContainer,
-                                                {
-                                                    backgroundColor: getColorForAnswer(q.answer).bg,
-                                                    borderColor: getColorForAnswer(q.answer).border,
-                                                },
-                                            ]}
-                                            entering={FadeInLeft.duration(150).delay(
-                                                showAnswer ? idx * 50 : 0
+                                    <View style={styles.questionHeader}>
+                                        <View style={styles.questionNumber}>
+                                            <Text style={styles.questionNumberText}>{idx + 1}</Text>
+                                        </View>
+                                        <View style={styles.questionContent}>
+                                            <Text style={styles.questionText}>{q.question}</Text>
+                                            {!shouldShowAnswer && (
+                                                <View style={styles.tapHint}>
+                                                    <Ionicons
+                                                        name="eye"
+                                                        size={14}
+                                                        color={theme.colors.onSurfaceVariant}
+                                                    />
+                                                    <Text style={styles.tapHintText}>
+                                                        Tap to reveal answer
+                                                    </Text>
+                                                </View>
                                             )}
-                                            exiting={FadeOutLeft.duration(100)}
+                                        </View>
+                                        <Ionicons
+                                            name={shouldShowAnswer ? "chevron-up" : "chevron-down"}
+                                            size={20}
+                                            color={theme.colors.onSurfaceVariant}
+                                        />
+                                    </View>
+                                </Pressable>
+
+                                {shouldShowAnswer && (
+                                    <Animated.View
+                                        style={styles.answerSection}
+                                        entering={FadeInLeft.duration(150).delay(
+                                            showAnswer ? idx * 50 : 0
+                                        )}
+                                        exiting={FadeOutLeft.duration(100)}
+                                    >
+                                        <View style={styles.answerDivider} />
+                                        <Pressable
+                                            onPress={() => toggleIndividualAnswer(idx)}
+                                            android_ripple={{
+                                                color: getColorForAnswer(q.answer).border + "20",
+                                                borderless: false,
+                                            }}
                                         >
-                                            <Animated.Text
+                                            <Animated.View
                                                 style={[
-                                                    styles.answerText,
-                                                    styles.visibleAnswer,
-                                                    { color: getColorForAnswer(q.answer).text },
+                                                    styles.answerChip,
+                                                    {
+                                                        backgroundColor: getColorForAnswer(q.answer)
+                                                            .bg,
+                                                        borderColor: getColorForAnswer(q.answer)
+                                                            .border,
+                                                    },
                                                 ]}
+                                                entering={FadeInLeft.delay(
+                                                    showAnswer ? idx * 50 + 25 : 0
+                                                ).duration(150)}
                                             >
-                                                {q.answer}
-                                            </Animated.Text>
-                                        </Animated.View>
-                                    </Pressable>
+                                                <Text
+                                                    style={[
+                                                        styles.answerChipText,
+                                                        { color: getColorForAnswer(q.answer).text },
+                                                    ]}
+                                                >
+                                                    {q.answer}
+                                                </Text>
+                                            </Animated.View>
+                                        </Pressable>
+                                    </Animated.View>
                                 )}
                             </Animated.View>
                         );
@@ -168,8 +242,8 @@ export default function DragAndDropQuiz() {
                 </View>
             </ScrollView>
 
-            {/* Bottom Button */}
-            <View style={styles.bottomContainer}>
+            {/* Enhanced Footer */}
+            <View style={styles.footerContainer}>
                 <Link
                     href={{
                         pathname: "/dndq-answer",
@@ -180,10 +254,15 @@ export default function DragAndDropQuiz() {
                     asChild
                 >
                     <Pressable
-                        android_ripple={{ color: "#ccc", borderless: false }}
-                        style={styles.quizButton}
+                        android_ripple={{
+                            color: theme.colors.onTertiary + "20",
+                            borderless: false,
+                        }}
+                        style={styles.takeQuizButton}
                     >
-                        <Text style={styles.quizButtonText}>Take the Quiz</Text>
+                        <Ionicons name="play" size={20} color={theme.colors.onTertiary} />
+                        <Text style={styles.takeQuizText}>Start Quiz</Text>
+                        <Ionicons name="arrow-forward" size={18} color={theme.colors.onTertiary} />
                     </Pressable>
                 </Link>
             </View>
@@ -237,31 +316,101 @@ const makeStyles = (theme: AppTheme) =>
             alignItems: "center",
             justifyContent: "center",
         },
-        switchContainer: {
+        // Header Section Styles
+        headerSection: {
+            gap: 12,
+        },
+        quizInfo: {
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-end",
-            zIndex: 10,
+            backgroundColor: theme.colors.surface,
+            padding: 16,
+            borderRadius: 16,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 4,
+            gap: 16,
         },
-        switchLabel: {
+        iconContainer: {
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: theme.colors.primaryContainer,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        quizDetails: {
+            flex: 1,
+            gap: 4,
+        },
+        quizTitle: {
+            fontSize: 20,
+            fontWeight: "700",
+            color: theme.colors.onSurface,
+        },
+        questionCount: {
+            fontSize: 14,
+            color: theme.colors.onSurfaceVariant,
+            fontWeight: "500",
+        },
+        toggleCard: {
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: theme.colors.surface,
+            padding: 12,
+            borderRadius: 12,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 4,
+            elevation: 2,
+            gap: 8,
+        },
+        toggleIcon: {},
+        toggleText: {
             fontWeight: "600",
             fontSize: 16,
             color: theme.colors.onSurface,
-        },
-        scrollView: {
             flex: 1,
         },
+        switch: {},
+        // Answers Section Styles
+        answersSection: {
+            backgroundColor: theme.colors.surface,
+            borderRadius: 16,
+            padding: 16,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 3,
+            gap: 12,
+        },
+        answersSectionHeader: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+        },
+        answersSectionTitle: {
+            fontSize: 16,
+            fontWeight: "600",
+            color: theme.colors.onSurface,
+        },
+        answersContainer: {
+            flexGrow: 1,
+        },
+        answersScrollView: {},
         answersRow: {
             flexDirection: "row",
             flexWrap: "wrap",
-            marginBottom: 20,
+            gap: 8,
         },
         chip: {
             paddingHorizontal: 16,
             paddingVertical: 12,
             borderRadius: 25,
-            margin: 4,
-            zIndex: 10,
             borderWidth: 1,
             borderColor: theme.colors.outline,
             backgroundColor: theme.colors.surface,
@@ -270,43 +419,84 @@ const makeStyles = (theme: AppTheme) =>
             color: theme.colors.onSurfaceVariant,
             fontWeight: "600",
         },
+        // Questions Section Styles
+        questionsScrollView: {
+            flex: 1,
+        },
+        scrollContainer: {
+            gap: 16,
+        },
         questions: {
             gap: 12,
         },
-        dropZone: {
-            padding: 16,
-            borderWidth: 2,
-            borderColor: theme.colors.outline,
-            borderRadius: 12,
-            minHeight: 70,
-            justifyContent: "center",
+        questionCard: {
             backgroundColor: theme.colors.surface,
-            marginBottom: 12,
+            borderRadius: 16,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 12,
+            elevation: 4,
+            overflow: "hidden",
         },
         questionPressable: {
-            padding: 8,
-            marginBottom: 8,
-            borderRadius: 8,
-            backgroundColor: "rgba(0,0,0,0.02)",
+            padding: 0,
+        },
+        questionHeader: {
+            flexDirection: "row",
+            alignItems: "center",
+            padding: 20,
+            gap: 16,
+        },
+        questionNumber: {
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: theme.colors.primaryContainer,
+            alignItems: "center",
+            justifyContent: "center",
+        },
+        questionNumberText: {
+            fontSize: 16,
+            fontWeight: "700",
+            color: theme.colors.primary,
+        },
+        questionContent: {
+            flex: 1,
+            gap: 8,
         },
         questionText: {
             fontSize: 16,
-            fontWeight: "500",
-            marginBottom: 6,
-        },
-        individualAnswerHint: {
-            fontSize: 14,
             fontWeight: "600",
-            color: theme.colors.secondary,
-            marginTop: 4,
+            color: theme.colors.onSurface,
+            lineHeight: 24,
+        },
+        tapHint: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+        },
+        tapHintText: {
+            fontSize: 12,
+            color: theme.colors.onSurfaceVariant,
             fontStyle: "italic",
         },
-        answerContainer: {
-            marginTop: 8,
-            paddingHorizontal: 16,
-            paddingVertical: 12,
+        answerSection: {
+            gap: 12,
+        },
+        answerDivider: {
+            height: 1,
+            backgroundColor: theme.colors.outline + "30",
+            marginHorizontal: 20,
+        },
+        answerChip: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            marginHorizontal: 20,
             borderRadius: 25,
-            borderWidth: 0,
+            borderWidth: 1,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
                 width: 0,
@@ -316,27 +506,33 @@ const makeStyles = (theme: AppTheme) =>
             shadowRadius: 4,
             elevation: 3,
         },
-        answerText: {
-            fontSize: 14,
-            color: theme.colors.onSurfaceVariant,
+        answerChipText: {
+            fontSize: 16,
+            fontWeight: "700",
             textAlign: "center",
         },
-        visibleAnswer: {
-            color: theme.colors.onSurface,
-            fontWeight: "600",
+        // Footer Styles
+        footerContainer: {
+            paddingTop: 20,
+            paddingBottom: 8,
         },
-        bottomContainer: {
-            paddingVertical: 16,
-        },
-        quizButton: {
-            backgroundColor: theme.colors.error,
-            padding: 16,
-            borderRadius: 12,
+        takeQuizButton: {
+            flexDirection: "row",
+            backgroundColor: theme.colors.tertiary,
+            padding: 18,
+            borderRadius: 16,
             alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            shadowColor: theme.colors.tertiary,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 6,
         },
-        quizButtonText: {
-            color: theme.colors.onError,
-            fontWeight: "bold",
-            fontSize: 16,
+        takeQuizText: {
+            color: theme.colors.onTertiary,
+            fontWeight: "700",
+            fontSize: 18,
         },
     });

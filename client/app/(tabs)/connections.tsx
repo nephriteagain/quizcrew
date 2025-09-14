@@ -1,23 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-    Image,
-    Pressable,
-    SectionList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
-} from "react-native-reanimated";
+import { Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { FAB } from "react-native-paper";
 
 interface Connection {
     id: string;
@@ -117,50 +104,16 @@ const mockConnections: Connection[] = [
 export default function Connections() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const [fabExpanded, setFabExpanded] = useState(false);
 
-    // Animation values
-    const fabRotation = useSharedValue(0);
-    const optionsOpacity = useSharedValue(0);
-    const optionsScale = useSharedValue(0.5);
+    const [state, setState] = useState({ open: false });
 
-    const toggleFab = () => {
-        const newExpanded = !fabExpanded;
-        setFabExpanded(newExpanded);
+    const onStateChange = ({ open }: { open: boolean }) => setState({ open });
 
-        fabRotation.value = withSpring(newExpanded ? 45 : 0);
-        optionsOpacity.value = withTiming(newExpanded ? 1 : 0, { duration: 200 });
-        optionsScale.value = withSpring(newExpanded ? 1 : 0.5);
-    };
+    const { open } = state;
 
-    const handleAddConnection = () => {
-        console.log("Add Connection pressed");
-        setFabExpanded(false);
-        fabRotation.value = withSpring(0);
-        optionsOpacity.value = withTiming(0, { duration: 200 });
-        optionsScale.value = withSpring(0.5);
-    };
-
-    const handleAddCircle = () => {
-        console.log("Add Circle pressed");
-        setFabExpanded(false);
-        fabRotation.value = withSpring(0);
-        optionsOpacity.value = withTiming(0, { duration: 200 });
-        optionsScale.value = withSpring(0.5);
-    };
-
-    // Animated styles
-    const fabAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: `${fabRotation.value}deg` }],
-    }));
-
-    const optionsAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: optionsOpacity.value,
-        transform: [{ scale: optionsScale.value }],
-    }));
     const sections: SectionData[] = [
         {
-            title: "Circles",
+            title: "Groups",
             data: mockGroups,
             type: "groups",
         },
@@ -265,45 +218,32 @@ export default function Connections() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
             />
-
-            {/* Floating Action Button */}
-            <View style={styles.fabContainer}>
-                {/* FAB Options */}
-                <Animated.View style={[styles.fabOptionsContainer, optionsAnimatedStyle]}>
-                    <Pressable
-                        style={[styles.fabOption, { backgroundColor: theme.colors.secondary }]}
-                        onPress={handleAddConnection}
-                    >
-                        <Ionicons name="person-add" size={20} color={theme.colors.onSecondary} />
-                        <Text style={[styles.fabOptionText, { color: theme.colors.onSecondary }]}>
-                            Add Connection
-                        </Text>
-                    </Pressable>
-
-                    <Pressable
-                        style={[styles.fabOption, { backgroundColor: theme.colors.tertiary }]}
-                        onPress={handleAddCircle}
-                    >
-                        <Ionicons name="people" size={20} color={theme.colors.onTertiary} />
-                        <Text style={[styles.fabOptionText, { color: theme.colors.onTertiary }]}>
-                            Add Circle
-                        </Text>
-                    </Pressable>
-                </Animated.View>
-
-                {/* Main FAB Button */}
-                <Pressable
-                    style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-                    onPress={toggleFab}
-                >
-                    <Animated.View style={fabAnimatedStyle}>
-                        <Ionicons name="add" size={28} color={theme.colors.onPrimary} />
-                    </Animated.View>
-                </Pressable>
-            </View>
-
-            {/* Backdrop overlay when FAB is expanded */}
-            {fabExpanded && <Pressable style={styles.fabBackdrop} onPress={toggleFab} />}
+            <FAB.Group
+                backdropColor={"transparent"}
+                open={open}
+                visible
+                icon={open ? "close" : "plus"}
+                actions={[
+                    {
+                        icon: "account-plus",
+                        label: "ADD CONNECTION",
+                        onPress: () => console.log("Pressed star"),
+                        labelTextColor: theme.colors.tertiary,
+                    },
+                    {
+                        icon: "account-group",
+                        label: "ADD GROUP",
+                        onPress: () => console.log("Pressed email"),
+                        labelTextColor: theme.colors.tertiary,
+                    },
+                ]}
+                onStateChange={onStateChange}
+                onPress={() => {
+                    if (open) {
+                        // do something if the speed dial is open
+                    }
+                }}
+            />
         </Container>
     );
 }

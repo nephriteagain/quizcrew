@@ -6,6 +6,7 @@ import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-nativ
 
 import Card from "@/components/Card";
 import Container from "@/components/Container";
+import { useBeforeRemove } from "@/hooks/useBeforeRemove";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { MultipleChoiceQ } from "@/types/review";
@@ -44,6 +45,11 @@ export default function MultipleChoiceQuestionsAns() {
     })();
 
     const totalQuestion = MULTIPLE_CHOICE_QUESTIONS.length;
+
+    // Back button confirmation hook
+    const { ConfirmationModal } = useBeforeRemove({
+        shouldShowConfirmation: () => !isSubmitted && Object.keys(answers).length > 0,
+    });
 
     const handleSelect = (questionIndex: number, choice: string) => {
         const prevAnswer = answers[questionIndex];
@@ -264,6 +270,14 @@ export default function MultipleChoiceQuestionsAns() {
                 onClose={() => setResultModalVisible(false)}
                 score={score}
                 totalQuestion={totalQuestion}
+            />
+
+            {/* Back Button Confirmation Modal */}
+            <ConfirmationModal
+                title="Exit Quiz?"
+                description={`You have answered ${Object.keys(answers).length} out of ${MULTIPLE_CHOICE_QUESTIONS.length} questions. Your progress will be lost if you exit.`}
+                cancelText="Continue Quiz"
+                confirmText="Exit Quiz"
             />
         </Container>
     );
