@@ -7,7 +7,7 @@ import reviewSelector from "@/store/review/review.store";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -18,16 +18,16 @@ function RootLayoutContent() {
     const reviews = reviewSelector.use.useQuizzes();
 
     // callbacks
-    const handleSheetChanges = useCallback((index: number) => {
+    const handleSheetChanges = (index: number) => {
         if (index === -1) {
             setQuizId(null);
         }
-    }, []);
+    };
 
-    const handleSettingsPress = useCallback((quiz_id: string) => {
+    const handleSettingsPress = (quiz_id: string) => {
         bottomSheetRef.current?.expand();
         setQuizId(quiz_id);
-    }, []);
+    };
 
     return (
         <AuthProvider>

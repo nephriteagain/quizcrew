@@ -8,7 +8,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
 const { width } = Dimensions.get("window");
@@ -29,7 +29,7 @@ export default function CreateQuiz() {
     const params = useLocalSearchParams<{ type: QUIZ_TYPE }>();
     const quizType = params.type;
 
-    const pickImage = useCallback(async () => {
+    const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: "images",
             quality: 1,
@@ -40,9 +40,9 @@ export default function CreateQuiz() {
         if (!result.canceled) {
             setAssets((prev) => [...prev, ...result.assets]);
         }
-    }, []);
+    };
 
-    const takePhoto = useCallback(async () => {
+    const takePhoto = async () => {
         const status = await ImagePicker.getCameraPermissionsAsync();
         if (!status.granted) {
             const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -68,29 +68,26 @@ export default function CreateQuiz() {
             return;
         }
         setAssets((prev) => [...prev, a]);
-    }, []);
+    };
 
-    const removeImage = useCallback((indexToRemove: number) => {
+    const removeImage = (indexToRemove: number) => {
         setAssets((prev) => prev.filter((_, index) => index !== indexToRemove));
-    }, []);
+    };
 
-    const asyncActionOptions = useMemo(
-        () => ({
-            onComplete: () => {
-                router.back();
-                router.back();
-                router.back();
-            },
-        }),
-        [router]
-    );
+    const asyncActionOptions = {
+        onComplete: () => {
+            router.back();
+            router.back();
+            router.back();
+        },
+    };
 
     const [handleCreateQuizReviewer, { isLoading: isSubmitting }] = useAsyncAction(
         createReviewer,
         asyncActionOptions
     );
 
-    const onCreateQuizReviewer = useCallback(() => {
+    const onCreateQuizReviewer = () => {
         Alert.alert("Create reviewer", "Create a quiz based on this assets.", [
             {
                 text: "Cancel",
@@ -122,7 +119,7 @@ export default function CreateQuiz() {
                 style: "default",
             },
         ]);
-    }, [quizType, assets]);
+    };
 
     return (
         <Container style={styles.container}>

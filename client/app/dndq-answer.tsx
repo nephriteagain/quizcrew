@@ -11,7 +11,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router";
 import { cloneDeep, debounce } from "lodash";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
@@ -49,22 +49,15 @@ export default function DragAndDropQuizAns() {
     const [resultModalVisible, setResultModalVisible] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const DRAG_AND_DROP = useMemo(() => {
-        if (!selectedQuiz)
-            return {
-                questions: [],
-                answers: [],
-            };
-        return selectedQuiz;
-    }, [selectedQuiz]);
+    const DRAG_AND_DROP = selectedQuiz || {
+        questions: [],
+        answers: [],
+    };
 
     /**only enable answer submission when user answers every choice */
-    const isSubmitEnabled = useMemo(
-        () => Object.keys(answers).length === DRAG_AND_DROP.questions.length,
-        [answers]
-    );
+    const isSubmitEnabled = Object.keys(answers).length === DRAG_AND_DROP.questions.length;
 
-    const score = useMemo(() => {
+    const score = (() => {
         let total: number = 0;
         for (let i = 0; i < DRAG_AND_DROP.questions.length; ++i) {
             const q = DRAG_AND_DROP.questions[i];
@@ -75,42 +68,38 @@ export default function DragAndDropQuizAns() {
             }
         }
         return total;
-    }, [answers]);
+    })();
 
-    const totalQuestion = useMemo(() => DRAG_AND_DROP.questions.length, [DRAG_AND_DROP.questions]);
+    const totalQuestion = DRAG_AND_DROP.questions.length;
 
     const containerOffset = useRef({ x: 0, y: 0 });
     const flashListRef = useRef<FlashListRef<(typeof DRAG_AND_DROP.questions)[0]>>(null);
 
     const questionRefs = useRef<(View | null)[]>([]);
 
-    const initializeRefs = useCallback(() => {
-        questionRefs.current = new Array(DRAG_AND_DROP.questions.length).fill(null);
-    }, []);
-
     useEffect(() => {
-        initializeRefs();
-    }, [initializeRefs]);
+        questionRefs.current = new Array(DRAG_AND_DROP.questions.length).fill(null);
+    }, [DRAG_AND_DROP.questions.length]);
 
-    const handleSubmit = useCallback(() => {
+    const handleSubmit = () => {
         setResultModalVisible(true);
         setIsSubmitted(true);
-    }, [setResultModalVisible]);
+    };
 
-    const handleReset = useCallback(() => {
+    const handleReset = () => {
         setIsSubmitted(false);
         setAnswers({});
         flashListRef.current?.scrollToIndex({ index: 0, animated: true });
-    }, [setIsSubmitted]);
+    };
 
-    const registerContainer = useCallback((ref: View | null) => {
+    const registerContainer = (ref: View | null) => {
         if (!ref) return;
         ref.measureInWindow((x, y) => {
             containerOffset.current = { x, y };
         });
-    }, []);
+    };
 
-    const recalibrateDropZones = useCallback(() => {
+    const recalibrateDropZones = () => {
         const container = containerOffset.current;
         if (!container) return;
 
@@ -146,78 +135,64 @@ export default function DragAndDropQuizAns() {
                 }
             }
         });
-    }, []);
+    };
 
-    const handleDropZones = useCallback(
-        (_e: any) => {
-            setTimeout(() => {
-                recalibrateDropZones();
-            }, 100);
-        },
-        [recalibrateDropZones]
-    );
+    const handleDropZones = (_e: any) => {
+        setTimeout(() => {
+            recalibrateDropZones();
+        }, 100);
+    };
 
-    const handleHover = useCallback(
-        (absX: number, absY: number) => {
-            const { x: offsetX, y: offsetY } = containerOffset.current;
-            const localX = absX - offsetX;
-            const localY = absY - offsetY;
+    const handleHover = (absX: number, absY: number) => {
+        const { x: offsetX, y: offsetY } = containerOffset.current;
+        const localX = absX - offsetX;
+        const localY = absY - offsetY;
 
-            const zone = dropZones.find(
-                (z) =>
-                    localX >= z.x &&
-                    localX <= z.x + z.width &&
-                    localY >= z.y &&
-                    localY <= z.y + z.height
-            );
-            setHoveredIndex(zone ? zone.index : null);
-        },
-        [dropZones]
-    );
+        const zone = dropZones.find(
+            (z) =>
+                localX >= z.x &&
+                localX <= z.x + z.width &&
+                localY >= z.y &&
+                localY <= z.y + z.height
+        );
+        setHoveredIndex(zone ? zone.index : null);
+    };
 
-    const handleDrop = useCallback(
-        (absX: number, absY: number, answer: string) => {
-            const { x: offsetX, y: offsetY } = containerOffset.current;
-            const localX = absX - offsetX;
-            const localY = absY - offsetY;
+    const handleDrop = (absX: number, absY: number, answer: string) => {
+        const { x: offsetX, y: offsetY } = containerOffset.current;
+        const localX = absX - offsetX;
+        const localY = absY - offsetY;
 
-            const zone = dropZones.find(
-                (z) =>
-                    localX >= z.x &&
-                    localX <= z.x + z.width &&
-                    localY >= z.y &&
-                    localY <= z.y + z.height
-            );
-            if (zone) {
-                setAnswers((prev) => ({ ...prev, [zone.index]: answer }));
-                // ✅ auto-scroll to next question if not the last
-                if (!flashListRef.current || hoveredIndex === null) return;
-                const delayedScrollToIndex = debounce(flashListRef?.current?.scrollToIndex, 150);
-                if (hoveredIndex < DRAG_AND_DROP.questions.length - 1) {
-                    delayedScrollToIndex({
-                        index: hoveredIndex + 1,
-                        animated: true,
-                    });
-                }
+        const zone = dropZones.find(
+            (z) =>
+                localX >= z.x &&
+                localX <= z.x + z.width &&
+                localY >= z.y &&
+                localY <= z.y + z.height
+        );
+        if (zone) {
+            setAnswers((prev) => ({ ...prev, [zone.index]: answer }));
+            // ✅ auto-scroll to next question if not the last
+            if (!flashListRef.current || hoveredIndex === null) return;
+            const delayedScrollToIndex = debounce(flashListRef?.current?.scrollToIndex, 150);
+            if (hoveredIndex < DRAG_AND_DROP.questions.length - 1) {
+                delayedScrollToIndex({
+                    index: hoveredIndex + 1,
+                    animated: true,
+                });
             }
-            setHoveredIndex(null);
-        },
-        [dropZones, hoveredIndex]
-    );
+        }
+        setHoveredIndex(null);
+    };
 
-    const setQuestionRef = useCallback(
-        (index: number) => (ref: View | null) => {
-            questionRefs.current[index] = ref;
-        },
-        []
-    );
+    const setQuestionRef = (index: number) => (ref: View | null) => {
+        questionRefs.current[index] = ref;
+    };
 
-    const unselectedAnswers = useMemo(() => {
-        return DRAG_AND_DROP.answers.filter((ans) => {
-            const isSelected = Object.values(answers).includes(ans);
-            return !isSelected;
-        });
-    }, [answers]);
+    const unselectedAnswers = DRAG_AND_DROP.answers.filter((ans) => {
+        const isSelected = Object.values(answers).includes(ans);
+        return !isSelected;
+    });
 
     if (!quiz_id) {
         return (
@@ -404,9 +379,9 @@ export default function DragAndDropQuizAns() {
                                                         style={styles.removeButton}
                                                     >
                                                         <AntDesign
-                                                            name="closesquare"
+                                                            name="close-square"
                                                             size={24}
-                                                            color="#ff6b6b"
+                                                            color="#9e4770"
                                                         />
                                                     </TouchableOpacity>
                                                 )}
@@ -449,7 +424,7 @@ export default function DragAndDropQuizAns() {
                             <Pressable
                                 android_ripple={
                                     isSubmitEnabled
-                                        ? { color: "#b8d418ff", borderless: false }
+                                        ? { color: "#631d76", borderless: false }
                                         : null
                                 }
                                 style={[

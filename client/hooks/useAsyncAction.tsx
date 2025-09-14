@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 type ActionState<T> = {
     data: T | null;
     error: Error | null;
@@ -27,28 +27,25 @@ export function useAsyncAction<TArgs extends any[], TResult>(
     const [isLoading, setIsLoading] = useState(false);
     const isError = !!error;
 
-    const run = useCallback(
-        async (...args: TArgs) => {
-            setIsLoading(true);
-            setError(null);
-            try {
-                const result = await fn(...args);
-                setData(result);
-                options?.onComplete?.();
-                return result;
-            } catch (err) {
-                console.error(err);
-                if (err instanceof Error) {
-                    setError(err);
-                } else {
-                    setError(new Error("Unknown error occurred."));
-                }
-            } finally {
-                setIsLoading(false);
+    const run = async (...args: TArgs) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const result = await fn(...args);
+            setData(result);
+            options?.onComplete?.();
+            return result;
+        } catch (err) {
+            console.error(err);
+            if (err instanceof Error) {
+                setError(err);
+            } else {
+                setError(new Error("Unknown error occurred."));
             }
-        },
-        [fn]
-    );
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return [run, { data, error, isLoading, isError }];
 }

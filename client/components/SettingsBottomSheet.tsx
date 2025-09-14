@@ -5,7 +5,7 @@ import { QuizDoc } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import { forwardRef, memo, useCallback, useMemo } from "react";
+import { forwardRef } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
 import LoadingModal from "./LoadingModal";
 
@@ -20,42 +20,37 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
         const theme = useAppTheme();
         const styles = makeStyles(theme);
         const router = useRouter();
-        const onComplete = useCallback(() => {
+        const onComplete = () => {
             (ref as any)?.current?.close();
             router.back();
-        }, [router]);
+        };
 
-        const asyncActionOption = useMemo(() => {
-            return {
-                onComplete,
-            };
-        }, [onComplete]);
+        const asyncActionOption = {
+            onComplete,
+        };
 
         const [deleteQuizFn, { isLoading }] = useAsyncAction(deleteQuiz, asyncActionOption);
 
-        const renderBackdrop = useCallback(
-            (props: any) => (
-                <BottomSheetBackdrop
-                    {...props}
-                    disappearsOnIndex={-1}
-                    appearsOnIndex={0}
-                    onPress={() => (ref as any)?.current?.close()}
-                />
-            ),
-            []
+        const renderBackdrop = (props: any) => (
+            <BottomSheetBackdrop
+                {...props}
+                disappearsOnIndex={-1}
+                appearsOnIndex={0}
+                onPress={() => (ref as any)?.current?.close()}
+            />
         );
 
-        const handleEditQuiz = useCallback(() => {
+        const handleEditQuiz = () => {
             console.log("edit");
             (ref as any)?.current?.close();
-        }, []);
+        };
 
-        const handleShareQuiz = useCallback(() => {
+        const handleShareQuiz = () => {
             console.log("share");
             (ref as any)?.current?.close();
-        }, []);
+        };
 
-        const handleDeleteQuiz = useCallback(() => {
+        const handleDeleteQuiz = () => {
             console.log("delete");
             const quiz = reviews.find((q) => q.quiz_id === quizId);
             if (!quiz) return;
@@ -77,7 +72,7 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
                     },
                 ]
             );
-        }, [reviews, quizId, deleteQuizFn]);
+        };
 
         return (
             <>
@@ -91,8 +86,6 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
                     animationConfigs={{
                         damping: 80,
                         overshootClamping: true,
-                        restDisplacementThreshold: 0.1,
-                        restSpeedThreshold: 0.1,
                         stiffness: 500,
                     }}
                 >
@@ -140,7 +133,7 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
 
 SettingsBottomSheet.displayName = "SettingsBottomSheet";
 
-export default memo(SettingsBottomSheet);
+export default SettingsBottomSheet;
 
 const makeStyles = (theme: AppTheme) =>
     StyleSheet.create({

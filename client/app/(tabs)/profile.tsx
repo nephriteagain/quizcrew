@@ -8,7 +8,7 @@ import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Link, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Profile() {
@@ -20,35 +20,32 @@ export default function Profile() {
 
     const router = useRouter();
 
-    const handlePress = useCallback(
-        (quiz: Quiz) => {
-            if (quiz.type === QUIZ_TYPE.MCQ) {
-                router.push({
-                    pathname: "../mcq",
-                    params: {
-                        quiz_id: quiz.quiz_id,
-                    },
-                });
-            } else if (quiz.type === QUIZ_TYPE.TOFQ) {
-                router.push({
-                    pathname: "../tofq",
-                    params: {
-                        quiz_id: quiz.quiz_id,
-                    },
-                });
-            } else if (quiz.type === QUIZ_TYPE.DNDQ) {
-                router.push({
-                    pathname: "/dndq",
-                    params: {
-                        quiz_id: quiz.quiz_id,
-                    },
-                });
-            }
-        },
-        [router]
-    );
+    const handlePress = (quiz: Quiz) => {
+        if (quiz.type === QUIZ_TYPE.MCQ) {
+            router.push({
+                pathname: "../mcq",
+                params: {
+                    quiz_id: quiz.quiz_id,
+                },
+            });
+        } else if (quiz.type === QUIZ_TYPE.TOFQ) {
+            router.push({
+                pathname: "../tofq",
+                params: {
+                    quiz_id: quiz.quiz_id,
+                },
+            });
+        } else if (quiz.type === QUIZ_TYPE.DNDQ) {
+            router.push({
+                pathname: "/dndq",
+                params: {
+                    quiz_id: quiz.quiz_id,
+                },
+            });
+        }
+    };
 
-    const pickImageFromLibrary = useCallback(async () => {
+    const pickImageFromLibrary = async () => {
         setIsUploadingPhoto(true);
         try {
             let result = await ImagePicker.launchImageLibraryAsync({
@@ -71,9 +68,9 @@ export default function Profile() {
         } finally {
             setIsUploadingPhoto(false);
         }
-    }, []);
+    };
 
-    const takePhoto = useCallback(async () => {
+    const takePhoto = async () => {
         const status = await ImagePicker.getCameraPermissionsAsync();
         if (!status.granted) {
             const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -106,9 +103,9 @@ export default function Profile() {
         } finally {
             setIsUploadingPhoto(false);
         }
-    }, []);
+    };
 
-    const showPhotoOptions = useCallback(() => {
+    const showPhotoOptions = () => {
         Alert.alert(
             "Update Profile Photo",
             "Choose how you'd like to update your profile picture",
@@ -127,7 +124,7 @@ export default function Profile() {
                 },
             ]
         );
-    }, [takePhoto, pickImageFromLibrary]);
+    };
 
     return (
         <Container style={styles.container}>
