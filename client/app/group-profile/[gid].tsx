@@ -6,8 +6,9 @@ import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { Button } from "react-native-paper";
+import { Button, FAB } from "react-native-paper";
 
 const mockGroup: Group = {
     id: "1",
@@ -26,8 +27,14 @@ export default function GroupProfile() {
     const quizzes = reviewSelector.use.useQuizzes();
     const router = useRouter();
 
-    const groupQuizzes = quizzes.filter((quiz) =>
-        quiz.gids?.includes(gid || "") || quiz.privacy === "ALL"
+    const [state, setState] = useState({ open: false });
+
+    const onStateChange = ({ open }: { open: boolean }) => setState({ open });
+
+    const { open } = state;
+
+    const groupQuizzes = quizzes.filter(
+        (quiz) => quiz.gids?.includes(gid || "") || quiz.privacy === "ALL"
     );
 
     const handlePress = (quiz: Quiz) => {
@@ -71,6 +78,8 @@ export default function GroupProfile() {
             },
         });
     };
+
+    const isMember = true;
 
     return (
         <Container style={styles.container}>
@@ -122,9 +131,7 @@ export default function GroupProfile() {
             </View>
 
             <View style={styles.quizzesSection}>
-                <Text style={styles.sectionTitle}>
-                    Shared Quizzes ({groupQuizzes.length})
-                </Text>
+                <Text style={styles.sectionTitle}>Shared Quizzes ({groupQuizzes.length})</Text>
                 {groupQuizzes.length === 0 ? (
                     <View style={styles.emptyContainer}>
                         <Ionicons
@@ -153,6 +160,34 @@ export default function GroupProfile() {
                     />
                 )}
             </View>
+            {isMember && (
+                <FAB.Group
+                    backdropColor={"transparent"}
+                    open={open}
+                    visible
+                    icon={open ? "close" : "plus"}
+                    actions={[
+                        {
+                            icon: "account-plus",
+                            label: "INVITE MEMBERS",
+                            onPress: () => router.push("/invite-members"),
+                            labelTextColor: theme.colors.tertiary,
+                        },
+                        {
+                            icon: "eye",
+                            label: "VIEW ALL MEMBERS",
+                            onPress: () => router.push("/members"),
+                            labelTextColor: theme.colors.tertiary,
+                        },
+                    ]}
+                    onStateChange={onStateChange}
+                    onPress={() => {
+                        if (open) {
+                            // do something if the speed dial is open
+                        }
+                    }}
+                />
+            )}
         </Container>
     );
 }

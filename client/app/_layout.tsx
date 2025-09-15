@@ -149,6 +149,9 @@ function RootLayoutContent() {
                         options={{ headerTitle: "Find New Connections" }}
                     />
                     <Stack.Screen name="add-groups" options={{ headerTitle: "Find Groups" }} />
+                    <Stack.Screen name="create-group" options={{ headerTitle: "Create Group" }} />
+                    <Stack.Screen name="invite-members" options={{ headerTitle: "Invite Members" }} />
+                    <Stack.Screen name="members" options={{ headerTitle: "Members" }} />
                     <Stack.Screen name="profile/[uid]" options={{ headerTitle: "Profile" }} />
                     <Stack.Screen
                         name="group-profile/[gid]"

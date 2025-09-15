@@ -4,7 +4,7 @@ import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 
@@ -107,7 +107,7 @@ export default function AddGroups() {
     const totalGroups = filteredSections.reduce((total, section) => total + section.data.length, 0);
 
     const handleCreateGroup = () => {
-        console.log("create group");
+        router.push("/create-group");
     };
 
     const renderGroupItem = ({ item }: { item: Group }) => {
@@ -121,6 +121,10 @@ export default function AddGroups() {
         };
         return <GroupCard {...item} handlePress={handlePress} />;
     };
+
+    useEffect(() => {
+        router.prefetch("/create-group");
+    }, [router]);
 
     return (
         <Container>

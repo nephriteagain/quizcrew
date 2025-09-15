@@ -21,7 +21,7 @@ export default function Layout() {
                     title: "Home",
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home" size={size} color={theme.colors?.onPrimary} />
+                        <Ionicons name="home" size={size} color={color} />
                     ),
                 }}
             />
@@ -31,7 +31,7 @@ export default function Layout() {
                     title: "Connections",
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="people" size={size} color={theme.colors?.onPrimary} />
+                        <Ionicons name="people" size={size} color={color} />
                     ),
                 }}
             />
@@ -41,7 +41,7 @@ export default function Layout() {
                     headerShown: false,
                     title: "Profile",
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="person" size={size} color={theme.colors?.onPrimary} />
+                        <Ionicons name="person" size={size} color={color} />
                     ),
                 }}
             />

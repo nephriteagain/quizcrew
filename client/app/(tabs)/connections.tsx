@@ -109,7 +109,19 @@ export default function Connections() {
 
     const { open } = state;
 
-    const renderGroupItem = (item: Group) => <GroupCard {...item} />;
+    const renderGroupItem = (item: Group) => (
+        <GroupCard
+            {...item}
+            handlePress={() => {
+                router.push({
+                    pathname: "/group-profile/[gid]",
+                    params: {
+                        gid: item.id,
+                    },
+                });
+            }}
+        />
+    );
 
     const renderConnectionItem = (item: Connection) => (
         <ConnectionCard
