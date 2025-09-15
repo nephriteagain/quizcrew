@@ -17,71 +17,128 @@ interface SectionData {
 
 const mockGroups: Group[] = [
     {
-        id: "1",
+        gid: "1",
+        status: "ACTIVE",
         name: "Quiz Masters",
         avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=100&h=100&fit=crop&crop=faces",
-        memberCount: 234,
-        lastActivity: "2 hours ago",
-        unreadMessages: 5,
         description: "Community for quiz enthusiasts",
+        owner: "owner1",
+        createdAt: new Date() as any,
+        memberCount: 234,
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner1",
+            username: "Owner User",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
+        },
     },
     {
-        id: "2",
+        gid: "2",
+        status: "ACTIVE",
         name: "Study Group Alpha",
         avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        memberCount: 45,
-        lastActivity: "1 day ago",
-        unreadMessages: 12,
         description: "Weekly study sessions",
+        owner: "owner2",
+        createdAt: new Date() as any,
+        memberCount: 45,
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner2",
+            username: "Alpha Leader",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
+        },
     },
     {
-        id: "3",
+        gid: "3",
+        status: "ACTIVE",
         name: "Trivia Night",
         avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b820?w=100&h=100&fit=crop&crop=faces",
-        memberCount: 89,
-        lastActivity: "3 days ago",
         description: "Friday night trivia challenges",
+        owner: "owner3",
+        createdAt: new Date() as any,
+        memberCount: 89,
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner3",
+            username: "Trivia Host",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
+        },
     },
 ];
 
 const mockConnections: Connection[] = [
     {
-        id: "1",
-        name: "Sarah Johnson",
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces",
-        status: "online",
-        mutualFriends: 12,
+        data: {
+            status: "ACTIVE",
+            uid: "1",
+            username: "Sarah Johnson",
+            photoURL:
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces",
+        },
+        meta: {
+            uid: "1",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "2",
-        name: "Mike Chen",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces",
-        status: "away",
-        lastSeen: "30 min ago",
-        mutualFriends: 8,
+        data: {
+            status: "ACTIVE",
+            uid: "2",
+            username: "Mike Chen",
+            photoURL:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces",
+        },
+        meta: {
+            uid: "2",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "3",
-        name: "Emily Davis",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces",
-        status: "offline",
-        lastSeen: "2 hours ago",
-        mutualFriends: 15,
+        data: {
+            status: "ACTIVE",
+            uid: "3",
+            username: "Emily Davis",
+            photoURL:
+                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces",
+        },
+        meta: {
+            uid: "3",
+            status: "INVITED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "4",
-        name: "Alex Rodriguez",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        status: "online",
-        mutualFriends: 6,
+        data: {
+            status: "ACTIVE",
+            uid: "4",
+            username: "Alex Rodriguez",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
+        },
+        meta: {
+            uid: "4",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "5",
-        name: "Jessica Kim",
-        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces",
-        status: "away",
-        lastSeen: "1 hour ago",
-        mutualFriends: 9,
+        data: {
+            status: "ACTIVE",
+            uid: "5",
+            username: "Jessica Kim",
+            photoURL:
+                "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces",
+        },
+        meta: {
+            uid: "5",
+            status: "REQUESTED",
+            createdAt: new Date() as any,
+        },
     },
 ];
 
@@ -116,7 +173,8 @@ export default function Connections() {
                 router.push({
                     pathname: "/group-profile/[gid]",
                     params: {
-                        gid: item.id,
+                        gid: item.gid,
+                        status: "ACTIVE",
                     },
                 });
             }}
@@ -125,12 +183,12 @@ export default function Connections() {
 
     const renderConnectionItem = (item: Connection) => (
         <ConnectionCard
-            {...item}
+            connection={item}
             handlePress={() => {
                 router.push({
                     pathname: "/profile/[uid]",
                     params: {
-                        uid: item.id,
+                        uid: item.meta.uid,
                     },
                 });
             }}
@@ -156,7 +214,7 @@ export default function Connections() {
         <Container style={styles.container}>
             <SectionList
                 sections={sections}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => ("gid" in item ? item.gid : item.meta.uid)}
                 renderItem={renderItem}
                 renderSectionHeader={renderSectionHeader}
                 showsVerticalScrollIndicator={false}

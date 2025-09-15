@@ -11,12 +11,21 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Button, FAB } from "react-native-paper";
 
 const mockGroup: Group = {
-    id: "1",
+    gid: "1",
+    status: "ACTIVE",
     name: "React Native Developers",
     avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&h=150&fit=crop",
-    memberCount: 1250,
-    lastActivity: "2 hours ago",
     description: "A community for React Native developers to share knowledge and experiences",
+    owner: "owner1",
+    createdAt: new Date() as any,
+    memberCount: 1250,
+    ownerData: {
+        uid: "owner1",
+        username: "Group Owner",
+        photoURL:
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
+        status: "ACTIVE",
+    },
 };
 
 export default function GroupProfile() {
@@ -102,7 +111,12 @@ export default function GroupProfile() {
                         </View>
                         <View style={styles.stat}>
                             <Ionicons name="time" size={16} color={theme.colors.primary} />
-                            <Text style={styles.statText}>Active {mockGroup.lastActivity}</Text>
+                            <Text style={styles.statText}>
+                                Created{" "}
+                                {mockGroup.createdAt?.toDate?.()
+                                    ? mockGroup.createdAt.toDate().toLocaleDateString()
+                                    : "Recently"}
+                            </Text>
                         </View>
                     </View>
                 </View>

@@ -1,4 +1,5 @@
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
+import { Timestamp } from "@react-native-firebase/firestore";
 
 /** strips all method in FirebaseAuthTypes.User */
 export type AuthUser = {
@@ -8,26 +9,49 @@ export type AuthUser = {
 };
 
 export type UserData = {
-    username?: string;
     uid: string;
+    status: "DELETED" | "ACTIVE";
+    username?: string;
     photoURL?: string;
 };
 
-export interface Connection {
-    id: string;
-    name: string;
-    avatar: string;
-    status: "online" | "offline" | "away";
-    lastSeen?: string;
-    mutualFriends?: number;
+export type UserGroupStatus = "INVITED" | "REQUESTED" | "CONNECTED";
+
+export interface UserGroupMeta {
+    status: UserGroupStatus;
+    gid: string;
+    createdAt: Timestamp;
+    updatedAt?: Timestamp;
 }
 
-export interface Group {
-    id: string;
+export type GroupStatus = "DELETED" | "ACTIVE";
+
+export interface GroupDoc {
+    createdAt: Timestamp;
+    updatedAt?: Timestamp;
+    gid: string;
     name: string;
     avatar: string;
-    memberCount: number;
-    lastActivity: string;
-    unreadMessages?: number;
     description: string;
+    owner: string;
+    status: GroupStatus;
+}
+
+export interface Group extends GroupDoc {
+    memberCount: number;
+    ownerData: UserData | null;
+}
+
+export type ConnectionStatus = "INVITED" | "REQUESTED" | "CONNECTED";
+
+export interface ConnectionMeta {
+    uid: string;
+    status: ConnectionStatus;
+    createdAt: Timestamp;
+    updatedAt?: Timestamp;
+}
+
+export interface Connection {
+    data: UserData | null;
+    meta: ConnectionMeta;
 }

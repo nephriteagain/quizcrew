@@ -6,6 +6,8 @@ import { Text } from "react-native-paper";
 
 export interface GroupCardProps extends Group {
     handlePress?: () => void;
+    lastActivity?: string;
+    unreadMessages?: number;
 }
 
 export default function GroupCard({ handlePress, ...item }: GroupCardProps) {

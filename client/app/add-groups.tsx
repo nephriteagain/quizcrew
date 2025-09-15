@@ -3,6 +3,7 @@ import GroupCard from "@/components/GroupCard";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
+import { Timestamp } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
@@ -10,58 +11,112 @@ import { Button, TextInput } from "react-native-paper";
 
 const mockInvitesFromGroups: Group[] = [
     {
-        id: "1",
+        gid: "1",
+        status: "ACTIVE",
         name: "React Native Developers",
         avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&h=150&fit=crop",
         memberCount: 1250,
-        lastActivity: "2 hours ago",
         description: "A community for React Native developers to share knowledge and experiences",
+        owner: "owner1",
+        createdAt: Timestamp.now(),
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner1",
+            username: "johndoe",
+            photoURL:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop",
+        },
     },
     {
-        id: "2",
+        gid: "2",
+        status: "ACTIVE",
         name: "Design Systems Guild",
         avatar: "https://images.unsplash.com/photo-1541462608143-67571c6738dd?w=150&h=150&fit=crop",
         memberCount: 840,
-        lastActivity: "5 hours ago",
         description: "Discussing best practices in design systems and component libraries",
+        owner: "owner2",
+        createdAt: Timestamp.now(),
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner2",
+            username: "designlead",
+            photoURL:
+                "https://images.unsplash.com/photo-1494790108755-2616b612b647?w=50&h=50&fit=crop",
+        },
     },
 ];
 
 const mockRequestedGroups: Group[] = [
     {
-        id: "3",
+        gid: "3",
+        status: "ACTIVE",
         name: "TypeScript Enthusiasts",
         avatar: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=150&h=150&fit=crop",
         memberCount: 2100,
-        lastActivity: "1 day ago",
         description: "All things TypeScript - tips, tricks, and best practices",
+        owner: "owner3",
+        createdAt: Timestamp.now(),
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner3",
+            username: "tsexpert",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop",
+        },
     },
 ];
 
 const mockRecommendedGroups: Group[] = [
     {
-        id: "4",
+        gid: "4",
+        status: "ACTIVE",
         name: "Mobile UI/UX Designers",
         avatar: "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=150&h=150&fit=crop",
         memberCount: 675,
-        lastActivity: "3 hours ago",
         description: "Mobile design patterns and user experience discussions",
+        owner: "owner4",
+        createdAt: Timestamp.now(),
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner4",
+            username: "uxdesigner",
+            photoURL:
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop",
+        },
     },
     {
-        id: "5",
+        gid: "5",
+        status: "ACTIVE",
         name: "JavaScript Weekly",
         avatar: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=150&h=150&fit=crop",
         memberCount: 3200,
-        lastActivity: "30 minutes ago",
         description: "Weekly discussions about JavaScript trends and updates",
+        owner: "owner5",
+        createdAt: Timestamp.now(),
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner5",
+            username: "jsweekly",
+            photoURL:
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop",
+        },
     },
     {
-        id: "6",
+        gid: "6",
+        status: "ACTIVE",
         name: "Startup Founders Network",
         avatar: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=150&h=150&fit=crop",
         memberCount: 445,
-        lastActivity: "1 hour ago",
         description: "Connect with fellow entrepreneurs and startup founders",
+        owner: "owner6",
+        createdAt: Timestamp.now(),
+        ownerData: {
+            status: "ACTIVE",
+            uid: "owner6",
+            username: "startupfounder",
+            photoURL:
+                "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=50&h=50&fit=crop",
+        },
     },
 ];
 
@@ -115,7 +170,7 @@ export default function AddGroups() {
             router.push({
                 pathname: "/group-profile/[gid]",
                 params: {
-                    gid: item.id,
+                    gid: item.gid,
                 },
             });
         };
@@ -168,7 +223,7 @@ export default function AddGroups() {
                         <Text style={styles.sectionCount}>({section.data.length})</Text>
                     </View>
                 )}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.gid}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
                 ListEmptyComponent={() => (

@@ -10,56 +10,94 @@ import { TextInput } from "react-native-paper";
 
 const mockRequestsToYou: Connection[] = [
     {
-        id: "1",
-        name: "Alex Johnson",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        status: "online",
-        mutualFriends: 5,
+        data: {
+            status: "ACTIVE",
+            uid: "1",
+            username: "Alex Johnson",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "1",
+            status: "INVITED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "2",
-        name: "Sarah Chen",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
-        status: "away",
-        lastSeen: "2 hours ago",
-        mutualFriends: 12,
+        data: {
+            status: "ACTIVE",
+            uid: "2",
+            username: "Sarah Chen",
+            photoURL:
+                "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "2",
+            status: "INVITED",
+            createdAt: new Date() as any,
+        },
     },
 ];
 
 const mockRequestsFromYou: Connection[] = [
     {
-        id: "3",
-        name: "Mike Davis",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        status: "offline",
-        lastSeen: "yesterday",
-        mutualFriends: 3,
+        data: {
+            status: "ACTIVE",
+            uid: "3",
+            username: "Mike Davis",
+            photoURL:
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "3",
+            status: "REQUESTED",
+            createdAt: new Date() as any,
+        },
     },
 ];
 
 const mockRecommended: Connection[] = [
     {
-        id: "4",
-        name: "Emily Rodriguez",
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        status: "online",
-        mutualFriends: 8,
+        data: {
+            status: "ACTIVE",
+            uid: "4",
+            username: "Emily Rodriguez",
+            photoURL:
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "4",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "5",
-        name: "David Park",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        status: "offline",
-        lastSeen: "3 days ago",
-        mutualFriends: 1,
+        data: {
+            status: "ACTIVE",
+            uid: "5",
+            username: "David Park",
+            photoURL:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "5",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "6",
-        name: "Lisa Wang",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-        status: "away",
-        lastSeen: "1 hour ago",
-        mutualFriends: 15,
+        data: {
+            status: "ACTIVE",
+            uid: "6",
+            username: "Lisa Wang",
+            photoURL:
+                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "6",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
 ];
 
@@ -97,7 +135,7 @@ export default function AddConnections() {
         .map((section) => ({
             ...section,
             data: section.data.filter((connection) =>
-                connection.name.toLowerCase().includes(searchQuery.toLowerCase())
+                connection.data?.username?.toLowerCase().includes(searchQuery.toLowerCase())
             ),
         }))
         .filter((section) => section.data.length > 0);
@@ -116,11 +154,17 @@ export default function AddConnections() {
             router.push({
                 pathname: "/profile/[uid]",
                 params: {
-                    uid: item.id,
+                    uid: item.meta.uid,
                 },
             });
         };
-        return <ConnectionCard {...item} handleConnect={handleConnect} handlePress={handlePress} />;
+        return (
+            <ConnectionCard
+                connection={item}
+                handleConnect={handleConnect}
+                handlePress={handlePress}
+            />
+        );
     };
 
     return (
@@ -156,7 +200,7 @@ export default function AddConnections() {
                         <Text style={styles.sectionCount}>({section.data.length})</Text>
                     </View>
                 )}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.meta.uid}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
                 ListEmptyComponent={() => (

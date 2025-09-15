@@ -9,60 +9,105 @@ import { Button, Chip, TextInput } from "react-native-paper";
 
 const mockConnections: Connection[] = [
     {
-        id: "1",
-        name: "Alex Johnson",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        status: "online",
-        mutualFriends: 5,
+        data: {
+            status: "ACTIVE",
+            uid: "1",
+            username: "Alex Johnson",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "1",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "2",
-        name: "Sarah Chen",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
-        status: "away",
-        lastSeen: "2 hours ago",
-        mutualFriends: 12,
+        data: {
+            status: "ACTIVE",
+            uid: "2",
+            username: "Sarah Chen",
+            photoURL:
+                "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "2",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "3",
-        name: "Mike Davis",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        status: "offline",
-        lastSeen: "yesterday",
-        mutualFriends: 3,
+        data: {
+            status: "ACTIVE",
+            uid: "3",
+            username: "Mike Davis",
+            photoURL:
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "3",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
 ];
 
 const mockRecommended: Connection[] = [
     {
-        id: "4",
-        name: "Emily Rodriguez",
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        status: "online",
-        mutualFriends: 8,
+        data: {
+            status: "ACTIVE",
+            uid: "4",
+            username: "Emily Rodriguez",
+            photoURL:
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "4",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "5",
-        name: "David Park",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        status: "offline",
-        lastSeen: "3 days ago",
-        mutualFriends: 1,
+        data: {
+            status: "ACTIVE",
+            uid: "5",
+            username: "David Park",
+            photoURL:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "5",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "6",
-        name: "Jessica Liu",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
-        status: "online",
-        mutualFriends: 0,
+        data: {
+            status: "ACTIVE",
+            uid: "6",
+            username: "Jessica Liu",
+            photoURL:
+                "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "6",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
     {
-        id: "7",
-        name: "Chris Wilson",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        status: "away",
-        lastSeen: "5 hours ago",
-        mutualFriends: 2,
+        data: {
+            status: "ACTIVE",
+            uid: "7",
+            username: "Chris Wilson",
+            photoURL:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "7",
+            status: "CONNECTED",
+            createdAt: new Date() as any,
+        },
     },
 ];
 
@@ -97,7 +142,7 @@ export default function InviteMembers() {
         .map((section) => ({
             ...section,
             data: section.data.filter((connection) =>
-                connection.name.toLowerCase().includes(searchQuery.toLowerCase())
+                connection.data?.username?.toLowerCase().includes(searchQuery.toLowerCase())
             ),
         }))
         .filter((section) => section.data.length > 0);
@@ -127,35 +172,32 @@ export default function InviteMembers() {
     };
 
     const getSelectedConnection = (id: string) => {
-        return allConnections.find((connection) => connection.id === id);
+        return allConnections.find((connection) => connection.meta.uid === id);
     };
 
     const renderConnectionItem = ({ item }: { item: Connection }) => {
-        const isSelected = selectedMembers.includes(item.id);
+        const isSelected = selectedMembers.includes(item.meta.uid);
         return (
             <View style={[styles.connectionItem, isSelected && styles.selectedItem]}>
                 <View style={styles.connectionInfo}>
-                    <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                    <Image
+                        source={{ uri: item.data?.photoURL || "https://via.placeholder.com/50" }}
+                        style={styles.avatar}
+                    />
                     <View style={styles.textInfo}>
-                        <Text style={styles.name}>{item.name}</Text>
+                        <Text style={styles.name}>{item.data?.username || "Unknown User"}</Text>
                         <Text style={styles.status}>
-                            {item.status === "online"
-                                ? "Online"
-                                : item.status === "away"
-                                  ? `Away${item.lastSeen ? ` • ${item.lastSeen}` : ""}`
-                                  : `Last seen ${item.lastSeen || "recently"}`}
+                            {item.meta.status === "CONNECTED"
+                                ? "Connected"
+                                : item.meta.status === "INVITED"
+                                  ? "Invited"
+                                  : "Requested"}
                         </Text>
-                        {item.mutualFriends !== undefined && (
-                            <Text style={styles.mutualFriends}>
-                                {item.mutualFriends} mutual connection
-                                {item.mutualFriends !== 1 ? "s" : ""}
-                            </Text>
-                        )}
                     </View>
                 </View>
                 <Button
                     mode={isSelected ? "outlined" : "contained"}
-                    onPress={() => handleSelectMember(item.id)}
+                    onPress={() => handleSelectMember(item.meta.uid)}
                     compact
                     style={styles.selectButton}
                 >
@@ -207,7 +249,7 @@ export default function InviteMembers() {
                                         onClose={() => handleRemoveSelected(memberId)}
                                         style={styles.chip}
                                     >
-                                        {connection?.name}
+                                        {connection?.data?.username || "Unknown User"}
                                     </Chip>
                                 );
                             })}
@@ -228,7 +270,7 @@ export default function InviteMembers() {
                             <Text style={styles.sectionCount}>({section.data.length})</Text>
                         </View>
                     )}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.meta.uid}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={() => (

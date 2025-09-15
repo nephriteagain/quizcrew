@@ -1,35 +1,49 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
-import { Connection } from "@/types/user";
+import { Connection, ConnectionStatus } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface ConnectionCardProps extends Connection {
-    handleConnect?: (id: string) => void;
+interface ConnectionCardProps {
+    connection: Connection;
+    handleConnect?: (uid: string) => void;
     handlePress?: () => void;
     handleAccept?: () => void;
     handleCancel?: () => void;
 }
 
 export default function ConnectionCard({
+    connection,
     handleConnect,
     handlePress,
     handleAccept,
     handleCancel,
-    ...item
 }: ConnectionCardProps) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
 
-    const getStatusColor = (status: Connection["status"]) => {
+    const getStatusColor = (status: ConnectionStatus) => {
         switch (status) {
-            case "online":
+            case "CONNECTED":
                 return "#4CAF50";
-            case "away":
+            case "INVITED":
                 return "#FF9800";
-            case "offline":
+            case "REQUESTED":
                 return "#9E9E9E";
             default:
                 return "#9E9E9E";
+        }
+    };
+
+    const getStatusText = (status: ConnectionStatus) => {
+        switch (status) {
+            case "CONNECTED":
+                return "Connected";
+            case "INVITED":
+                return "Invited";
+            case "REQUESTED":
+                return "Requested";
+            default:
+                return "Unknown";
         }
     };
 
@@ -40,29 +54,20 @@ export default function ConnectionCard({
             android_ripple={{ color: theme.colors?.primary }}
         >
             <View style={styles.avatarContainer}>
-                <Image source={{ uri: item.avatar }} style={styles.connectionAvatar} />
+                <Image source={{ uri: connection.data?.photoURL || 'https://via.placeholder.com/50' }} style={styles.connectionAvatar} />
                 <View
                     style={[
                         styles.statusIndicator,
-                        { backgroundColor: getStatusColor(item.status) },
+                        { backgroundColor: getStatusColor(connection.meta.status) },
                     ]}
                 />
             </View>
             <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemName}>{connection.data?.username || 'Unknown User'}</Text>
                 <View style={styles.connectionMeta}>
                     <Text style={styles.statusText}>
-                        {item.status === "online"
-                            ? "Online"
-                            : item.status === "away"
-                              ? `Away • ${item.lastSeen}`
-                              : `Last seen ${item.lastSeen}`}
+                        {getStatusText(connection.meta.status)}
                     </Text>
-                    {item.mutualFriends && (
-                        <Text style={styles.mutualFriends}>
-                            {item.mutualFriends} mutual connections
-                        </Text>
-                    )}
                 </View>
             </View>
             <View style={styles.actionsContainer}>
@@ -70,7 +75,7 @@ export default function ConnectionCard({
                     <TouchableOpacity
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={styles.connectButton}
-                        onPress={() => handleConnect(item.id)}
+                        onPress={() => handleConnect(connection.meta.uid)}
                     >
                         <Ionicons name="person-add" size={16} color="white" />
                         <Text style={styles.connectButtonText}>Connect</Text>

@@ -1,6 +1,6 @@
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
-import { Connection } from "@/types/user";
+import { Connection, ConnectionStatus } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -10,14 +10,24 @@ import { Button, Menu, TextInput } from "react-native-paper";
 interface Member extends Connection {
     role: "admin" | "moderator" | "member";
     joinedDate: string;
+    lastSeen?: string;
+    mutualFriends?: number;
 }
 
 const mockAdmins: Member[] = [
     {
-        id: "admin1",
-        name: "Sarah Chen",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
-        status: "online",
+        data: {
+            status: "ACTIVE",
+            uid: "admin1",
+            username: "Sarah Chen",
+            photoURL:
+                "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "admin1",
+            status: "CONNECTED",
+            createdAt: { seconds: 1704067200, nanoseconds: 0 } as any,
+        },
         role: "admin",
         joinedDate: "January 2024",
         mutualFriends: 12,
@@ -26,55 +36,95 @@ const mockAdmins: Member[] = [
 
 const mockModerators: Member[] = [
     {
-        id: "mod1",
-        name: "Alex Johnson",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        status: "away",
-        lastSeen: "2 hours ago",
+        data: {
+            status: "ACTIVE",
+            uid: "mod1",
+            username: "Alex Johnson",
+            photoURL:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "mod1",
+            status: "CONNECTED",
+            createdAt: { seconds: 1706659200, nanoseconds: 0 } as any,
+        },
         role: "moderator",
         joinedDate: "February 2024",
+        lastSeen: "2 hours ago",
         mutualFriends: 5,
     },
 ];
 
 const mockMembers: Member[] = [
     {
-        id: "member1",
-        name: "Mike Davis",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        status: "offline",
-        lastSeen: "yesterday",
+        data: {
+            status: "ACTIVE",
+            uid: "member1",
+            username: "Mike Davis",
+            photoURL:
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "member1",
+            status: "CONNECTED",
+            createdAt: { seconds: 1709251200, nanoseconds: 0 } as any,
+        },
         role: "member",
         joinedDate: "March 2024",
+        lastSeen: "yesterday",
         mutualFriends: 3,
     },
     {
-        id: "member2",
-        name: "Emily Rodriguez",
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        status: "online",
+        data: {
+            status: "ACTIVE",
+            uid: "member2",
+            username: "Emily Rodriguez",
+            photoURL:
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "member2",
+            status: "CONNECTED",
+            createdAt: { seconds: 1709251200, nanoseconds: 0 } as any,
+        },
         role: "member",
         joinedDate: "March 2024",
         mutualFriends: 8,
     },
     {
-        id: "member3",
-        name: "David Park",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        status: "offline",
-        lastSeen: "3 days ago",
+        data: {
+            status: "ACTIVE",
+            uid: "member3",
+            username: "David Park",
+            photoURL:
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "member3",
+            status: "CONNECTED",
+            createdAt: { seconds: 1711929600, nanoseconds: 0 } as any,
+        },
         role: "member",
         joinedDate: "April 2024",
+        lastSeen: "3 days ago",
         mutualFriends: 1,
     },
     {
-        id: "member4",
-        name: "Jessica Liu",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-        status: "away",
-        lastSeen: "1 hour ago",
+        data: {
+            status: "ACTIVE",
+            uid: "member4",
+            username: "Jessica Liu",
+            photoURL:
+                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+        },
+        meta: {
+            uid: "member4",
+            status: "CONNECTED",
+            createdAt: { seconds: 1711929600, nanoseconds: 0 } as any,
+        },
         role: "member",
         joinedDate: "April 2024",
+        lastSeen: "1 hour ago",
         mutualFriends: 6,
     },
 ];
@@ -115,7 +165,7 @@ export default function Members() {
         .map((section) => ({
             ...section,
             data: section.data.filter((member) =>
-                member.name.toLowerCase().includes(searchQuery.toLowerCase())
+                member.data?.username?.toLowerCase().includes(searchQuery.toLowerCase())
             ),
         }))
         .filter((section) => section.data.length > 0);
@@ -148,54 +198,97 @@ export default function Members() {
         }
     };
 
-    const getStatusColor = (status: Connection["status"]) => {
-        switch (status) {
-            case "online":
-                return "#4CAF50";
-            case "away":
-                return "#FF9800";
-            case "offline":
-                return "#9E9E9E";
-            default:
-                return "#9E9E9E";
+    const getStatusColor = (status: ConnectionStatus, lastSeen?: string) => {
+        // For simplicity, we'll derive visual status from Connection status and lastSeen
+        if (status === "CONNECTED") {
+            if (!lastSeen) {
+                return "#4CAF50"; // online
+            } else if (lastSeen.includes("hour")) {
+                return "#FF9800"; // away
+            } else {
+                return "#9E9E9E"; // offline
+            }
         }
+        return "#9E9E9E"; // default
     };
 
-    const handleProfilePress = (memberId: string) => {
+    const handleProfilePress = (memberUid: string) => {
         router.push({
             pathname: "/profile/[uid]",
-            params: { uid: memberId },
+            params: { uid: memberUid },
         });
     };
 
-    const handleMenuAction = (action: string, memberId: string) => {
+    const handleMenuAction = (action: string, memberUid: string) => {
         setVisibleMenuId(null);
-        console.log(`Action: ${action} for member: ${memberId}`);
+        console.log(`Action: ${action} for member: ${memberUid}`);
     };
 
     const renderMemberItem = ({ item }: { item: Member }) => {
-        const isMenuVisible = visibleMenuId === item.id;
+        const isMenuVisible = visibleMenuId === item.meta.uid;
+        const displayName = item.data?.username || "Unknown User";
+        const avatarUri = item.data?.photoURL;
+
+        // Determine visual status for display
+        const getDisplayStatus = () => {
+            if (item.meta.status === "CONNECTED") {
+                if (!item.lastSeen) {
+                    return "online";
+                } else if (item.lastSeen.includes("hour")) {
+                    return "away";
+                } else {
+                    return "offline";
+                }
+            }
+            return "offline";
+        };
+
+        const displayStatus = getDisplayStatus();
 
         return (
             <TouchableOpacity
                 style={styles.memberItem}
-                onPress={() => handleProfilePress(item.id)}
+                onPress={() => handleProfilePress(item.meta.uid)}
                 activeOpacity={0.7}
             >
                 <View style={styles.memberInfo}>
                     <View style={styles.avatarContainer}>
-                        <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                        {avatarUri ? (
+                            <Image source={{ uri: avatarUri }} style={styles.avatar} />
+                        ) : (
+                            <View
+                                style={[
+                                    styles.avatar,
+                                    {
+                                        backgroundColor: theme.colors.surfaceVariant,
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    },
+                                ]}
+                            >
+                                <Ionicons
+                                    name="person"
+                                    size={24}
+                                    color={theme.colors.onSurfaceVariant}
+                                />
+                            </View>
+                        )}
                         <View
                             style={[
                                 styles.statusIndicator,
-                                { backgroundColor: getStatusColor(item.status) },
+                                {
+                                    backgroundColor: getStatusColor(
+                                        item.meta.status,
+                                        item.lastSeen
+                                    ),
+                                },
                             ]}
                         />
                     </View>
 
                     <View style={styles.textInfo}>
                         <View style={styles.nameRow}>
-                            <Text style={styles.name}>{item.name}</Text>
+                            <Text style={styles.name}>{displayName}</Text>
                             {getRoleBadge(item.role) && (
                                 <Text style={styles.roleBadge}>{getRoleBadge(item.role)}</Text>
                             )}
@@ -206,9 +299,9 @@ export default function Members() {
                         </Text>
 
                         <Text style={styles.status}>
-                            {item.status === "online"
+                            {displayStatus === "online"
                                 ? "Online"
-                                : item.status === "away"
+                                : displayStatus === "away"
                                   ? `Away${item.lastSeen ? ` • ${item.lastSeen}` : ""}`
                                   : `Last seen ${item.lastSeen || "recently"}`}
                         </Text>
@@ -217,7 +310,8 @@ export default function Members() {
 
                         {item.mutualFriends !== undefined && (
                             <Text style={styles.mutualFriends}>
-                                {item.mutualFriends} mutual connection{item.mutualFriends !== 1 ? "s" : ""}
+                                {item.mutualFriends} mutual connection
+                                {item.mutualFriends !== 1 ? "s" : ""}
                             </Text>
                         )}
                     </View>
@@ -229,24 +323,46 @@ export default function Members() {
                     anchor={
                         <TouchableOpacity
                             style={styles.menuButton}
-                            onPress={() => setVisibleMenuId(item.id)}
+                            onPress={() => setVisibleMenuId(item.meta.uid)}
                         >
-                            <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.onSurfaceVariant} />
+                            <Ionicons
+                                name="ellipsis-vertical"
+                                size={20}
+                                color={theme.colors.onSurfaceVariant}
+                            />
                         </TouchableOpacity>
                     }
                 >
-                    <Menu.Item onPress={() => handleMenuAction("message", item.id)} title="Send Message" />
-                    <Menu.Item onPress={() => handleMenuAction("profile", item.id)} title="View Profile" />
+                    <Menu.Item
+                        onPress={() => handleMenuAction("message", item.meta.uid)}
+                        title="Send Message"
+                    />
+                    <Menu.Item
+                        onPress={() => handleMenuAction("profile", item.meta.uid)}
+                        title="View Profile"
+                    />
                     {item.role === "member" && (
                         <>
-                            <Menu.Item onPress={() => handleMenuAction("promote", item.id)} title="Make Moderator" />
-                            <Menu.Item onPress={() => handleMenuAction("remove", item.id)} title="Remove from Group" />
+                            <Menu.Item
+                                onPress={() => handleMenuAction("promote", item.meta.uid)}
+                                title="Make Moderator"
+                            />
+                            <Menu.Item
+                                onPress={() => handleMenuAction("remove", item.meta.uid)}
+                                title="Remove from Group"
+                            />
                         </>
                     )}
                     {item.role === "moderator" && (
                         <>
-                            <Menu.Item onPress={() => handleMenuAction("demote", item.id)} title="Remove as Moderator" />
-                            <Menu.Item onPress={() => handleMenuAction("remove", item.id)} title="Remove from Group" />
+                            <Menu.Item
+                                onPress={() => handleMenuAction("demote", item.meta.uid)}
+                                title="Remove as Moderator"
+                            />
+                            <Menu.Item
+                                onPress={() => handleMenuAction("remove", item.meta.uid)}
+                                title="Remove from Group"
+                            />
                         </>
                     )}
                 </Menu>
@@ -298,7 +414,7 @@ export default function Members() {
                             <Text style={styles.sectionCount}>({section.data.length})</Text>
                         </View>
                     )}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.meta.uid}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={() => (
