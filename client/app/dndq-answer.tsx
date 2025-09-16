@@ -3,8 +3,9 @@ import Card from "@/components/Card";
 import Container from "@/components/Container";
 import { QuizResultModal } from "@/components/QuizResultModal";
 import { StartQuizModal } from "@/components/StartQuizModal";
-import { useBeforeRemove } from "@/hooks/useBeforeRemove";
 import { WIDTH } from "@/constants/values";
+import { useBeforeRemove } from "@/hooks/useBeforeRemove";
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { fontSizeScaler } from "@/lib/utils/fontSizeScaler";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
@@ -13,7 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router";
 import { cloneDeep, debounce } from "lodash";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
@@ -84,7 +85,7 @@ export default function DragAndDropQuizAns() {
 
     const questionRefs = useRef<(View | null)[]>([]);
 
-    useEffect(() => {
+    useEffectLogRoute(() => {
         questionRefs.current = new Array(DRAG_AND_DROP.questions.length).fill(null);
     }, [DRAG_AND_DROP.questions.length]);
 

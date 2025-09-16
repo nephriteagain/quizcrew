@@ -1,7 +1,8 @@
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
-import { AudioPlayer, useAudioPlayer } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import { AudioPlayer, useAudioPlayer } from "expo-audio";
+import React from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
     FadeIn,
@@ -39,7 +40,7 @@ export function QuizResultModal({ score, totalQuestion, visible, onClose }: Quiz
     const player3 = useAudioPlayer(APPLAUSE3);
 
     // Auto start confetti and sound when modal opens
-    useEffect(() => {
+    useEffectLogRoute(() => {
         const playClapSound = async () => {
             try {
                 let player: AudioPlayer;
@@ -145,12 +146,13 @@ export function QuizResultModal({ score, totalQuestion, visible, onClose }: Quiz
                 <Animated.View style={[styles.card, cardStyle]}>
                     {/* Header with Icon */}
                     <Animated.View style={styles.header} entering={FadeInUp.delay(300)}>
-                        <View style={[styles.iconContainer, { backgroundColor: scoreData.color + "20" }]}>
-                            <Ionicons
-                                name={scoreData.icon}
-                                size={48}
-                                color={scoreData.color}
-                            />
+                        <View
+                            style={[
+                                styles.iconContainer,
+                                { backgroundColor: scoreData.color + "20" },
+                            ]}
+                        >
+                            <Ionicons name={scoreData.icon} size={48} color={scoreData.color} />
                         </View>
                         <Text style={[styles.scoreText, { color: scoreData.color }]}>
                             {scoreData.text}
@@ -171,7 +173,11 @@ export function QuizResultModal({ score, totalQuestion, visible, onClose }: Quiz
                         <View style={styles.progressContainer}>
                             <View style={styles.progressTrack}>
                                 <Animated.View
-                                    style={[styles.progressFill, { backgroundColor: scoreData.color }, progressStyle]}
+                                    style={[
+                                        styles.progressFill,
+                                        { backgroundColor: scoreData.color },
+                                        progressStyle,
+                                    ]}
                                 />
                             </View>
                             <Text style={[styles.percentText, { color: scoreData.color }]}>

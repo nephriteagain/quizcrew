@@ -1,6 +1,6 @@
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import authSelector from "@/store/user/user.store";
 import utilsSelector from "@/store/utils/utils.store";
-import { useEffect } from "react";
 import AddUsernameDialog from "./AddUsernameDialog";
 
 export default function CreateUsernameModal() {
@@ -19,7 +19,7 @@ export default function CreateUsernameModal() {
         utilsSelector.setState({ isCreateUsernameModalShown: false });
     };
 
-    useEffect(() => {
+    useEffectLogRoute(() => {
         // make sure there is a user account before showing the modal
         if (!username && user?.uid) {
             utilsSelector.setState({ isCreateUsernameModalShown: true });

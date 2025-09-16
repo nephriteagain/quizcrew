@@ -1,8 +1,9 @@
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { debounce } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInDown, FadeInUp } from "react-native-reanimated";
 
@@ -29,7 +30,7 @@ export function StartQuizModal({ title, description, totalQuestions }: StartQuiz
         hideModal();
     };
 
-    useEffect(() => {
+    useEffectLogRoute(() => {
         const delaySetVisible = debounce(setIsVisible, 100);
         delaySetVisible(true);
     }, []);

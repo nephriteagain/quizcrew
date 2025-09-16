@@ -1,11 +1,12 @@
 import Container from "@/components/Container";
 import GroupCard from "@/components/GroupCard";
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 
@@ -177,7 +178,7 @@ export default function AddGroups() {
         return <GroupCard {...item} handlePress={handlePress} />;
     };
 
-    useEffect(() => {
+    useEffectLogRoute(() => {
         router.prefetch("/create-group");
     }, [router]);
 
