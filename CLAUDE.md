@@ -1,1 +1,2 @@
 - avoid using margins, always use parent container to determine child item spacing
+- use yarn when installing new packages

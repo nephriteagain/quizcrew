@@ -1,22 +1,47 @@
 import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
+import SettingsDrawer, { SettingsDrawerRef } from "@/components/SettingsDrawer";
 import { DEFAULT_USER } from "@/constants/values";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
+import { deleteAccount } from "@/store/user/actions/deleteAccount";
+import { logout } from "@/store/user/actions/logout";
 import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    Image,
+    Pressable,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { Button } from "react-native-paper";
 
 export default function Profile() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const quizzes = reviewSelector.use.useQuizzes();
     const userData = authSelector.use.useUserData();
+    const user = authSelector.use.useUser();
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+    const [
+        deleteAccountFn,
+        { isError: isDeleteError, isLoading: isDeleteLoading, error: deleteError },
+    ] = useAsyncAction(deleteAccount, {
+        onComplete: () => {},
+    });
+    const [logoutFn, { isError: isLogoutError, isLoading: isLogoutLoading, error: logoutError }] =
+        useAsyncAction(logout, {
+            onComplete: () => {},
+        });
 
     const router = useRouter();
 
@@ -126,61 +151,200 @@ export default function Profile() {
         );
     };
 
+    const drawerRef = useRef<SettingsDrawerRef>(null);
+
+    const handleDeleteAccount = () => {
+        Alert.alert(
+            "⚠️ Delete Account",
+            "This action is permanent and cannot be undone. All your data, including quizzes, progress, and account information will be permanently deleted.\n\nAre you absolutely sure you want to delete your account?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Delete Forever",
+                    style: "destructive",
+                    onPress: () => {
+                        deleteAccountFn();
+                    },
+                },
+            ]
+        );
+    };
+
+    const handleLogout = () => {
+        Alert.alert(
+            "Logout",
+            "Are you sure you want to logout? You'll need to sign in again to access your account.",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Logout",
+                    style: "default",
+                    onPress: () => {
+                        logoutFn();
+                    },
+                },
+            ]
+        );
+    };
+
     return (
-        <Container style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.avatarContainer}>
-                    <Image
-                        source={{
-                            uri: userData?.photoURL ?? DEFAULT_USER,
-                        }}
-                        style={styles.avatar}
-                    />
-                    <Pressable
-                        style={styles.editPhotoButton}
-                        onPress={showPhotoOptions}
-                        disabled={isUploadingPhoto}
-                    >
-                        {isUploadingPhoto ? (
-                            <ActivityIndicator size="small" color="white" />
-                        ) : (
-                            <Ionicons name="camera" size={16} color="white" />
-                        )}
-                    </Pressable>
-                </View>
-                <View>
-                    <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
-                    <View style={{ flexDirection: "row", columnGap: 8 }}>
-                        <Link href={"/connections"}>
-                            <Text style={{ color: theme.colors.onSurfaceVariant }}>
-                                <Text style={{ fontWeight: "600", color: theme.colors.onSurface }}>
-                                    10{" "}
-                                </Text>
-                                connections
-                            </Text>
-                        </Link>
-                        <Link href={"/under-construction"}>
-                            <Text style={{ color: theme.colors.onSurfaceVariant }}>
-                                <Text style={{ fontWeight: "600", color: theme.colors.onSurface }}>
-                                    2{" "}
-                                </Text>
-                                groups
-                            </Text>
-                        </Link>
+        <SettingsDrawer
+            ref={drawerRef}
+            renderDrawerContent={
+                <View style={styles.drawerContainer}>
+                    <View style={styles.drawerHeader}>
+                        <Text style={styles.drawerTitle}>User Settings</Text>
+                    </View>
+
+                    <View style={styles.drawerContent}>
+                        <View style={styles.actionButtonContainer}>
+                            {user?.isAnonymous ? (
+                                <Button
+                                    onPress={handleDeleteAccount}
+                                    mode="contained"
+                                    buttonColor={theme.colors.error}
+                                    textColor={theme.colors.onError}
+                                    style={styles.actionButton}
+                                    contentStyle={styles.actionButtonContent}
+                                    labelStyle={styles.actionButtonLabel}
+                                    loading={isDeleteLoading}
+                                    disabled={isDeleteLoading}
+                                >
+                                    {isDeleteLoading ? "Deleting..." : "Delete Account"}
+                                </Button>
+                            ) : (
+                                <Button
+                                    onPress={handleLogout}
+                                    mode="contained"
+                                    buttonColor={theme.colors.primary}
+                                    textColor={theme.colors.onPrimary}
+                                    style={styles.actionButton}
+                                    contentStyle={styles.actionButtonContent}
+                                    labelStyle={styles.actionButtonLabel}
+                                    loading={isLogoutLoading}
+                                    disabled={isLogoutLoading}
+                                >
+                                    {isLogoutLoading ? "Logging out..." : "Logout"}
+                                </Button>
+                            )}
+                        </View>
+
+                        <View style={styles.linksContainer}>
+                            <Link href={"/terms-of-service"} style={styles.linkWrapper}>
+                                <View style={styles.linkItem}>
+                                    <Ionicons
+                                        name="document-text"
+                                        size={20}
+                                        color={theme.colors.onSurfaceVariant}
+                                    />
+                                    <Text style={styles.linkText}>Terms of Service</Text>
+                                    <Ionicons
+                                        name="chevron-forward"
+                                        size={16}
+                                        color={theme.colors.onSurfaceVariant}
+                                    />
+                                </View>
+                            </Link>
+                            <View style={styles.linkDivider} />
+                            <Link href={"/privacy-policy"} style={styles.linkWrapper}>
+                                <View style={styles.linkItem}>
+                                    <Ionicons
+                                        name="shield-checkmark"
+                                        size={20}
+                                        color={theme.colors.onSurfaceVariant}
+                                    />
+                                    <Text style={styles.linkText}>Privacy Policy</Text>
+                                    <Ionicons
+                                        name="chevron-forward"
+                                        size={16}
+                                        color={theme.colors.onSurfaceVariant}
+                                    />
+                                </View>
+                            </Link>
+                        </View>
                     </View>
                 </View>
-            </View>
+            }
+        >
+            <Container style={styles.container}>
+                <View style={styles.header}>
+                    <View style={styles.avatarContainer}>
+                        <Image
+                            source={{
+                                uri: userData?.photoURL ?? DEFAULT_USER,
+                            }}
+                            style={styles.avatar}
+                        />
+                        <Pressable
+                            style={styles.editPhotoButton}
+                            onPress={showPhotoOptions}
+                            disabled={isUploadingPhoto}
+                        >
+                            {isUploadingPhoto ? (
+                                <ActivityIndicator size="small" color="white" />
+                            ) : (
+                                <Ionicons name="camera" size={16} color="white" />
+                            )}
+                        </Pressable>
+                    </View>
+                    <View>
+                        <Text style={styles.displayName}>{userData?.username || "Guest User"}</Text>
+                        <View style={{ flexDirection: "row", columnGap: 8 }}>
+                            <Link href={"/connections"}>
+                                <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                                    <Text
+                                        style={{ fontWeight: "600", color: theme.colors.onSurface }}
+                                    >
+                                        10{" "}
+                                    </Text>
+                                    connections
+                                </Text>
+                            </Link>
+                            <Link href={"/under-construction"}>
+                                <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                                    <Text
+                                        style={{ fontWeight: "600", color: theme.colors.onSurface }}
+                                    >
+                                        2{" "}
+                                    </Text>
+                                    groups
+                                </Text>
+                            </Link>
+                        </View>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => {
+                            drawerRef.current?.open();
+                        }}
+                        style={{ alignSelf: "flex-start", marginLeft: "auto" }}
+                    >
+                        <View>
+                            <Ionicons
+                                name="settings-sharp"
+                                size={24}
+                                color={theme.colors.onSurface}
+                            />
+                        </View>
+                    </TouchableOpacity>
+                </View>
 
-            <View style={styles.quizzesSection}>
-                <QuizList
-                    onQuizPress={handlePress}
-                    quizzes={quizzes}
-                    ListHeaderComponent={
-                        <Text style={styles.sectionTitle}>My Quizzes ({quizzes.length})</Text>
-                    }
-                />
-            </View>
-        </Container>
+                <View style={styles.quizzesSection}>
+                    <QuizList
+                        onQuizPress={handlePress}
+                        quizzes={quizzes}
+                        ListHeaderComponent={
+                            <Text style={styles.sectionTitle}>My Quizzes ({quizzes.length})</Text>
+                        }
+                    />
+                </View>
+            </Container>
+        </SettingsDrawer>
     );
 }
 
@@ -291,6 +455,79 @@ const makeStyles = (theme: AppTheme) => {
             color: theme.colors.primary,
             marginRight: 8,
             marginBottom: 4,
+        },
+        drawerContainer: {
+            flex: 1,
+            backgroundColor: theme.colors.surface,
+        },
+        drawerHeader: {},
+        drawerTitle: {
+            fontSize: 24,
+            fontWeight: "bold",
+            color: theme.colors.onSurface,
+        },
+        drawerContent: {
+            flex: 1,
+            justifyContent: "space-between",
+            paddingTop: 8,
+        },
+        actionButtonContainer: {
+            flex: 1,
+            justifyContent: "center",
+        },
+        actionButton: {
+            borderRadius: 12,
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 4,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 6,
+        },
+        actionButtonContent: {
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+        },
+        actionButtonLabel: {
+            fontSize: 16,
+            fontWeight: "600",
+        },
+        linksContainer: {
+            backgroundColor: theme.colors.surfaceVariant,
+            borderRadius: 16,
+            overflow: "hidden",
+            shadowColor: theme.colors.onSurface,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.05,
+            shadowRadius: 4,
+            elevation: 2,
+        },
+        linkWrapper: {
+            textDecorationLine: "none",
+        },
+        linkItem: {
+            flexDirection: "row",
+            alignItems: "center",
+            paddingVertical: 16,
+            paddingHorizontal: 20,
+            backgroundColor: theme.colors.surface,
+        },
+        linkText: {
+            flex: 1,
+            fontSize: 16,
+            color: theme.colors.onSurface,
+            fontWeight: "500",
+            marginLeft: 16,
+        },
+        linkDivider: {
+            height: 1,
+            backgroundColor: theme.colors.outlineVariant,
+            marginLeft: 56,
         },
     });
 };

@@ -150,12 +150,25 @@ function RootLayoutContent() {
                     />
                     <Stack.Screen name="add-groups" options={{ headerTitle: "Find Groups" }} />
                     <Stack.Screen name="create-group" options={{ headerTitle: "Create Group" }} />
-                    <Stack.Screen name="invite-members" options={{ headerTitle: "Invite Members" }} />
+                    <Stack.Screen
+                        name="invite-members"
+                        options={{ headerTitle: "Invite Members" }}
+                    />
                     <Stack.Screen name="members" options={{ headerTitle: "Members" }} />
                     <Stack.Screen name="profile/[uid]" options={{ headerTitle: "Profile" }} />
                     <Stack.Screen
                         name="group-profile/[gid]"
                         options={{ headerTitle: "Group Profile" }}
+                    />
+
+                    {/* Terms of Service */}
+                    <Stack.Screen
+                        name="terms-of-service"
+                        options={{ headerTitle: "Terms of Service" }}
+                    />
+                    <Stack.Screen
+                        name="privacy-policy"
+                        options={{ headerTitle: "Privacy Policy" }}
                     />
                 </Stack>
                 <GlobalLoadingModal />
