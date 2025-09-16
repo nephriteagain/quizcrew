@@ -20,6 +20,7 @@ export function useAsyncAction<TArgs extends any[], TResult>(
     options?: {
         /** Callback function executed when the async action completes successfully */
         onComplete?: () => void;
+        onError?: (error: unknown) => void;
     }
 ): [(...args: TArgs) => Promise<TResult | undefined>, ActionState<TResult>] {
     const [data, setData] = useState<TResult | null>(null);
@@ -42,6 +43,7 @@ export function useAsyncAction<TArgs extends any[], TResult>(
             } else {
                 setError(new Error("Unknown error occurred."));
             }
+            options?.onError?.(error);
         } finally {
             setIsLoading(false);
         }

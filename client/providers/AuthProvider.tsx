@@ -1,5 +1,4 @@
 import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizzes";
-import { anonSignin } from "@/store/user/actions/anonSignin";
 import { subscribeAuthState } from "@/store/user/actions/subscribeAuthState";
 import { subscribeConnections } from "@/store/user/actions/subscribeConnection";
 import { subscribeGroups } from "@/store/user/actions/subscribeGroups";
@@ -14,8 +13,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         let unsub: () => void | undefined;
         if (!user?.uid) {
-            utilsSelector.setState({ isLoading: true, loadingText: "Configuring..." });
-            anonSignin();
         } else {
             utilsSelector.setState({ isLoading: false, loadingText: null });
             // fetch quizzes
