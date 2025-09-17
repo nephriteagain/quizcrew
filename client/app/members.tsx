@@ -198,7 +198,7 @@ export default function Members() {
         }
     };
 
-    const getStatusColor = (status: ConnectionStatus, lastSeen?: string) => {
+    const getStatusColor = (status?: ConnectionStatus, lastSeen?: string) => {
         // For simplicity, we'll derive visual status from Connection status and lastSeen
         if (status === "CONNECTED") {
             if (!lastSeen) {
@@ -225,13 +225,13 @@ export default function Members() {
     };
 
     const renderMemberItem = ({ item }: { item: Member }) => {
-        const isMenuVisible = visibleMenuId === item.meta.uid;
+        const isMenuVisible = visibleMenuId === item.data.uid;
         const displayName = item.data?.username || "Unknown User";
         const avatarUri = item.data?.photoURL;
 
         // Determine visual status for display
         const getDisplayStatus = () => {
-            if (item.meta.status === "CONNECTED") {
+            if (item.meta?.status === "CONNECTED") {
                 if (!item.lastSeen) {
                     return "online";
                 } else if (item.lastSeen.includes("hour")) {
@@ -248,7 +248,7 @@ export default function Members() {
         return (
             <TouchableOpacity
                 style={styles.memberItem}
-                onPress={() => handleProfilePress(item.meta.uid)}
+                onPress={() => handleProfilePress(item.data.uid)}
                 activeOpacity={0.7}
             >
                 <View style={styles.memberInfo}>
@@ -278,7 +278,7 @@ export default function Members() {
                                 styles.statusIndicator,
                                 {
                                     backgroundColor: getStatusColor(
-                                        item.meta.status,
+                                        item.meta?.status,
                                         item.lastSeen
                                     ),
                                 },
@@ -323,7 +323,7 @@ export default function Members() {
                     anchor={
                         <TouchableOpacity
                             style={styles.menuButton}
-                            onPress={() => setVisibleMenuId(item.meta.uid)}
+                            onPress={() => setVisibleMenuId(item.data.uid)}
                         >
                             <Ionicons
                                 name="ellipsis-vertical"
@@ -334,21 +334,21 @@ export default function Members() {
                     }
                 >
                     <Menu.Item
-                        onPress={() => handleMenuAction("message", item.meta.uid)}
+                        onPress={() => handleMenuAction("message", item.data.uid)}
                         title="Send Message"
                     />
                     <Menu.Item
-                        onPress={() => handleMenuAction("profile", item.meta.uid)}
+                        onPress={() => handleMenuAction("profile", item.data.uid)}
                         title="View Profile"
                     />
                     {item.role === "member" && (
                         <>
                             <Menu.Item
-                                onPress={() => handleMenuAction("promote", item.meta.uid)}
+                                onPress={() => handleMenuAction("promote", item.data.uid)}
                                 title="Make Moderator"
                             />
                             <Menu.Item
-                                onPress={() => handleMenuAction("remove", item.meta.uid)}
+                                onPress={() => handleMenuAction("remove", item.data.uid)}
                                 title="Remove from Group"
                             />
                         </>
@@ -356,11 +356,11 @@ export default function Members() {
                     {item.role === "moderator" && (
                         <>
                             <Menu.Item
-                                onPress={() => handleMenuAction("demote", item.meta.uid)}
+                                onPress={() => handleMenuAction("demote", item.data.uid)}
                                 title="Remove as Moderator"
                             />
                             <Menu.Item
-                                onPress={() => handleMenuAction("remove", item.meta.uid)}
+                                onPress={() => handleMenuAction("remove", item.data.uid)}
                                 title="Remove from Group"
                             />
                         </>
@@ -414,7 +414,7 @@ export default function Members() {
                             <Text style={styles.sectionCount}>({section.data.length})</Text>
                         </View>
                     )}
-                    keyExtractor={(item) => item.meta.uid}
+                    keyExtractor={(item) => item.data.uid}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={() => (

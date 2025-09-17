@@ -172,11 +172,11 @@ export default function InviteMembers() {
     };
 
     const getSelectedConnection = (id: string) => {
-        return allConnections.find((connection) => connection.meta.uid === id);
+        return allConnections.find((connection) => connection.data.uid === id);
     };
 
     const renderConnectionItem = ({ item }: { item: Connection }) => {
-        const isSelected = selectedMembers.includes(item.meta.uid);
+        const isSelected = selectedMembers.includes(item.data.uid);
         return (
             <View style={[styles.connectionItem, isSelected && styles.selectedItem]}>
                 <View style={styles.connectionInfo}>
@@ -187,17 +187,19 @@ export default function InviteMembers() {
                     <View style={styles.textInfo}>
                         <Text style={styles.name}>{item.data?.username || "Unknown User"}</Text>
                         <Text style={styles.status}>
-                            {item.meta.status === "CONNECTED"
+                            {item.meta?.status === "CONNECTED"
                                 ? "Connected"
-                                : item.meta.status === "INVITED"
+                                : item.meta?.status === "INVITED"
                                   ? "Invited"
-                                  : "Requested"}
+                                  : item.meta?.status === "REQUESTED"
+                                    ? "Requested"
+                                    : "Not Connected"}
                         </Text>
                     </View>
                 </View>
                 <Button
                     mode={isSelected ? "outlined" : "contained"}
-                    onPress={() => handleSelectMember(item.meta.uid)}
+                    onPress={() => handleSelectMember(item.data.uid)}
                     compact
                     style={styles.selectButton}
                 >
@@ -270,7 +272,7 @@ export default function InviteMembers() {
                             <Text style={styles.sectionCount}>({section.data.length})</Text>
                         </View>
                     )}
-                    keyExtractor={(item) => item.meta.uid}
+                    keyExtractor={(item) => item.data.uid}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={() => (

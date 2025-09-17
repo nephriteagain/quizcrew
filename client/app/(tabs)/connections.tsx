@@ -188,7 +188,7 @@ export default function Connections() {
                 router.push({
                     pathname: "/profile/[uid]",
                     params: {
-                        uid: item.meta.uid,
+                        uid: item.data.uid,
                     },
                 });
             }}
@@ -214,7 +214,7 @@ export default function Connections() {
         <Container style={styles.container}>
             <SectionList
                 sections={sections}
-                keyExtractor={(item) => ("gid" in item ? item.gid : item.meta.uid)}
+                keyExtractor={(item) => ("gid" in item ? item.gid : item.data.uid)}
                 renderItem={renderItem}
                 renderSectionHeader={renderSectionHeader}
                 showsVerticalScrollIndicator={false}

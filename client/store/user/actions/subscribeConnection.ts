@@ -30,10 +30,10 @@ async function handleConnections(connectionMeta: ConnectionMeta[]) {
 async function getUserData(connectionMeta: ConnectionMeta): Promise<Connection> {
     const userDataRef = doc(db, COL.USERS_DATA, connectionMeta.uid);
     const userSnap = await getDoc(userDataRef);
-    const userData = userSnap.data() as UserData | undefined;
+    const userData = userSnap.data() as UserData;
 
     return {
-        data: userData ?? null,
+        data: userData,
         meta: connectionMeta,
     };
 }

@@ -52,6 +52,6 @@ export interface ConnectionMeta {
 }
 
 export interface Connection {
-    data: UserData | null;
-    meta: ConnectionMeta;
+    data: UserData;
+    meta: ConnectionMeta | null;
 }

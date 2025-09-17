@@ -1,10 +1,13 @@
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
+import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { searchNewConnection } from "@/store/user/actions/searchNewConnection";
 import { Connection } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { debounce } from "lodash";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-paper";
 
@@ -104,7 +107,7 @@ const mockRecommended: Connection[] = [
 type SectionData = {
     title: string;
     data: Connection[];
-    type: "requests_to_you" | "requests_from_you" | "recommended";
+    type: "requests_to_you" | "requests_from_you" | "recommended" | "search_results";
 };
 
 export default function AddConnections() {
@@ -112,24 +115,63 @@ export default function AddConnections() {
     const styles = makeStyles(theme);
     const [searchQuery, setSearchQuery] = useState("");
     const router = useRouter();
+    const [connectionSearch, setConnectionSearch] = useState<Connection[]>([]);
+    const [searchNewConnectionFn, isLoading] = useAsyncStatus(searchNewConnection);
 
-    const sections: SectionData[] = [
-        {
-            title: "Requests to You",
-            data: mockRequestsToYou,
-            type: "requests_to_you",
+    const sections: SectionData[] = useMemo(() => {
+        return [
+            {
+                title: "Requests to You",
+                data: mockRequestsToYou,
+                type: "requests_to_you",
+            },
+            {
+                title: "Requests from You",
+                data: mockRequestsFromYou,
+                type: "requests_from_you",
+            },
+            {
+                title: "Recommended",
+                data: mockRecommended,
+                type: "recommended",
+            },
+            {
+                title: "Search Results",
+                data: connectionSearch,
+                type: "search_results",
+            },
+        ];
+    }, [connectionSearch]);
+
+    const searchFunction = useCallback(
+        async (query: string) => {
+            try {
+                const result = await searchNewConnectionFn(query);
+                if (result) {
+                    const c = result.map((r) => ({ data: r, meta: null }));
+                    setConnectionSearch(c);
+                }
+            } catch (error) {
+                console.error("Search error:", error);
+                setConnectionSearch([]);
+            }
         },
-        {
-            title: "Requests from You",
-            data: mockRequestsFromYou,
-            type: "requests_from_you",
-        },
-        {
-            title: "Recommended",
-            data: mockRecommended,
-            type: "recommended",
-        },
-    ];
+        [searchNewConnectionFn]
+    );
+
+    useEffect(() => {
+        if (!searchQuery) {
+            setConnectionSearch([]);
+            return;
+        }
+
+        const debounceSearch = debounce(searchFunction, 300);
+        debounceSearch(searchQuery);
+
+        return () => {
+            debounceSearch.cancel();
+        };
+    }, [searchQuery, searchFunction]);
 
     const filteredSections = sections
         .map((section) => ({
@@ -154,7 +196,7 @@ export default function AddConnections() {
             router.push({
                 pathname: "/profile/[uid]",
                 params: {
-                    uid: item.meta.uid,
+                    uid: item.data.uid,
                 },
             });
         };
@@ -181,7 +223,9 @@ export default function AddConnections() {
                     onChangeText={setSearchQuery}
                     left={<TextInput.Icon icon="magnify" />}
                     right={
-                        searchQuery.length > 0 ? (
+                        isLoading ? (
+                            <TextInput.Icon icon={"loading"} color={theme.colors.primary} />
+                        ) : searchQuery.length > 0 ? (
                             <TextInput.Icon icon="close" onPress={() => setSearchQuery("")} />
                         ) : undefined
                     }
@@ -200,7 +244,7 @@ export default function AddConnections() {
                         <Text style={styles.sectionCount}>({section.data.length})</Text>
                     </View>
                 )}
-                keyExtractor={(item) => item.meta.uid}
+                keyExtractor={(item) => item.data.uid}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
                 ListEmptyComponent={() => (
@@ -218,6 +262,7 @@ export default function AddConnections() {
                         </View>
                     </View>
                 )}
+                extraData={connectionSearch}
             />
         </Container>
     );

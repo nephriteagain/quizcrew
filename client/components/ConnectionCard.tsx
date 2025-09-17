@@ -1,3 +1,4 @@
+import { DEFAULT_USER } from "@/constants/values";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Connection, ConnectionStatus } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,7 +22,7 @@ export default function ConnectionCard({
     const theme = useAppTheme();
     const styles = makeStyles(theme);
 
-    const getStatusColor = (status: ConnectionStatus) => {
+    const getStatusColor = (status?: ConnectionStatus) => {
         switch (status) {
             case "CONNECTED":
                 return "#4CAF50";
@@ -34,7 +35,7 @@ export default function ConnectionCard({
         }
     };
 
-    const getStatusText = (status: ConnectionStatus) => {
+    const getStatusText = (status?: ConnectionStatus) => {
         switch (status) {
             case "CONNECTED":
                 return "Connected";
@@ -43,7 +44,7 @@ export default function ConnectionCard({
             case "REQUESTED":
                 return "Requested";
             default:
-                return "Unknown";
+                return "Not Connected";
         }
     };
 
@@ -54,20 +55,21 @@ export default function ConnectionCard({
             android_ripple={{ color: theme.colors?.primary }}
         >
             <View style={styles.avatarContainer}>
-                <Image source={{ uri: connection.data?.photoURL || 'https://via.placeholder.com/50' }} style={styles.connectionAvatar} />
+                <Image
+                    source={{ uri: connection.data?.photoURL || DEFAULT_USER }}
+                    style={styles.connectionAvatar}
+                />
                 <View
                     style={[
                         styles.statusIndicator,
-                        { backgroundColor: getStatusColor(connection.meta.status) },
+                        { backgroundColor: getStatusColor(connection.meta?.status) },
                     ]}
                 />
             </View>
             <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{connection.data?.username || 'Unknown User'}</Text>
+                <Text style={styles.itemName}>{connection.data?.username || "Unknown User"}</Text>
                 <View style={styles.connectionMeta}>
-                    <Text style={styles.statusText}>
-                        {getStatusText(connection.meta.status)}
-                    </Text>
+                    <Text style={styles.statusText}>{getStatusText(connection.meta?.status)}</Text>
                 </View>
             </View>
             <View style={styles.actionsContainer}>
@@ -75,7 +77,7 @@ export default function ConnectionCard({
                     <TouchableOpacity
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={styles.connectButton}
-                        onPress={() => handleConnect(connection.meta.uid)}
+                        onPress={() => handleConnect(connection.data.uid)}
                     >
                         <Ionicons name="person-add" size={16} color="white" />
                         <Text style={styles.connectButtonText}>Connect</Text>

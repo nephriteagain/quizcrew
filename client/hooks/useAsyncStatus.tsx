@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 type AsyncFunction<TArgs extends any[], TResult> = (...args: TArgs) => Promise<TResult>;
 
@@ -12,15 +12,18 @@ export function useAsyncStatus<TArgs extends any[], TResult>(
 ): [AsyncFunction<TArgs, TResult>, boolean] {
     const [isLoading, setIsLoading] = useState(false);
 
-    const run = async (...args: TArgs) => {
-        setIsLoading(true);
-        try {
-            const result = await fn(...args);
-            return result;
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const run = useCallback(
+        async (...args: TArgs) => {
+            setIsLoading(true);
+            try {
+                const result = await fn(...args);
+                return result;
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [fn]
+    );
 
     return [run, isLoading];
 }
