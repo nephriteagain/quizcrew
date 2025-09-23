@@ -1,10 +1,13 @@
 import Container from "@/components/Container";
+import LoadingModal from "@/components/LoadingModal";
 import QuizList from "@/components/QuizList";
 import SettingsDrawer, { SettingsDrawerRef } from "@/components/SettingsDrawer";
 import { DEFAULT_USER } from "@/constants/values";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
+import { addUserProfilePic } from "@/store/user/actions/addUserProfilePic";
 import { deleteAccount } from "@/store/user/actions/deleteAccount";
 import { logout } from "@/store/user/actions/logout";
 import authSelector from "@/store/user/user.store";
@@ -42,6 +45,7 @@ export default function Profile() {
         useAsyncAction(logout, {
             onComplete: () => {},
         });
+    const [addUserProfilePicFn, profilePicLoading] = useAsyncStatus(addUserProfilePic);
 
     const router = useRouter();
 
@@ -85,7 +89,16 @@ export default function Profile() {
                 const asset = result.assets[0];
                 // TODO: Upload to Firebase storage and update user profile
                 console.log("Selected image:", asset.uri);
-                Alert.alert("Photo Selected", "Photo upload functionality will be implemented");
+                if (userData) {
+                    const url = await addUserProfilePicFn(asset.uri);
+                    if (!url) {
+                        Alert.alert("Failed", "Failed to updated user profile picture");
+                    } else {
+                        Alert.alert("Success", "Your profile picture has been updated");
+                    }
+                } else {
+                    Alert.alert("Aborted", "User is not logged in");
+                }
             }
         } catch (error) {
             console.error("Error picking image:", error);
@@ -120,7 +133,16 @@ export default function Profile() {
                 const asset = result.assets[0];
                 // TODO: Upload to Firebase storage and update user profile
                 console.log("Captured photo:", asset.uri);
-                Alert.alert("Photo Captured", "Photo upload functionality will be implemented");
+                if (userData) {
+                    const url = await addUserProfilePicFn(asset.uri);
+                    if (!url) {
+                        Alert.alert("Failed", "Failed to updated user profile picture");
+                    } else {
+                        Alert.alert("Success", "Your profile picture has been updated");
+                    }
+                } else {
+                    Alert.alert("Aborted", "User is not logged in");
+                }
             }
         } catch (error) {
             console.error("Error taking photo:", error);
@@ -204,6 +226,27 @@ export default function Profile() {
 
                     <View style={styles.drawerContent}>
                         <View style={styles.actionButtonContainer}>
+                            {user?.isAnonymous && (
+                                <Link asChild href={"/link-email"}>
+                                    <Button
+                                        mode="contained"
+                                        buttonColor={"transparent"}
+                                        textColor={theme.colors.onSurface}
+                                        style={styles.actionButton}
+                                        contentStyle={styles.actionButtonContent}
+                                        labelStyle={[
+                                            styles.actionButtonLabel,
+                                            {
+                                                textDecorationLine: "underline",
+                                            },
+                                        ]}
+                                        loading={isDeleteLoading}
+                                        disabled={isDeleteLoading}
+                                    >
+                                        Link account to email
+                                    </Button>
+                                </Link>
+                            )}
                             {user?.isAnonymous ? (
                                 <Button
                                     onPress={handleDeleteAccount}
@@ -343,6 +386,10 @@ export default function Profile() {
                         }
                     />
                 </View>
+                <LoadingModal
+                    isVisible={profilePicLoading}
+                    loadingText="Updating profile picture..."
+                />
             </Container>
         </SettingsDrawer>
     );
@@ -474,6 +521,7 @@ const makeStyles = (theme: AppTheme) => {
         actionButtonContainer: {
             flex: 1,
             justifyContent: "center",
+            rowGap: 10,
         },
         actionButton: {
             borderRadius: 12,
