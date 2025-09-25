@@ -178,6 +178,7 @@ function RootLayoutContent() {
                             name="signup"
                             options={{ headerTitle: "Sign Up", headerShown: false }}
                         />
+                        <Stack.Screen name="signup-email" options={{ headerTitle: "" }} />
                     </Stack.Protected>
                     {/* Terms of Service */}
                     <Stack.Screen
@@ -188,6 +189,10 @@ function RootLayoutContent() {
                     <Stack.Screen
                         name="privacy-policy"
                         options={{ headerTitle: "Privacy Policy" }}
+                    />
+                    <Stack.Screen
+                        name="link-email"
+                        options={{ headerTitle: "Link account with email" }}
                     />
                 </Stack>
                 <GlobalLoadingModal />

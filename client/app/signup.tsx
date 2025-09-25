@@ -59,7 +59,19 @@ export default function SignUpScreen() {
                 {/* Sign Up Section */}
                 <View style={styles.signUpSection}>
                     <Text style={styles.sectionTitle}>Get Started</Text>
-
+                    <Link asChild href={"/signup-email"}>
+                        <Button
+                            mode="contained"
+                            style={styles.signUpButton}
+                            contentStyle={styles.signUpButtonContent}
+                            labelStyle={styles.signUpButtonLabel}
+                            disabled={isLoading}
+                            buttonColor={theme.colors.primary}
+                            textColor={theme.colors.onPrimary}
+                        >
+                            {"Sign Up with Email"}
+                        </Button>
+                    </Link>
                     <Button
                         mode="contained"
                         onPress={handleSignUpAsGuest}
@@ -67,7 +79,7 @@ export default function SignUpScreen() {
                         contentStyle={styles.signUpButtonContent}
                         labelStyle={styles.signUpButtonLabel}
                         loading={isLoading}
-                        disabled={isLoading || !isTermsAccepted}
+                        disabled={isLoading}
                         buttonColor={theme.colors.primary}
                         textColor={theme.colors.onPrimary}
                     >
