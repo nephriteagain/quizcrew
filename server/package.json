@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node ./dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "start": "node ./dist/server.js",
+    "dev": "tsx watch src/server.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
