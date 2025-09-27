@@ -21,7 +21,6 @@ RUN adduser --system --uid 1001 nodejs
 COPY --from=deps /app/node_modules ./node_modules
 COPY dist ./dist
 COPY package.json ./
-COPY .env ./
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
