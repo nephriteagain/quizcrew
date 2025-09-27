@@ -1,0 +1,6 @@
+client/
+.claude/
+.vscode/
+node_modules/
+.git/
+*.md
