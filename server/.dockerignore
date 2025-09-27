@@ -1,0 +1,52 @@
+# Development files
+src/
+*.ts
+tsconfig.json
+tsconfig.tsbuildinfo
+.prettierrc
+
+# Dependencies (will be installed in container)
+node_modules/
+
+# Environment and config files
+.env.local
+.env.production
+.env.development
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Documentation
+*.md
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Vercel
+vercel.json
