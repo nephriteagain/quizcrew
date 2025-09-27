@@ -6,7 +6,12 @@ import { doc, setDoc } from "@react-native-firebase/firestore";
 import reviewSelector from "../review.store";
 
 export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
-    const url = `${process.env.EXPO_PUBLIC_API_URL}/quiz/from-images`;
+    const URL =
+        process.env.NODE_ENV === "production"
+            ? process.env.EXPO_PUBLIC_API_URL_PROD
+            : process.env.EXPO_PUBLIC_API_URL;
+
+    const url = `${URL}/quiz/from-images`;
     const user = authSelector.getState().user;
 
     console.log("creating reviewer...");
