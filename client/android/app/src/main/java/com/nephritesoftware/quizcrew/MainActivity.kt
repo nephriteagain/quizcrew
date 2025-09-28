@@ -1,4 +1,4 @@
-package com.review.app
+package com.nephritesoftware.quizcrew
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

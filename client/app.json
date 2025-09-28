@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.review.app",
+      "bundleIdentifier": "com.nephritesoftware.quizcrew",
       "googleServicesFile": "GoogleService-Info.plist"
     },
     "android": {
@@ -19,7 +19,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.review.app",
+      "package": "com.nephritesoftware.quizcrew",
       "googleServicesFile": "google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",

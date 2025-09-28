@@ -28,13 +28,13 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>review</string>
-          <string>com.review.app</string>
+          <string>com.nephritesoftware.quizcrew</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.googleusercontent.apps.738000701632-dfi54ib46873c1emgcmhddqo8fo65dl0</string>
+          <string>com.googleusercontent.apps.738000701632-lcnlm9n3a92grsv36tacrm3hf6n6k5rc</string>
         </array>
       </dict>
     </array>

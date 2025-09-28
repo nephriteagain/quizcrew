@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.review.app'
+    namespace 'com.nephritesoftware.quizcrew'
     defaultConfig {
-        applicationId 'com.review.app'
+        applicationId 'com.nephritesoftware.quizcrew'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
