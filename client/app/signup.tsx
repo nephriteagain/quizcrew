@@ -90,6 +90,13 @@ export default function SignUpScreen() {
                         Start using QuizCraft immediately as a guest user. You can upgrade your
                         account later.
                     </Text>
+
+                    <Text style={styles.guestDescription}>
+                        Already have an account?{" "}
+                        <Link href="/signin" style={styles.link}>
+                            <Text style={styles.linkText}>Sign in here</Text>
+                        </Link>
+                    </Text>
                 </View>
 
                 {/* Terms and Privacy Section */}
