@@ -178,7 +178,10 @@ function RootLayoutContent() {
                             name="signup"
                             options={{ headerTitle: "Sign Up", headerShown: false }}
                         />
+                        <Stack.Screen name="signin" options={{ headerTitle: "Sign In" }} />
                         <Stack.Screen name="signup-email" options={{ headerTitle: "" }} />
+                        <Stack.Screen name="signin-email" options={{ headerTitle: "" }} />
+                        <Stack.Screen name="forgot-password" options={{ headerTitle: "" }} />
                     </Stack.Protected>
                     {/* Terms of Service */}
                     <Stack.Screen
