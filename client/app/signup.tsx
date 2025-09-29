@@ -1,4 +1,5 @@
 import Container from "@/components/Container";
+import GoogleSignupBtn from "@/components/GoogleSignupBtn";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { anonSignin } from "@/store/user/actions/anonSignin";
@@ -72,6 +73,7 @@ export default function SignUpScreen() {
                             {"Sign Up with Email"}
                         </Button>
                     </Link>
+                    <GoogleSignupBtn type="long" />
                     <Button
                         mode="contained"
                         onPress={handleSignUpAsGuest}
@@ -178,6 +180,7 @@ const makeStyles = (theme: AppTheme) => {
         },
         signUpSection: {
             marginBottom: 48,
+            rowGap: 12,
         },
         sectionTitle: {
             fontSize: 24,
@@ -188,7 +191,6 @@ const makeStyles = (theme: AppTheme) => {
         },
         signUpButton: {
             borderRadius: 16,
-            marginBottom: 16,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
                 width: 0,

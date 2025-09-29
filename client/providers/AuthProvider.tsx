@@ -6,7 +6,16 @@ import { subscribeGroups } from "@/store/user/actions/subscribeGroups";
 import { subscribeUserData } from "@/store/user/actions/subscribeUserData";
 import authSelector from "@/store/user/user.store";
 import utilsSelector from "@/store/utils/utils.store";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { ReactNode } from "react";
+
+const WEB_CLIENT_ID = "738000701632-fkme0fmilj4ngvth0vgdk9j1i2phhk1b.apps.googleusercontent.com";
+
+function configureGoogleSignIn() {
+    GoogleSignin.configure({
+        webClientId: WEB_CLIENT_ID,
+    });
+}
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const user = authSelector.use.useUser();
@@ -36,6 +45,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffectLogRoute(() => {
         const unsub = subscribeAuthState();
+        configureGoogleSignIn();
         return () => {
             unsub();
         };
