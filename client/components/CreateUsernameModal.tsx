@@ -5,10 +5,7 @@ import AddUsernameDialog from "./AddUsernameDialog";
 
 export default function CreateUsernameModal() {
     const userData = authSelector.use.useUserData();
-    const user = authSelector.use.useUser();
     const isCreateUsernameModalShown = utilsSelector.use.useIsCreateUsernameModalShown();
-
-    const username = userData?.username;
 
     const handleClose = () => {
         utilsSelector.setState({ isCreateUsernameModalShown: false });
@@ -21,12 +18,12 @@ export default function CreateUsernameModal() {
 
     useEffectLogRoute(() => {
         // make sure there is a user account before showing the modal
-        if (!username && user?.uid) {
+        if (userData && !userData.username) {
             utilsSelector.setState({ isCreateUsernameModalShown: true });
         } else {
             utilsSelector.setState({ isCreateUsernameModalShown: false });
         }
-    }, [username, user?.uid]);
+    }, [userData]);
 
     return (
         <AddUsernameDialog
