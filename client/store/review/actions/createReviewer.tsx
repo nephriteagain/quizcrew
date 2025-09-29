@@ -12,6 +12,8 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
             : process.env.EXPO_PUBLIC_API_URL;
 
     const url = `${URL}/quiz/from-images`;
+    console.log(url);
+
     const user = authSelector.getState().user;
 
     console.log("creating reviewer...");

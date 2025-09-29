@@ -110,7 +110,7 @@ export default function CreateQuiz() {
                         .filter((s) => typeof s === "string");
                     console.log(`sending ${imagesBase64.length} images...`);
                     const result = await handleCreateQuizReviewer(quizType, imagesBase64);
-                    if (!result) {
+                    if (!result.data) {
                         Alert.alert("Server error.");
                         return;
                     }

@@ -22,20 +22,28 @@ export function useAsyncAction<TArgs extends any[], TResult>(
         onComplete?: () => void;
         onError?: (error: unknown) => void;
     }
-): [(...args: TArgs) => Promise<TResult | undefined>, ActionState<TResult>] {
+): [
+    (...args: TArgs) => Promise<{
+        data: Awaited<TResult> | null;
+        error: Error | null;
+    }>,
+    ActionState<TResult>,
+] {
     const [data, setData] = useState<TResult | null>(null);
     const [error, setError] = useState<Error | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const isError = !!error;
 
-    const run = async (...args: TArgs) => {
+    const run = async (
+        ...args: TArgs
+    ): Promise<{ data: Awaited<TResult> | null; error: Error | null }> => {
         setIsLoading(true);
         setError(null);
         try {
             const result = await fn(...args);
             setData(result);
             options?.onComplete?.();
-            return result;
+            return { data: result, error: null };
         } catch (err) {
             console.error(err);
             if (err instanceof Error) {
@@ -44,6 +52,7 @@ export function useAsyncAction<TArgs extends any[], TResult>(
                 setError(new Error("Unknown error occurred."));
             }
             options?.onError?.(error);
+            return { data: null, error };
         } finally {
             setIsLoading(false);
         }

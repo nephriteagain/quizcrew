@@ -1,19 +1,13 @@
 import Container from "@/components/Container";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { signinEmail } from "@/store/user/actions/signinEmail";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
-import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native";
-import { Button, TextInput } from "react-native-paper";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Button, Text, TextInput } from "react-native-paper";
 import * as Yup from "yup";
 
 const signinSchema = Yup.object().shape({
@@ -30,16 +24,20 @@ export default function SigninEmail() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const [showPassword, setShowPassword] = useState(false);
+    const [signinEmailFn, { isLoading }] = useAsyncAction(signinEmail);
 
     const initialValues: SigninFormValues = {
         email: "",
         password: "",
     };
 
-    const handleSignIn = (values: SigninFormValues) => {
+    const handleSignIn = async (values: SigninFormValues) => {
         // TODO: Implement email signin logic
         console.log("Email signin:", values);
-        Alert.alert("Success", "Signed in successfully!");
+        const result = await signinEmailFn(values.email, values.password);
+        if (result.error) {
+            Alert.alert("Failed", result.error.message);
+        }
     };
 
     return (
@@ -58,6 +56,7 @@ export default function SigninEmail() {
                     touched,
                     setFieldValue,
                     isValid,
+                    isSubmitting,
                 }) => (
                     <KeyboardAvoidingView
                         style={styles.keyboardAvoidingView}
@@ -134,13 +133,13 @@ export default function SigninEmail() {
                                     style={[styles.signInButton, !isValid && styles.disabledButton]}
                                     contentStyle={styles.signInButtonContent}
                                     labelStyle={styles.signInButtonLabel}
-                                    disabled={!isValid}
+                                    disabled={!isValid || isLoading || isSubmitting}
+                                    loading={isLoading || isSubmitting}
                                     buttonColor={theme.colors.primary}
                                     textColor={theme.colors.onPrimary}
                                 >
                                     Sign In
                                 </Button>
-
                                 <View style={styles.signUpSection}>
                                     <Text style={styles.signUpText}>
                                         Don&apos;t have an account?{" "}
@@ -207,7 +206,7 @@ const makeStyles = (theme: AppTheme) => {
             paddingHorizontal: 16,
         },
         formSection: {
-            gap: 16,
+            gap: 8,
         },
         input: {
             backgroundColor: theme.colors.surface,

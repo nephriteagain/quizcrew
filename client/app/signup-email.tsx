@@ -1,10 +1,21 @@
 import Container from "@/components/Container";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { signupEmail } from "@/store/user/actions/signupEmail";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { Button, Checkbox, TextInput } from "react-native-paper";
 import * as Yup from "yup";
 
@@ -34,6 +45,7 @@ export default function SignupEmail() {
     const styles = makeStyles(theme);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [signupEmailFn, { isLoading }] = useAsyncAction(signupEmail);
 
     const initialValues: SignupFormValues = {
         email: "",
@@ -42,10 +54,13 @@ export default function SignupEmail() {
         isTermsAccepted: false,
     };
 
-    const handleSignUp = (values: SignupFormValues) => {
+    const handleSignUp = async (values: SignupFormValues) => {
         // TODO: Implement email signup logic
         console.log("Email signup:", values);
-        Alert.alert("Success", "Account created successfully!");
+        const result = await signupEmailFn(values.email, values.password);
+        if (result.error) {
+            Alert.alert("Signup Failed", result.error.message);
+        }
     };
 
     return (
@@ -64,151 +79,164 @@ export default function SignupEmail() {
                     touched,
                     setFieldValue,
                     isValid,
+                    isSubmitting,
                 }) => (
                     <KeyboardAvoidingView
                         style={styles.keyboardAvoidingView}
-                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
                     >
                         <ScrollView
                             contentContainerStyle={styles.scrollContent}
                             showsVerticalScrollIndicator={false}
                             keyboardShouldPersistTaps="handled"
                         >
-                        <View style={styles.header}>
-                            <View style={styles.logoContainer}>
-                                <Ionicons name="mail" size={64} color={theme.colors.primary} />
+                            <View style={styles.header}>
+                                <View style={styles.logoContainer}>
+                                    <Ionicons name="mail" size={64} color={theme.colors.primary} />
+                                </View>
+                                <Text style={styles.title}>Create Account</Text>
+                                <Text style={styles.subtitle}>
+                                    Sign up with your email to get started
+                                </Text>
                             </View>
-                            <Text style={styles.title}>Create Account</Text>
-                            <Text style={styles.subtitle}>
-                                Sign up with your email to get started
-                            </Text>
-                        </View>
 
-                        <View style={styles.formSection}>
-                            <TextInput
-                                mode="outlined"
-                                label="Email"
-                                placeholder="Enter your email"
-                                value={values.email}
-                                onChangeText={handleChange("email")}
-                                onBlur={handleBlur("email")}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                                style={styles.input}
-                                left={<TextInput.Icon icon="email" />}
-                                error={touched.email && !!errors.email}
-                            />
-                            {touched.email && errors.email && (
-                                <Text style={styles.errorText}>{errors.email}</Text>
-                            )}
+                            <View style={styles.formSection}>
+                                <TextInput
+                                    mode="outlined"
+                                    label="Email"
+                                    placeholder="Enter your email"
+                                    value={values.email}
+                                    onChangeText={handleChange("email")}
+                                    onBlur={handleBlur("email")}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    style={styles.input}
+                                    left={<TextInput.Icon icon="email" />}
+                                    error={touched.email && !!errors.email}
+                                />
+                                {touched.email && errors.email && (
+                                    <Text style={styles.errorText}>{errors.email}</Text>
+                                )}
 
-                            <TextInput
-                                mode="outlined"
-                                label="Password"
-                                placeholder="Enter your password"
-                                value={values.password}
-                                onChangeText={handleChange("password")}
-                                onBlur={handleBlur("password")}
-                                secureTextEntry={!showPassword}
-                                style={styles.input}
-                                left={<TextInput.Icon icon="lock" />}
-                                right={
-                                    <TextInput.Icon
-                                        icon={showPassword ? "eye-off" : "eye"}
-                                        onPress={() => setShowPassword(!showPassword)}
-                                    />
-                                }
-                                error={touched.password && !!errors.password}
-                            />
-                            {touched.password && errors.password && (
-                                <Text style={styles.errorText}>{errors.password}</Text>
-                            )}
-
-                            <TextInput
-                                mode="outlined"
-                                label="Confirm Password"
-                                placeholder="Confirm your password"
-                                value={values.confirmPassword}
-                                onChangeText={handleChange("confirmPassword")}
-                                onBlur={handleBlur("confirmPassword")}
-                                secureTextEntry={!showConfirmPassword}
-                                style={styles.input}
-                                left={<TextInput.Icon icon="lock-check" />}
-                                right={
-                                    <TextInput.Icon
-                                        icon={showConfirmPassword ? "eye-off" : "eye"}
-                                        onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    />
-                                }
-                                error={touched.confirmPassword && !!errors.confirmPassword}
-                            />
-                            {touched.confirmPassword && errors.confirmPassword && (
-                                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-                            )}
-
-                            <View style={styles.termsSection}>
-                                <TouchableOpacity
-                                    style={styles.checkboxContainer}
-                                    onPress={() =>
-                                        setFieldValue("isTermsAccepted", !values.isTermsAccepted)
+                                <TextInput
+                                    mode="outlined"
+                                    label="Password"
+                                    placeholder="Enter your password"
+                                    value={values.password}
+                                    onChangeText={handleChange("password")}
+                                    onBlur={handleBlur("password")}
+                                    secureTextEntry={!showPassword}
+                                    style={styles.input}
+                                    left={<TextInput.Icon icon="lock" />}
+                                    right={
+                                        <TextInput.Icon
+                                            icon={showPassword ? "eye-off" : "eye"}
+                                            onPress={() => setShowPassword(!showPassword)}
+                                        />
                                     }
-                                    activeOpacity={0.7}
-                                >
-                                    <Checkbox
-                                        status={values.isTermsAccepted ? "checked" : "unchecked"}
+                                    error={touched.password && !!errors.password}
+                                />
+                                {touched.password && errors.password && (
+                                    <Text style={styles.errorText}>{errors.password}</Text>
+                                )}
+
+                                <TextInput
+                                    mode="outlined"
+                                    label="Confirm Password"
+                                    placeholder="Confirm your password"
+                                    value={values.confirmPassword}
+                                    onChangeText={handleChange("confirmPassword")}
+                                    onBlur={handleBlur("confirmPassword")}
+                                    secureTextEntry={!showConfirmPassword}
+                                    style={styles.input}
+                                    left={<TextInput.Icon icon="lock-check" />}
+                                    right={
+                                        <TextInput.Icon
+                                            icon={showConfirmPassword ? "eye-off" : "eye"}
+                                            onPress={() =>
+                                                setShowConfirmPassword(!showConfirmPassword)
+                                            }
+                                        />
+                                    }
+                                    error={touched.confirmPassword && !!errors.confirmPassword}
+                                />
+                                {touched.confirmPassword && errors.confirmPassword && (
+                                    <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+                                )}
+
+                                <View style={styles.termsSection}>
+                                    <TouchableOpacity
+                                        style={styles.checkboxContainer}
                                         onPress={() =>
                                             setFieldValue(
                                                 "isTermsAccepted",
                                                 !values.isTermsAccepted
                                             )
                                         }
-                                        uncheckedColor={theme.colors.onSurfaceVariant}
-                                        color={theme.colors.primary}
-                                    />
-                                    <View style={styles.termsTextContainer}>
-                                        <Text style={styles.termsText}>
-                                            I agree to the{" "}
-                                            <Link href="/terms-of-service" style={styles.link}>
-                                                <Text style={styles.linkText}>
-                                                    Terms of Service
-                                                </Text>
-                                            </Link>{" "}
-                                            and{" "}
-                                            <Link href="/privacy-policy" style={styles.link}>
-                                                <Text style={styles.linkText}>Privacy Policy</Text>
-                                            </Link>
+                                        activeOpacity={0.7}
+                                    >
+                                        <Checkbox
+                                            status={
+                                                values.isTermsAccepted ? "checked" : "unchecked"
+                                            }
+                                            onPress={() =>
+                                                setFieldValue(
+                                                    "isTermsAccepted",
+                                                    !values.isTermsAccepted
+                                                )
+                                            }
+                                            uncheckedColor={theme.colors.onSurfaceVariant}
+                                            color={theme.colors.primary}
+                                        />
+                                        <View style={styles.termsTextContainer}>
+                                            <Text style={styles.termsText}>
+                                                I agree to the{" "}
+                                                <Link href="/terms-of-service" style={styles.link}>
+                                                    <Text style={styles.linkText}>
+                                                        Terms of Service
+                                                    </Text>
+                                                </Link>{" "}
+                                                and{" "}
+                                                <Link href="/privacy-policy" style={styles.link}>
+                                                    <Text style={styles.linkText}>
+                                                        Privacy Policy
+                                                    </Text>
+                                                </Link>
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    {errors.isTermsAccepted && (
+                                        <Text style={styles.errorText}>
+                                            {errors.isTermsAccepted}
                                         </Text>
-                                    </View>
-                                </TouchableOpacity>
-                                {errors.isTermsAccepted && (
-                                    <Text style={styles.errorText}>{errors.isTermsAccepted}</Text>
-                                )}
-                            </View>
+                                    )}
+                                </View>
 
-                            <Button
-                                mode="contained"
-                                onPress={() => handleSubmit()}
-                                style={[styles.signUpButton, !isValid && styles.disabledButton]}
-                                contentStyle={styles.signUpButtonContent}
-                                labelStyle={styles.signUpButtonLabel}
-                                disabled={!isValid}
-                                buttonColor={theme.colors.primary}
-                                textColor={theme.colors.onPrimary}
-                            >
-                                Create Account
-                            </Button>
+                                <Button
+                                    mode="contained"
+                                    onPress={() => handleSubmit()}
+                                    style={[styles.signUpButton, !isValid && styles.disabledButton]}
+                                    contentStyle={styles.signUpButtonContent}
+                                    labelStyle={styles.signUpButtonLabel}
+                                    disabled={!isValid || isSubmitting || isLoading}
+                                    loading={isSubmitting || isLoading}
+                                    buttonColor={theme.colors.primary}
+                                    textColor={theme.colors.onPrimary}
+                                >
+                                    Create Account
+                                </Button>
 
-                            <View style={styles.signInSection}>
-                                <Text style={styles.signInText}>
-                                    Already have an account?{" "}
-                                    <Link href="/signup" style={styles.link}>
-                                        <Text style={styles.linkText}>Sign In</Text>
-                                    </Link>
-                                </Text>
+                                <View style={styles.signInSection}>
+                                    <Text style={styles.signInText}>
+                                        Already have an account?{" "}
+                                        <Link href="/signin" style={styles.link}>
+                                            <Text style={styles.linkText}>Sign In</Text>
+                                        </Link>
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
                         </ScrollView>
                     </KeyboardAvoidingView>
                 )}
@@ -266,7 +294,7 @@ const makeStyles = (theme: AppTheme) => {
             paddingHorizontal: 16,
         },
         formSection: {
-            gap: 16,
+            gap: 8,
         },
         input: {
             backgroundColor: theme.colors.surface,

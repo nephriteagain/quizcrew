@@ -1,6 +1,7 @@
 import CreateUsernameModal from "@/components/CreateUsernameModal";
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
 import SettingsBottomSheet from "@/components/SettingsBottomSheet";
+import VerifyEmailModal from "@/components/VerifyEmailModal";
 import AuthProvider from "@/providers/AuthProvider";
 import ThemeProvider, { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
@@ -206,6 +207,7 @@ function RootLayoutContent() {
                     onSheetChanges={handleSheetChanges}
                 />
                 <CreateUsernameModal />
+                <VerifyEmailModal />
             </GestureHandlerRootView>
         </AuthProvider>
     );
