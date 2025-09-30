@@ -1,12 +1,13 @@
 import { COL } from "@/constants/collections";
 import { db } from "@/firebase";
-import { UserData } from "@/types/user";
+import { AuthUser, UserData } from "@/types/user";
 import { doc, onSnapshot } from "@react-native-firebase/firestore";
 import authSelector from "../user.store";
 
 export function subscribeUserData(uid: string) {
     const userDataRef = doc(db, COL.USERS_DATA, uid);
-    const unsub = onSnapshot(userDataRef, (snap) => {
+    const unsubUserData = onSnapshot(userDataRef, (snap) => {
+        console.log("userData snapshot");
         const userData = snap.data() as UserData | undefined;
         if (userData) {
             authSelector.setState({ userData });
@@ -15,6 +16,19 @@ export function subscribeUserData(uid: string) {
             authSelector.setState({ userData: null });
         }
     });
+    const userRef = doc(db, COL.USERS, uid);
+    const unsubUser = onSnapshot(userRef, (snap) => {
+        console.log("user snapshot");
+        const user = snap.data() as AuthUser | undefined;
+        if (user) {
+            authSelector.setState({ user });
+        } else {
+            authSelector.setState({ user: null });
+        }
+    });
 
-    return unsub;
+    return () => {
+        unsubUserData();
+        unsubUser();
+    };
 }

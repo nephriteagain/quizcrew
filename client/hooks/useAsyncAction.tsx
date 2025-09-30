@@ -52,7 +52,7 @@ export function useAsyncAction<TArgs extends any[], TResult>(
                 setError(new Error("Unknown error occurred."));
             }
             options?.onError?.(error);
-            return { data: null, error };
+            return { data: null, error: err as Error };
         } finally {
             setIsLoading(false);
         }

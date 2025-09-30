@@ -5,6 +5,7 @@ import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { anonSignin } from "@/store/user/actions/anonSignin";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-paper";
 
@@ -22,10 +23,13 @@ export default function SignInScreen() {
             ]);
         },
     });
+    const [googleSigninLoading, setGoogleSigninLoading] = useState(false);
 
     const handleSignInAsGuest = () => {
         signInAsGuest();
     };
+
+    const hasLoading = isLoading || googleSigninLoading;
 
     return (
         <Container style={styles.container}>
@@ -44,7 +48,7 @@ export default function SignInScreen() {
 
                 {/* Sign In Section */}
                 <View style={styles.signInSection}>
-                    <Link asChild href={"/signin-email"}>
+                    <Link asChild href={"/signin-email"} disabled={hasLoading}>
                         <Button
                             mode="contained"
                             style={styles.signInButton}
@@ -57,7 +61,13 @@ export default function SignInScreen() {
                             {"Sign In with Email"}
                         </Button>
                     </Link>
-                    <GoogleSignupBtn type="long" variant="signin" />
+                    <GoogleSignupBtn
+                        type="long"
+                        variant="signin"
+                        isLoading={googleSigninLoading}
+                        setIsLoading={setGoogleSigninLoading}
+                        disabled={hasLoading}
+                    />
                     <Button
                         mode="contained"
                         onPress={handleSignInAsGuest}
@@ -65,7 +75,7 @@ export default function SignInScreen() {
                         contentStyle={styles.signInButtonContent}
                         labelStyle={styles.signInButtonLabel}
                         loading={isLoading}
-                        disabled={isLoading}
+                        disabled={hasLoading}
                         buttonColor={theme.colors.primary}
                         textColor={theme.colors.onPrimary}
                     >

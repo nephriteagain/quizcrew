@@ -27,6 +27,7 @@ import {
     View,
 } from "react-native";
 import { Button } from "react-native-paper";
+import Svg, { Path } from "react-native-svg";
 
 export default function Profile() {
     const theme = useAppTheme();
@@ -226,7 +227,7 @@ export default function Profile() {
 
                     <View style={styles.drawerContent}>
                         <View style={styles.actionButtonContainer}>
-                            {user?.isAnonymous && (
+                            {/* {user?.isAnonymous && (
                                 <Link asChild href={"/link-email"}>
                                     <Button
                                         mode="contained"
@@ -244,6 +245,52 @@ export default function Profile() {
                                         disabled={isDeleteLoading}
                                     >
                                         Link account to email
+                                    </Button>
+                                </Link>
+                            )} */}
+                            {user?.isAnonymous && (
+                                <Link asChild href={"/link-google"}>
+                                    <Button
+                                        icon={() => (
+                                            <Svg
+                                                width="32"
+                                                height="32"
+                                                viewBox="0 0 32 32"
+                                                fill="none"
+                                            >
+                                                <Path
+                                                    d="M32 16.3636C32 15.2291 31.8961 14.1382 31.7032 13.0909H16.3265V19.2873H25.1132C24.7273 21.28 23.5696 22.9673 21.833 24.1018V28.1309H27.1317C30.2189 25.3382 32 21.2364 32 16.3636Z"
+                                                    fill="#4285F4"
+                                                />
+                                                <Path
+                                                    d="M16.3265 32C20.7347 32 24.4304 30.5745 27.1317 28.1309L21.833 24.1018C20.3785 25.0618 18.5232 25.6436 16.3265 25.6436C12.0816 25.6436 8.47495 22.8364 7.18367 19.0545H1.75139V23.1855C4.43785 28.4073 9.94434 32 16.3265 32Z"
+                                                    fill="#34A853"
+                                                />
+                                                <Path
+                                                    d="M7.18367 19.04C6.85714 18.08 6.66419 17.0618 6.66419 16C6.66419 14.9382 6.85714 13.92 7.18367 12.96V8.82909H1.75139C0.638219 10.9818 0 13.4109 0 16C0 18.5891 0.638219 21.0182 1.75139 23.1709L5.98145 19.9418L7.18367 19.04Z"
+                                                    fill="#FBBC05"
+                                                />
+                                                <Path
+                                                    d="M16.3265 6.37091C18.731 6.37091 20.8683 7.18545 22.5751 8.75636L27.2505 4.17455C24.4156 1.58545 20.7347 0 16.3265 0C9.94434 0 4.43785 3.59273 1.75139 8.82909L7.18367 12.96C8.47495 9.17818 12.0816 6.37091 16.3265 6.37091Z"
+                                                    fill="#EA4335"
+                                                />
+                                            </Svg>
+                                        )}
+                                        mode="contained"
+                                        buttonColor={"transparent"}
+                                        textColor={theme.colors.primary}
+                                        style={styles.actionButton}
+                                        contentStyle={styles.actionButtonContent}
+                                        labelStyle={[
+                                            styles.actionButtonLabel,
+                                            {
+                                                textDecorationLine: "underline",
+                                            },
+                                        ]}
+                                        loading={isDeleteLoading}
+                                        disabled={isDeleteLoading}
+                                    >
+                                        Link account to Google
                                     </Button>
                                 </Link>
                             )}

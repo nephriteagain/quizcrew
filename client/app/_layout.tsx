@@ -198,6 +198,10 @@ function RootLayoutContent() {
                         name="link-email"
                         options={{ headerTitle: "Link account with email" }}
                     />
+                    <Stack.Screen
+                        name="link-google"
+                        options={{ headerTitle: "Link account with Google" }}
+                    />
                 </Stack>
                 <GlobalLoadingModal />
                 <SettingsBottomSheet

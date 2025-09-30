@@ -2,16 +2,23 @@ import { auth } from "@/firebase";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { GoogleAuthProvider, signInWithCredential } from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Dispatch, SetStateAction } from "react";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Svg, { Path } from "react-native-svg";
 
 function GoogleSignupBtn({
     type = "short",
     variant = "signup",
+    isLoading = false,
+    setIsLoading,
+    disabled = false,
 }: {
     type?: "long" | "short";
     variant?: "signup" | "signin";
+    isLoading?: boolean;
+    setIsLoading?: Dispatch<SetStateAction<boolean>>;
+    disabled?: boolean;
 }) {
     //   const isLogginIn = termsSelector.use.isLoggingIn?.();
     const theme = useAppTheme();
@@ -19,7 +26,14 @@ function GoogleSignupBtn({
 
     const signInWithGoogle = async () => {
         try {
-            await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+            setIsLoading?.(true);
+            const hasPlay = await GoogleSignin.hasPlayServices({
+                showPlayServicesUpdateDialog: true,
+            });
+            if (!hasPlay) {
+                Alert.alert("Google Play Services API not found.");
+                return;
+            }
             const signInResult = await GoogleSignin.signIn();
             const idToken = signInResult.data?.idToken;
             if (!idToken) {
@@ -31,9 +45,9 @@ function GoogleSignupBtn({
 
             return result;
         } catch (error) {
-            // @ts-expect-error check the error
-            toastError(error?.toString());
             console.error(error);
+        } finally {
+            setIsLoading?.(false);
         }
     };
 
@@ -41,6 +55,8 @@ function GoogleSignupBtn({
         return (
             <Button
                 contentStyle={styles.buttonContent}
+                loading={isLoading}
+                disabled={disabled || isLoading}
                 mode="contained"
                 icon={() => (
                     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -121,7 +137,8 @@ const makeStyles = (theme: AppTheme) => {
             alignItems: "center",
             backgroundColor: theme.colors?.surface,
             borderRadius: 16,
-            //   opacity: isLogginIn ? 0.6 : 1,
+            borderColor: theme.colors.primary,
+            borderWidth: 1,
         },
         buttonText: {
             fontSize: 18,
