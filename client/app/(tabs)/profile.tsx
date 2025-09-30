@@ -216,6 +216,8 @@ export default function Profile() {
         );
     };
 
+    const isGoogleProviderLinked = user?.providerData.some((p) => p.providerId === "google.com");
+
     return (
         <SettingsDrawer
             ref={drawerRef}
@@ -248,7 +250,7 @@ export default function Profile() {
                                     </Button>
                                 </Link>
                             )} */}
-                            {user?.isAnonymous && (
+                            {(user?.isAnonymous || !isGoogleProviderLinked) && (
                                 <Link asChild href={"/link-google"}>
                                     <Button
                                         icon={() => (
