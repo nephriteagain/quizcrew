@@ -81,7 +81,7 @@ export default function SignUpScreen() {
                         contentStyle={styles.signUpButtonContent}
                         labelStyle={styles.signUpButtonLabel}
                         loading={isLoading}
-                        disabled={isLoading}
+                        disabled={isLoading || !isTermsAccepted}
                         buttonColor={theme.colors.primary}
                         textColor={theme.colors.onPrimary}
                     >

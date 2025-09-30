@@ -1,17 +1,16 @@
 import Container from "@/components/Container";
+import GoogleSignupBtn from "@/components/GoogleSignupBtn";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { anonSignin } from "@/store/user/actions/anonSignin";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-paper";
 
 export default function SignInScreen() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const [rememberMe, setRememberMe] = useState(false);
 
     const [signInAsGuest, { isLoading }] = useAsyncAction(anonSignin, {
         onComplete: () => {
@@ -58,6 +57,7 @@ export default function SignInScreen() {
                             {"Sign In with Email"}
                         </Button>
                     </Link>
+                    <GoogleSignupBtn type="long" variant="signin" />
                     <Button
                         mode="contained"
                         onPress={handleSignInAsGuest}
@@ -135,6 +135,7 @@ const makeStyles = (theme: AppTheme) => {
         },
         signInSection: {
             marginBottom: 48,
+            rowGap: 16,
         },
         sectionTitle: {
             fontSize: 24,
@@ -145,7 +146,6 @@ const makeStyles = (theme: AppTheme) => {
         },
         signInButton: {
             borderRadius: 16,
-            marginBottom: 16,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
                 width: 0,

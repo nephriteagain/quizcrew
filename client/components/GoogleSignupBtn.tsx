@@ -6,7 +6,13 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Svg, { Path } from "react-native-svg";
 
-function GoogleSignupBtn({ type = "short" }: { type?: "long" | "short" }) {
+function GoogleSignupBtn({
+    type = "short",
+    variant = "signup",
+}: {
+    type?: "long" | "short";
+    variant?: "signup" | "signin";
+}) {
     //   const isLogginIn = termsSelector.use.isLoggingIn?.();
     const theme = useAppTheme();
     const styles = makeStyles(theme);
@@ -60,7 +66,9 @@ function GoogleSignupBtn({ type = "short" }: { type?: "long" | "short" }) {
                 onPress={signInWithGoogle}
                 // disabled={isLogginIn}
             >
-                <Text style={styles.buttonText}>Sign up using Google</Text>
+                <Text style={styles.buttonText}>
+                    {variant === "signup" ? "Sign up using Google" : "Log in with Google"}
+                </Text>
             </Button>
         );
     }
