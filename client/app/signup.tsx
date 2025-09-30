@@ -13,6 +13,7 @@ export default function SignUpScreen() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+    const [googleSigninLoading, setGoogleSigninLoading] = useState(false);
 
     const [signUpAsGuest, { isLoading }] = useAsyncAction(anonSignin, {
         onComplete: () => {
@@ -40,6 +41,8 @@ export default function SignUpScreen() {
         signUpAsGuest();
     };
 
+    const hasLoading = isLoading || googleSigninLoading;
+
     return (
         <Container style={styles.container}>
             <ScrollView
@@ -60,20 +63,25 @@ export default function SignUpScreen() {
                 {/* Sign Up Section */}
                 <View style={styles.signUpSection}>
                     <Text style={styles.sectionTitle}>Get Started</Text>
-                    <Link asChild href={"/signup-email"}>
+                    <Link asChild href={"/signup-email"} disabled={hasLoading}>
                         <Button
                             mode="contained"
                             style={styles.signUpButton}
                             contentStyle={styles.signUpButtonContent}
                             labelStyle={styles.signUpButtonLabel}
-                            disabled={isLoading}
+                            disabled={hasLoading}
                             buttonColor={theme.colors.primary}
                             textColor={theme.colors.onPrimary}
                         >
                             {"Sign Up with Email"}
                         </Button>
                     </Link>
-                    <GoogleSignupBtn type="long" />
+                    <GoogleSignupBtn
+                        type="long"
+                        isLoading={googleSigninLoading}
+                        setIsLoading={setGoogleSigninLoading}
+                        disabled={hasLoading}
+                    />
                     <Button
                         mode="contained"
                         onPress={handleSignUpAsGuest}
@@ -81,7 +89,7 @@ export default function SignUpScreen() {
                         contentStyle={styles.signUpButtonContent}
                         labelStyle={styles.signUpButtonLabel}
                         loading={isLoading}
-                        disabled={isLoading || !isTermsAccepted}
+                        disabled={hasLoading || !isTermsAccepted}
                         buttonColor={theme.colors.primary}
                         textColor={theme.colors.onPrimary}
                     >

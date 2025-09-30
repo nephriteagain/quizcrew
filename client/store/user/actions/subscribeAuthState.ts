@@ -8,6 +8,7 @@ import authSelector from "../user.store";
 
 export function subscribeAuthState() {
     const unsub = onAuthStateChanged(auth, (user) => {
+        console.log("AUTH STATE CHANGED");
         if (user) {
             console.log(
                 `${user.isAnonymous ? "anonymous " : ""}user detected ${user.email ? `email: ${user.email}` : ""}`
@@ -17,14 +18,14 @@ export function subscribeAuthState() {
         }
         if (user) {
             const extracted = extractAuthUser(user);
-            authSelector.setState({ user: extracted });
             const userRef = doc(db, COL.USERS, user.uid);
             const currentUser = authSelector.getState().user;
             const deepEqual = isEqual(currentUser, extracted);
             if (!deepEqual) {
                 console.log("user doc changed, updating...");
-                setDoc(userRef, extracted);
+                setDoc(userRef, extracted, { merge: true });
             }
+            authSelector.setState({ user: extracted });
         } else {
             authSelector.setState({ user: null });
         }

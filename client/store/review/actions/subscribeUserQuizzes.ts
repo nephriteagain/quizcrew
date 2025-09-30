@@ -8,6 +8,7 @@ export function subscribeUserQuizzes(uid: string) {
     const quizRef = collection(db, COL.QUIZZES);
     const quizQ = query(quizRef, where("createdBy", "==", uid), where("status", "==", "LIVE"));
     const unsub = quizQ.onSnapshot((snap) => {
+        console.log("subscribeUserQuizzes snapshot");
         if (!snap) return;
         const quizzes = snap.docs.map((d) => d.data()) as QuizDoc[];
         // save quizzes to store
