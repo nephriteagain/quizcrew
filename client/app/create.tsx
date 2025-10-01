@@ -76,9 +76,7 @@ export default function CreateQuiz() {
 
     const asyncActionOptions = {
         onComplete: () => {
-            router.back();
-            router.back();
-            router.back();
+            router.replace("/profile");
         },
     };
 

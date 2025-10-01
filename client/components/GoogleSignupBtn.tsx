@@ -1,6 +1,8 @@
-import { auth } from "@/firebase";
+import { COL } from "@/constants/collections";
+import { auth, db } from "@/firebase";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { GoogleAuthProvider, signInWithCredential } from "@react-native-firebase/auth";
+import { doc, setDoc } from "@react-native-firebase/firestore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Dispatch, SetStateAction } from "react";
 import { Alert, StyleSheet, TouchableOpacity } from "react-native";
@@ -42,6 +44,13 @@ function GoogleSignupBtn({
             const googleCredential = GoogleAuthProvider.credential(idToken);
 
             const result = await signInWithCredential(auth, googleCredential);
+            const isNewUser = result.additionalUserInfo?.isNewUser;
+            if (isNewUser) {
+                console.log("new user detected, creating firestore user document.");
+                const userDataRef = doc(db, COL.USERS_DATA, result.user.uid);
+                const userData = { uid: result.user.uid, status: "ACTIVE" } as const;
+                await setDoc(userDataRef, userData, { merge: true });
+            }
 
             return result;
         } catch (error) {

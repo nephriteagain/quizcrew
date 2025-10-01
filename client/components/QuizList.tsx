@@ -96,7 +96,7 @@ export default function QuizList({
             }
             // Performance optimizations
             drawDistance={400}
-            extraData={quizzes?.length || 0}
+            extraData={{ length: quizzes?.length || 0, isLoading, emptyMessage }}
             {...rest}
         />
     );
@@ -114,7 +114,7 @@ const makeStyles = (theme: any) =>
             height: 16,
         },
         emptyContainer: {
-            flex: 1,
+            height: 200,
             justifyContent: "center",
             alignItems: "center",
             paddingVertical: 60,
@@ -125,7 +125,7 @@ const makeStyles = (theme: any) =>
             textAlign: "center",
         },
         loadingContainer: {
-            flex: 1,
+            height: 200,
             justifyContent: "center",
             alignItems: "center",
         },

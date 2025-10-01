@@ -188,8 +188,11 @@ export default function Profile() {
                 {
                     text: "Delete Forever",
                     style: "destructive",
-                    onPress: () => {
-                        deleteAccountFn();
+                    onPress: async () => {
+                        const { error } = await deleteAccountFn();
+                        if (error) {
+                            Alert.alert("Account deletion failed", error.message);
+                        }
                     },
                 },
             ]
@@ -296,21 +299,20 @@ export default function Profile() {
                                     </Button>
                                 </Link>
                             )}
-                            {user?.isAnonymous ? (
-                                <Button
-                                    onPress={handleDeleteAccount}
-                                    mode="contained"
-                                    buttonColor={theme.colors.error}
-                                    textColor={theme.colors.onError}
-                                    style={styles.actionButton}
-                                    contentStyle={styles.actionButtonContent}
-                                    labelStyle={styles.actionButtonLabel}
-                                    loading={isDeleteLoading}
-                                    disabled={isDeleteLoading}
-                                >
-                                    {isDeleteLoading ? "Deleting..." : "Delete Account"}
-                                </Button>
-                            ) : (
+                            <Button
+                                onPress={handleDeleteAccount}
+                                mode="contained"
+                                buttonColor={theme.colors.error}
+                                textColor={theme.colors.onError}
+                                style={styles.actionButton}
+                                contentStyle={styles.actionButtonContent}
+                                labelStyle={styles.actionButtonLabel}
+                                loading={isDeleteLoading}
+                                disabled={isDeleteLoading}
+                            >
+                                {isDeleteLoading ? "Deleting..." : "Delete Account"}
+                            </Button>
+                            {!user?.isAnonymous && (
                                 <Button
                                     onPress={handleLogout}
                                     mode="contained"
@@ -495,7 +497,8 @@ const makeStyles = (theme: AppTheme) => {
         },
         quizzesSection: {
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 16,
+            paddingBottom: 16,
         },
         sectionTitle: {
             fontSize: 18,
