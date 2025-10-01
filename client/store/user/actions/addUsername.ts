@@ -8,6 +8,7 @@ import {
     getDoc,
     query,
     setDoc,
+    updateDoc,
     where,
 } from "@react-native-firebase/firestore";
 
@@ -40,7 +41,7 @@ export async function addUsername(uid: string, username: string): Promise<ADD_US
             await setDoc(userDataRef, { username, uid }, { merge: true });
             return ADD_USERNAME_RESULT.SUCESS;
         }
-        await setDoc(userDataRef, { username });
+        await updateDoc(userDataRef, { username });
         console.log("username added");
         return ADD_USERNAME_RESULT.SUCESS;
     } catch (error) {

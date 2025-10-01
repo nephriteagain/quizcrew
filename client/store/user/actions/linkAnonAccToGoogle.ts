@@ -5,6 +5,7 @@ import { GoogleAuthProvider, linkWithCredential } from "@react-native-firebase/a
 import { doc, setDoc } from "@react-native-firebase/firestore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Alert } from "react-native";
+import authSelector from "../user.store";
 
 export async function linkAnonAccToGoogle() {
     const user = auth.currentUser;
@@ -30,5 +31,6 @@ export async function linkAnonAccToGoogle() {
     const userRef = doc(db, COL.USERS, user.uid);
     const extracted = extractAuthUser(result.user);
     await setDoc(userRef, extracted, { merge: true });
+    authSelector.setState({ user: extracted });
     return result;
 }
