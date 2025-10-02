@@ -1,5 +1,6 @@
 import { COL } from "@/constants/collections";
-import { auth, db } from "@/firebase";
+import { analytics, auth, db } from "@/firebase";
+import { logEvent } from "@react-native-firebase/analytics";
 import { deleteUser } from "@react-native-firebase/auth";
 import { doc, writeBatch } from "@react-native-firebase/firestore";
 import authSelector from "../user.store";
@@ -33,6 +34,8 @@ export async function deleteAccount() {
             connections: [],
             groups: [],
         });
+
+        logEvent(analytics, "delete_account", {});
     } catch (error) {
         console.error("Error deleting account:", error);
         throw error;

@@ -1,9 +1,11 @@
 import Card from "@/components/Card";
 import Container from "@/components/Container";
+import { analytics } from "@/firebase";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { logEvent } from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -37,6 +39,7 @@ export default function QuizTypes() {
     const router = useRouter();
 
     const handleSelect = (type: QUIZ_TYPE) => {
+        logEvent(analytics, "select_quiz_type", { quiz_type: type });
         router.push({
             pathname: "/create",
             params: { type },

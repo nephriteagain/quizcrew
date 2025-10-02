@@ -1,10 +1,12 @@
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
+import { analytics } from "@/firebase";
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { searchNewConnection } from "@/store/user/actions/searchNewConnection";
 import { Connection } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
+import { logEvent } from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -193,6 +195,10 @@ export default function AddConnections() {
 
     const renderConnectionItem = ({ item }: { item: Connection }) => {
         const handlePress = () => {
+            logEvent(analytics, "view_user_profile", {
+                target_user_id: item.data.uid,
+                connection_status: item.meta?.status,
+            });
             router.push({
                 pathname: "/profile/[uid]",
                 params: {

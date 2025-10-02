@@ -1,6 +1,7 @@
 import { COL } from "@/constants/collections";
-import { db } from "@/firebase";
+import { analytics, db } from "@/firebase";
 import { UserData } from "@/types/user";
+import { logEvent } from "@react-native-firebase/analytics";
 import {
     collection,
     doc,
@@ -31,6 +32,7 @@ export async function addUsername(uid: string, username: string): Promise<ADD_US
         const dataSnap = await getCountFromServer(dataQ);
         const count = dataSnap.data().count;
         if (count > 0) {
+            logEvent(analytics, "username_unavailable", { username_length: username.length });
             return ADD_USERNAME_RESULT.ALREADY_USED;
         }
 
@@ -39,10 +41,12 @@ export async function addUsername(uid: string, username: string): Promise<ADD_US
         const userData = userSnap.data() as UserData | undefined;
         if (!userData) {
             await setDoc(userDataRef, { username, uid }, { merge: true });
+            logEvent(analytics, "create_username", { username_length: username.length, result: "success" });
             return ADD_USERNAME_RESULT.SUCESS;
         }
         await updateDoc(userDataRef, { username });
         console.log("username added");
+        logEvent(analytics, "create_username", { username_length: username.length, result: "success" });
         return ADD_USERNAME_RESULT.SUCESS;
     } catch (error) {
         console.error(error);

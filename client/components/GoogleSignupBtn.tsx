@@ -1,6 +1,7 @@
 import { COL } from "@/constants/collections";
-import { auth, db } from "@/firebase";
+import { analytics, auth, db } from "@/firebase";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { logEvent } from "@react-native-firebase/analytics";
 import { GoogleAuthProvider, signInWithCredential } from "@react-native-firebase/auth";
 import { doc, setDoc } from "@react-native-firebase/firestore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -50,6 +51,9 @@ function GoogleSignupBtn({
                 const userDataRef = doc(db, COL.USERS_DATA, result.user.uid);
                 const userData = { uid: result.user.uid, status: "ACTIVE" } as const;
                 await setDoc(userDataRef, userData, { merge: true });
+                logEvent(analytics, "sign_up", { method: "google" });
+            } else {
+                logEvent(analytics, "login", { method: "google" });
             }
 
             return result;
