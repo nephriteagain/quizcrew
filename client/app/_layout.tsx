@@ -2,6 +2,7 @@ import CreateUsernameModal from "@/components/CreateUsernameModal";
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
 import SettingsBottomSheet from "@/components/SettingsBottomSheet";
 import VerifyEmailModal from "@/components/VerifyEmailModal";
+import { useLogScreen } from "@/hooks/useLogScreen";
 import AuthProvider from "@/providers/AuthProvider";
 import ThemeProvider, { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
@@ -15,6 +16,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 function RootLayoutContent() {
+    useLogScreen();
+
     const [quizId, setQuizId] = useState<string | null>(null);
     const theme = useAppTheme();
     const bottomSheetRef = useRef<BottomSheet>(null);
