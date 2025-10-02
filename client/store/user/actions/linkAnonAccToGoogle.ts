@@ -1,6 +1,7 @@
 import { COL } from "@/constants/collections";
-import { auth, db } from "@/firebase";
+import { analytics, auth, db } from "@/firebase";
 import { extractAuthUser } from "@/lib/utils/extraAuthUser";
+import { logEvent } from "@react-native-firebase/analytics";
 import { GoogleAuthProvider, linkWithCredential } from "@react-native-firebase/auth";
 import { doc, setDoc } from "@react-native-firebase/firestore";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -13,6 +14,7 @@ export async function linkAnonAccToGoogle() {
         console.error("user not logged in");
         return;
     }
+    const previousMethod = user.isAnonymous ? "anonymous" : user.providerData[0]?.providerId;
     const hasPlay = await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
     });
@@ -32,5 +34,6 @@ export async function linkAnonAccToGoogle() {
     const extracted = extractAuthUser(result.user);
     await setDoc(userRef, extracted, { merge: true });
     authSelector.setState({ user: extracted });
+    logEvent(analytics, "link_account", { method: "google", previous_method: previousMethod });
     return result;
 }

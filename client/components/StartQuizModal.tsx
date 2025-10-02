@@ -1,7 +1,9 @@
+import { analytics } from "@/firebase";
 import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { logEvent } from "@react-native-firebase/analytics";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { debounce } from "lodash";
 import React, { useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
@@ -11,21 +13,26 @@ interface StartQuizModalProps {
     title: string;
     description: string;
     totalQuestions: number;
+    quizType?: string;
 }
 
-export function StartQuizModal({ title, description, totalQuestions }: StartQuizModalProps) {
+export function StartQuizModal({ title, description, totalQuestions, quizType }: StartQuizModalProps) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
 
     const [isVisible, setIsVisible] = useState(false);
+    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const quiz_id = params.quiz_id;
 
     const router = useRouter();
 
     const hideModal = () => {
+        logEvent(analytics, "start_quiz", { quiz_id, quiz_type: quizType, question_count: totalQuestions });
         setIsVisible(false);
     };
 
     const handleCancel = () => {
+        logEvent(analytics, "cancel_quiz_start", { quiz_id, quiz_type: quizType });
         router.back();
         hideModal();
     };

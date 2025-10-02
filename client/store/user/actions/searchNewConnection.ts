@@ -1,6 +1,7 @@
 import { COL } from "@/constants/collections";
-import { db } from "@/firebase";
+import { analytics, db } from "@/firebase";
 import { UserData } from "@/types/user";
+import { logEvent } from "@react-native-firebase/analytics";
 import { collection, endAt, orderBy, query, startAt } from "@react-native-firebase/firestore";
 import authSelector from "../user.store";
 
@@ -20,5 +21,6 @@ export async function searchNewConnection(keyword: string) {
     const filtered = data.filter((d) => d.uid !== selfUid);
     // filter yourself
     console.log(JSON.stringify(filtered, null, 2));
+    logEvent(analytics, "search_connections", { keyword_length: keyword.length, results_count: filtered.length });
     return filtered;
 }

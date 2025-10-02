@@ -1,6 +1,7 @@
 import { COL } from "@/constants/collections";
-import { auth, db } from "@/firebase";
+import { analytics, auth, db } from "@/firebase";
 import { extractAuthUser } from "@/lib/utils/extraAuthUser";
+import { logEvent } from "@react-native-firebase/analytics";
 import { signInAnonymously } from "@react-native-firebase/auth";
 import { doc, setDoc } from "@react-native-firebase/firestore";
 import authSelector from "../user.store";
@@ -21,5 +22,6 @@ export async function anonSignin() {
             user: authUser,
             userData,
         });
+        logEvent(analytics, "sign_up", { method: "anonymous" });
     }
 }

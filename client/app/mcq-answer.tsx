@@ -7,10 +7,12 @@ import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-nativ
 import Card from "@/components/Card";
 import Container from "@/components/Container";
 import { StartQuizModal } from "@/components/StartQuizModal";
+import { analytics } from "@/firebase";
 import { useBeforeRemove } from "@/hooks/useBeforeRemove";
 import { useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { MultipleChoiceQ } from "@/types/review";
+import { logEvent } from "@react-native-firebase/analytics";
 import { useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
@@ -65,6 +67,14 @@ export default function MultipleChoiceQuestionsAns() {
                 [questionIndex]: choice,
             }));
 
+            const correctAnswer = MULTIPLE_CHOICE_QUESTIONS[questionIndex]?.answer;
+            logEvent(analytics, "answer_question", {
+                quiz_id,
+                quiz_type: "MCQ",
+                question_number: questionIndex + 1,
+                is_correct: choice === correctAnswer,
+            });
+
             // ✅ auto-scroll to next question if not the last
             if (!listRef.current) return;
             const delayedScrollToIndex = debounce(listRef?.current?.scrollToIndex, 100);
@@ -78,11 +88,25 @@ export default function MultipleChoiceQuestionsAns() {
     };
 
     const handleSubmit = () => {
+        const scorePercent = Math.round((score / totalQuestion) * 100);
+        logEvent(analytics, "complete_quiz", {
+            quiz_id,
+            quiz_type: selectedQuiz?.type,
+            score,
+            total_questions: totalQuestion,
+            score_percentage: scorePercent,
+        });
         setResultModalVisible(true);
         setIsSubmitted(true);
     };
 
     const handleReset = () => {
+        logEvent(analytics, "reset_quiz", {
+            quiz_id,
+            quiz_type: selectedQuiz?.type,
+            previous_score: score,
+            previous_total: totalQuestion,
+        });
         setIsSubmitted(false);
         setAnswers({});
         listRef.current?.scrollToIndex({ index: 0, animated: true });

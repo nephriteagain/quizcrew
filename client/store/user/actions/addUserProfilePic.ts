@@ -1,6 +1,7 @@
 import { COL } from "@/constants/collections";
-import { auth, db, storage } from "@/firebase";
+import { analytics, auth, db, storage } from "@/firebase";
 import { uploadImageResumable } from "@/lib/utils/uploadImageResumable";
+import { logEvent } from "@react-native-firebase/analytics";
 import { doc, updateDoc } from "@react-native-firebase/firestore";
 import { ref } from "@react-native-firebase/storage";
 
@@ -19,5 +20,6 @@ export async function addUserProfilePic(imageUri: string) {
     await updateDoc(userDataRef, {
         photoURL: url,
     });
+    logEvent(analytics, "update_profile_picture", {});
     return url;
 }

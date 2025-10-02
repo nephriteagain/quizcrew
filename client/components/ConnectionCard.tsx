@@ -1,7 +1,9 @@
 import { DEFAULT_USER } from "@/constants/values";
+import { analytics } from "@/firebase";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Connection, ConnectionStatus } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
+import { logEvent } from "@react-native-firebase/analytics";
 import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ConnectionCardProps {
@@ -77,7 +79,10 @@ export default function ConnectionCard({
                     <TouchableOpacity
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={styles.connectButton}
-                        onPress={() => handleConnect(connection.data.uid)}
+                        onPress={() => {
+                            logEvent(analytics, "send_connection_request", { target_user_id: connection.data.uid });
+                            handleConnect(connection.data.uid);
+                        }}
                     >
                         <Ionicons name="person-add" size={16} color="white" />
                         <Text style={styles.connectButtonText}>Connect</Text>
@@ -87,7 +92,12 @@ export default function ConnectionCard({
                     <TouchableOpacity
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={[styles.actionButton, styles.acceptButton]}
-                        onPress={() => handleAccept()}
+                        onPress={() => {
+                            logEvent(analytics, "accept_connection_request", {
+                                connection_user_id: connection.data.uid,
+                            });
+                            handleAccept();
+                        }}
                     >
                         <Ionicons name="checkmark" size={14} color="white" />
                     </TouchableOpacity>
@@ -96,7 +106,12 @@ export default function ConnectionCard({
                     <TouchableOpacity
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={[styles.actionButton, styles.cancelButton]}
-                        onPress={() => handleCancel()}
+                        onPress={() => {
+                            logEvent(analytics, "reject_connection_request", {
+                                connection_user_id: connection.data.uid,
+                            });
+                            handleCancel();
+                        }}
                     >
                         <Ionicons name="close" size={14} color={theme.colors.error} />
                     </TouchableOpacity>
