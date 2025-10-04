@@ -1,5 +1,7 @@
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizzes";
+import { recommendConnections } from "@/store/user/actions/recommendConnections";
 import { subscribeAuthState } from "@/store/user/actions/subscribeAuthState";
 import { subscribeConnections } from "@/store/user/actions/subscribeConnection";
 import { subscribeGroups } from "@/store/user/actions/subscribeGroups";
@@ -19,6 +21,8 @@ function configureGoogleSignIn() {
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const user = authSelector.use.useUser();
+    const connections = authSelector.use.useConnections();
+    const [recommendConnectionsFn] = useAsyncAction(recommendConnections);
 
     useEffectLogRoute(() => {
         let unsub: () => void | undefined;
@@ -50,6 +54,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             unsub();
         };
     }, []);
+
+    useEffectLogRoute(() => {
+        if (user?.uid) {
+            recommendConnectionsFn();
+        }
+    }, [connections.length]);
 
     return <>{children}</>;
 }

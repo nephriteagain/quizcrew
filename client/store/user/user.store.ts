@@ -9,6 +9,7 @@ interface UserStore {
     userData: UserData | null;
     connections: Connection[];
     groups: Group[];
+    recommendedConnections: Connection[];
 }
 
 const useAuth = create<UserStore>()(
@@ -18,6 +19,7 @@ const useAuth = create<UserStore>()(
             userData: null,
             connections: [],
             groups: [],
+            recommendedConnections: [],
         }),
         {
             name: "user-storage",

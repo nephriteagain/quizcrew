@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
 
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
 import GroupCard from "@/components/GroupCard";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import authSelector from "@/store/user/user.store";
 import { Connection, Group } from "@/types/user";
 import { useRouter } from "expo-router";
 import { FAB } from "react-native-paper";
@@ -69,92 +70,6 @@ const mockGroups: Group[] = [
     },
 ];
 
-const mockConnections: Connection[] = [
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "1",
-            username: "Sarah Johnson",
-            photoURL:
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=faces",
-        },
-        meta: {
-            uid: "1",
-            status: "CONNECTED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "2",
-            username: "Mike Chen",
-            photoURL:
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces",
-        },
-        meta: {
-            uid: "2",
-            status: "CONNECTED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "3",
-            username: "Emily Davis",
-            photoURL:
-                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces",
-        },
-        meta: {
-            uid: "3",
-            status: "INVITED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "4",
-            username: "Alex Rodriguez",
-            photoURL:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        },
-        meta: {
-            uid: "4",
-            status: "CONNECTED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "5",
-            username: "Jessica Kim",
-            photoURL:
-                "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces",
-        },
-        meta: {
-            uid: "5",
-            status: "REQUESTED",
-            createdAt: new Date() as any,
-        },
-    },
-];
-
-const sections: SectionData[] = [
-    {
-        title: "Groups",
-        data: mockGroups,
-        type: "groups",
-    },
-    {
-        title: "Connections",
-        data: mockConnections,
-        type: "connections",
-    },
-];
-
 export default function Connections() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
@@ -165,6 +80,27 @@ export default function Connections() {
     const onStateChange = ({ open }: { open: boolean }) => setState({ open });
 
     const { open } = state;
+
+    const connections = authSelector.use.useConnections();
+    const activeConnections = useMemo(() => {
+        return connections.filter((c) => c.meta?.status === "CONNECTED");
+    }, [connections]);
+
+    const sections: SectionData[] = useMemo(
+        () => [
+            {
+                title: "Groups",
+                data: mockGroups,
+                type: "groups",
+            },
+            {
+                title: "Connections",
+                data: activeConnections,
+                type: "connections",
+            },
+        ],
+        [activeConnections]
+    );
 
     const renderGroupItem = (item: Group) => (
         <GroupCard

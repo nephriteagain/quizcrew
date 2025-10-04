@@ -1,9 +1,14 @@
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
 import { analytics } from "@/firebase";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { approveConnection } from "@/store/user/actions/approveConnection";
+import { rejectConnection } from "@/store/user/actions/rejectConnection";
+import { requestConnection } from "@/store/user/actions/requestConnection";
 import { searchNewConnection } from "@/store/user/actions/searchNewConnection";
+import authSelector from "@/store/user/user.store";
 import { Connection } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { logEvent } from "@react-native-firebase/analytics";
@@ -12,99 +17,7 @@ import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SectionList, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-paper";
-
-const mockRequestsToYou: Connection[] = [
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "1",
-            username: "Alex Johnson",
-            photoURL:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        },
-        meta: {
-            uid: "1",
-            status: "INVITED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "2",
-            username: "Sarah Chen",
-            photoURL:
-                "https://images.unsplash.com/photo-1494790108755-2616b39bb30b?w=150&h=150&fit=crop&crop=face",
-        },
-        meta: {
-            uid: "2",
-            status: "INVITED",
-            createdAt: new Date() as any,
-        },
-    },
-];
-
-const mockRequestsFromYou: Connection[] = [
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "3",
-            username: "Mike Davis",
-            photoURL:
-                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        },
-        meta: {
-            uid: "3",
-            status: "REQUESTED",
-            createdAt: new Date() as any,
-        },
-    },
-];
-
-const mockRecommended: Connection[] = [
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "4",
-            username: "Emily Rodriguez",
-            photoURL:
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-        },
-        meta: {
-            uid: "4",
-            status: "CONNECTED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "5",
-            username: "David Park",
-            photoURL:
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-        },
-        meta: {
-            uid: "5",
-            status: "CONNECTED",
-            createdAt: new Date() as any,
-        },
-    },
-    {
-        data: {
-            status: "ACTIVE",
-            uid: "6",
-            username: "Lisa Wang",
-            photoURL:
-                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-        },
-        meta: {
-            uid: "6",
-            status: "CONNECTED",
-            createdAt: new Date() as any,
-        },
-    },
-];
+import { Toast } from "toastify-react-native";
 
 type SectionData = {
     title: string;
@@ -118,32 +31,42 @@ export default function AddConnections() {
     const [searchQuery, setSearchQuery] = useState("");
     const router = useRouter();
     const [connectionSearch, setConnectionSearch] = useState<Connection[]>([]);
+    const [loadingCards, setLoadingCards] = useState<string[]>([]);
     const [searchNewConnectionFn, isLoading] = useAsyncStatus(searchNewConnection);
+    const [requestConnectionFn] = useAsyncAction(requestConnection);
+    const [rejectConnectionFn] = useAsyncAction(rejectConnection);
+    const [approveConnectionFn] = useAsyncAction(approveConnection);
+
+    const connections = authSelector.use.useConnections();
+    const recommendedConnections = authSelector.use.useRecommendedConnections();
 
     const sections: SectionData[] = useMemo(() => {
+        const requestToYou = connections.filter((c) => c.meta?.status === "INVITED");
+        const requestFromYou = connections.filter((c) => c.meta?.status === "REQUESTED");
+
         return [
             {
                 title: "Requests to You",
-                data: mockRequestsToYou,
+                data: requestToYou,
                 type: "requests_to_you",
             },
             {
                 title: "Requests from You",
-                data: mockRequestsFromYou,
+                data: requestFromYou,
                 type: "requests_from_you",
-            },
-            {
-                title: "Recommended",
-                data: mockRecommended,
-                type: "recommended",
             },
             {
                 title: "Search Results",
                 data: connectionSearch,
                 type: "search_results",
             },
+            {
+                title: "Recommended",
+                data: recommendedConnections,
+                type: "recommended",
+            },
         ];
-    }, [connectionSearch]);
+    }, [connectionSearch, connections, recommendedConnections]);
 
     const searchFunction = useCallback(
         async (query: string) => {
@@ -189,8 +112,38 @@ export default function AddConnections() {
         0
     );
 
-    const handleConnect = (_connectionId: string) => {
-        console.log("connected");
+    const handleConnect = async (uid: string) => {
+        console.log({ uid });
+        setLoadingCards((prev) => [...prev, uid]);
+        const { error } = await requestConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        }
+        setSearchQuery("");
+        setConnectionSearch([]);
+        await searchFunction(searchQuery);
+        setLoadingCards((prev) => prev.filter((id) => id !== uid));
+    };
+
+    const handleCancel = async (uid: string) => {
+        setLoadingCards((prev) => [...prev, uid]);
+        const { error } = await rejectConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        }
+        setSearchQuery("");
+        setConnectionSearch([]);
+        setLoadingCards((prev) => prev.filter((id) => id !== uid));
+    };
+    const handleAccept = async (uid: string) => {
+        setLoadingCards((prev) => [...prev, uid]);
+        const { error } = await approveConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        }
+        setSearchQuery("");
+        setConnectionSearch([]);
+        setLoadingCards((prev) => prev.filter((id) => id !== uid));
     };
 
     const renderConnectionItem = ({ item }: { item: Connection }) => {
@@ -210,7 +163,10 @@ export default function AddConnections() {
             <ConnectionCard
                 connection={item}
                 handleConnect={handleConnect}
+                handleAccept={handleAccept}
+                handleCancel={handleCancel}
                 handlePress={handlePress}
+                isLoading={loadingCards.includes(item.data.uid)}
             />
         );
     };
@@ -268,7 +224,7 @@ export default function AddConnections() {
                         </View>
                     </View>
                 )}
-                extraData={connectionSearch}
+                extraData={{ connectionSearch, loadingCards }}
             />
         </Container>
     );
