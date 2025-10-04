@@ -1,24 +1,79 @@
 import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
 import { DEFAULT_USER } from "@/constants/values";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
-import reviewSelector from "@/store/review/review.store";
-import { Quiz, QUIZ_TYPE } from "@/types/review";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+import { subscribeOtherUserQuizzes } from "@/store/review/actions/subsribeOtherUserQuizzes";
+import { approveConnection } from "@/store/user/actions/approveConnection";
+import { getTotalConnections } from "@/store/user/actions/getTotalConnections";
+import { rejectConnection } from "@/store/user/actions/rejectConnection";
+import { requestConnection } from "@/store/user/actions/requestConnection";
+import { subscribeOtherConnection } from "@/store/user/actions/subscribeOtherUserConnection";
+import authSelector from "@/store/user/user.store";
+import { Quiz, QUIZ_TYPE, QuizDoc } from "@/types/review";
+import { ConnectionMeta, UserData } from "@/types/user";
+import { Unsubscribe } from "@react-native-firebase/firestore";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Toast } from "toastify-react-native";
 
 export default function Profile() {
     const { uid } = useLocalSearchParams<{ uid: string }>();
 
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const quizzes = reviewSelector.use.useQuizzes();
-    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+    const [quizzes, setQuizzes] = useState<QuizDoc[]>([]);
+    const [profile, setProfile] = useState<{ data: UserData | null; meta: ConnectionMeta | null }>({
+        data: null,
+        meta: null,
+    });
+    const [totalConnections, setTotalConnections] = useState(0);
+
+    const user = authSelector.use.useUser();
 
     const router = useRouter();
+    const [requestConnectionFn, { isLoading: connectLoading }] = useAsyncAction(requestConnection);
+    const [rejectConnectionFn, { isLoading: cancelLoading }] = useAsyncAction(rejectConnection);
+    const [approveConnectionFn, { isLoading: approveLoading }] = useAsyncAction(approveConnection);
+    const [getTotalConnectionsFn] = useAsyncAction(getTotalConnections);
+
+    const handleConnect = async (uid: string) => {
+        console.log({ uid });
+        const { error } = await requestConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        } else {
+            Toast.success("Connection requested");
+        }
+    };
+
+    const handleCancel = async (uid: string) => {
+        const { error } = await rejectConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        } else {
+            Toast.success("Connection request cancelled");
+        }
+    };
+    const handleAccept = async (uid: string) => {
+        const { error } = await approveConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        } else {
+            Toast.success("Connection request accepted");
+        }
+    };
+
+    const handleReject = async (uid: string) => {
+        const { error } = await rejectConnectionFn(uid);
+        if (error) {
+            Toast.error(error?.message);
+        } else {
+            Toast.success("Connection request rejected");
+        }
+    };
 
     const handlePress = (quiz: Quiz) => {
         if (quiz.type === QUIZ_TYPE.MCQ) {
@@ -45,86 +100,38 @@ export default function Profile() {
         }
     };
 
-    const pickImageFromLibrary = async () => {
-        setIsUploadingPhoto(true);
-        try {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: "images",
-                quality: 0.8,
-                allowsEditing: true,
-                aspect: [1, 1],
-                base64: true,
-            });
+    useEffectLogRoute(() => {
+        let unsub: Unsubscribe | null;
+        subscribeOtherConnection({
+            uid,
+            selfUid: user?.uid,
+            onChange: (result) => {
+                setProfile(result);
+            },
+        }).then((u) => (unsub = u));
 
-            if (!result.canceled && result.assets[0]) {
-                const asset = result.assets[0];
-                // TODO: Upload to Firebase storage and update user profile
-                console.log("Selected image:", asset.uri);
-                Alert.alert("Photo Selected", "Photo upload functionality will be implemented");
+        return () => {
+            unsub?.();
+        };
+    }, [user?.uid, uid]);
+
+    useEffectLogRoute(() => {
+        const unsub = subscribeOtherUserQuizzes(uid, (quizzes) => {
+            setQuizzes(quizzes);
+        });
+        getTotalConnectionsFn(uid).then((count) => {
+            if (typeof count.data === "number") {
+                setTotalConnections(count.data);
             }
-        } catch (error) {
-            console.error("Error picking image:", error);
-            Alert.alert("Error", "Failed to select image");
-        } finally {
-            setIsUploadingPhoto(false);
-        }
-    };
+        });
+        return () => {
+            unsub();
+        };
+    }, [uid]);
 
-    const takePhoto = async () => {
-        const status = await ImagePicker.getCameraPermissionsAsync();
-        if (!status.granted) {
-            const permission = await ImagePicker.requestCameraPermissionsAsync();
-            if (!permission.granted) {
-                Alert.alert("Permission Required", "Camera permission is required to take photos");
-                return;
-            }
-        }
-
-        setIsUploadingPhoto(true);
-        try {
-            const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: "images",
-                quality: 0.8,
-                allowsEditing: true,
-                aspect: [1, 1],
-                base64: true,
-                cameraType: ImagePicker.CameraType.front,
-            });
-
-            if (!result.canceled && result.assets[0]) {
-                const asset = result.assets[0];
-                // TODO: Upload to Firebase storage and update user profile
-                console.log("Captured photo:", asset.uri);
-                Alert.alert("Photo Captured", "Photo upload functionality will be implemented");
-            }
-        } catch (error) {
-            console.error("Error taking photo:", error);
-            Alert.alert("Error", "Failed to take photo");
-        } finally {
-            setIsUploadingPhoto(false);
-        }
-    };
-
-    const showPhotoOptions = () => {
-        Alert.alert(
-            "Update Profile Photo",
-            "Choose how you'd like to update your profile picture",
-            [
-                {
-                    text: "Camera",
-                    onPress: takePhoto,
-                },
-                {
-                    text: "Photo Library",
-                    onPress: pickImageFromLibrary,
-                },
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
-            ]
-        );
-    };
+    const showConnectBtn = user && !profile.meta;
+    const showAcceptAndRejectBtn = user && profile.meta?.status === "INVITED";
+    const showCancelBtn = user && profile.meta?.status === "REQUESTED";
 
     return (
         <Container style={styles.container}>
@@ -132,29 +139,64 @@ export default function Profile() {
                 <View style={styles.avatarContainer}>
                     <Image
                         source={{
-                            uri: DEFAULT_USER,
+                            uri: profile.data?.photoURL ?? DEFAULT_USER,
                         }}
                         style={styles.avatar}
                     />
-                    <Pressable
-                        style={styles.editPhotoButton}
-                        onPress={showPhotoOptions}
-                        disabled={isUploadingPhoto}
-                    >
-                        {isUploadingPhoto ? (
-                            <ActivityIndicator size="small" color="white" />
-                        ) : (
-                            <Ionicons name="camera" size={16} color="white" />
-                        )}
-                    </Pressable>
                 </View>
-                <View>
-                    <Text style={styles.displayName}>{uid}</Text>
-                    <View style={{ flexDirection: "row", columnGap: 8 }}>
+                <View style={styles.profileInfo}>
+                    <Text style={styles.displayName}>{profile?.data?.username}</Text>
+                    {showConnectBtn && (
+                        <TouchableOpacity
+                            style={styles.connectButton}
+                            disabled={connectLoading}
+                            onPress={() => {
+                                handleConnect(uid);
+                            }}
+                        >
+                            <Text style={styles.connectButtonText}>Connect</Text>
+                        </TouchableOpacity>
+                    )}
+                    {showAcceptAndRejectBtn && (
+                        <View style={styles.actionButtons}>
+                            <TouchableOpacity
+                                style={styles.acceptButton}
+                                disabled={approveLoading || cancelLoading}
+                                onPress={() => {
+                                    handleAccept(uid);
+                                }}
+                            >
+                                <Text style={styles.acceptButtonText}>Accept</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.rejectButton}
+                                disabled={approveLoading || cancelLoading}
+                                onPress={() => {
+                                    handleReject(uid);
+                                }}
+                            >
+                                <Text style={styles.rejectButtonText}>Reject</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    {showCancelBtn && (
+                        <TouchableOpacity
+                            style={styles.cancelButton}
+                            disabled={cancelLoading}
+                            onPress={() => {
+                                handleCancel(uid);
+                            }}
+                        >
+                            <Text style={styles.connectButtonText}>Cancel Request</Text>
+                        </TouchableOpacity>
+                    )}
+
+                    <View style={styles.statsContainer}>
                         <Link href={"/connections"}>
                             <Text style={{ color: theme.colors.onSurfaceVariant }}>
                                 <Text style={{ fontWeight: "600", color: theme.colors.onSurface }}>
-                                    10{" "}
+                                    {totalConnections}{" "}
                                 </Text>
                                 connections
                             </Text>
@@ -188,14 +230,24 @@ const makeStyles = (theme: AppTheme) => {
     return StyleSheet.create({
         container: {},
         header: {
-            alignItems: "center",
             flexDirection: "row",
+            columnGap: 16,
             paddingTop: 16,
             paddingHorizontal: 16,
         },
         avatarContainer: {
             position: "relative",
-            marginRight: 16,
+        },
+        profileInfo: {
+            rowGap: 8,
+        },
+        actionButtons: {
+            flexDirection: "row",
+            columnGap: 8,
+        },
+        statsContainer: {
+            flexDirection: "row",
+            columnGap: 8,
         },
         avatar: {
             width: 80,
@@ -226,7 +278,6 @@ const makeStyles = (theme: AppTheme) => {
         displayName: {
             fontSize: 24,
             fontWeight: "bold",
-            marginBottom: 5,
             color: theme.colors.onSurface,
         },
         email: {
@@ -240,7 +291,6 @@ const makeStyles = (theme: AppTheme) => {
         sectionTitle: {
             fontSize: 18,
             fontWeight: "bold",
-            marginBottom: 8,
             color: theme.colors.onSurface,
         },
         listContainer: {
@@ -249,7 +299,7 @@ const makeStyles = (theme: AppTheme) => {
         quizItem: {
             backgroundColor: theme.colors.surface,
             padding: 16,
-            marginBottom: 12,
+            rowGap: 8,
             borderRadius: 8,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
@@ -263,24 +313,20 @@ const makeStyles = (theme: AppTheme) => {
         quizTitle: {
             fontSize: 18,
             fontWeight: "bold",
-            marginBottom: 8,
             color: theme.colors.onSurface,
         },
         quizDescription: {
             fontSize: 14,
             color: theme.colors.onSurfaceVariant,
-            marginBottom: 8,
         },
         quizType: {
             fontSize: 12,
             fontWeight: "bold",
             color: theme.colors.primary,
-            marginBottom: 4,
         },
         quizDate: {
             fontSize: 12,
             color: theme.colors.onSurfaceVariant,
-            marginBottom: 8,
         },
         tagsContainer: {
             flexDirection: "row",
@@ -289,8 +335,49 @@ const makeStyles = (theme: AppTheme) => {
         tag: {
             fontSize: 12,
             color: theme.colors.primary,
-            marginRight: 8,
-            marginBottom: 4,
+        },
+        connectButton: {
+            backgroundColor: theme.colors.primary,
+            paddingVertical: 5,
+            paddingHorizontal: 10,
+            borderRadius: 8,
+            alignItems: "center",
+        },
+        connectButtonText: {
+            color: theme.colors.onPrimary,
+            fontSize: 12,
+            fontWeight: "600",
+        },
+        acceptButton: {
+            backgroundColor: "#34C759",
+            paddingVertical: 5,
+            paddingHorizontal: 10,
+            borderRadius: 8,
+            alignItems: "center",
+        },
+        acceptButtonText: {
+            color: "#FFFFFF",
+            fontSize: 12,
+            fontWeight: "600",
+        },
+        rejectButton: {
+            backgroundColor: "#FF3B30",
+            paddingVertical: 5,
+            paddingHorizontal: 10,
+            borderRadius: 8,
+            alignItems: "center",
+        },
+        rejectButtonText: {
+            color: "#FFFFFF",
+            fontSize: 12,
+            fontWeight: "600",
+        },
+        cancelButton: {
+            backgroundColor: theme.colors.error,
+            paddingVertical: 5,
+            paddingHorizontal: 10,
+            borderRadius: 8,
+            alignItems: "center",
         },
     });
 };
