@@ -9,9 +9,10 @@ import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "reac
 interface ConnectionCardProps {
     connection: Connection;
     handleConnect?: (uid: string) => void;
+    handleAccept?: (uid: string) => void;
+    handleCancel?: (uid: string) => void;
     handlePress?: () => void;
-    handleAccept?: () => void;
-    handleCancel?: () => void;
+    isLoading?: boolean;
 }
 
 export default function ConnectionCard({
@@ -20,6 +21,7 @@ export default function ConnectionCard({
     handlePress,
     handleAccept,
     handleCancel,
+    isLoading,
 }: ConnectionCardProps) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
@@ -50,11 +52,16 @@ export default function ConnectionCard({
         }
     };
 
+    const showConnectBtn = handleConnect && !connection.meta;
+    const showAcceptBtn = handleAccept && connection.meta?.status === "INVITED";
+    const showCancelBtn = handleCancel && connection.meta?.status === "INVITED";
+
     return (
         <Pressable
             style={styles.itemContainer}
             onPress={handlePress}
             android_ripple={{ color: theme.colors?.primary }}
+            disabled={isLoading}
         >
             <View style={styles.avatarContainer}>
                 <Image
@@ -75,12 +82,16 @@ export default function ConnectionCard({
                 </View>
             </View>
             <View style={styles.actionsContainer}>
-                {handleConnect && (
+                {showConnectBtn && (
                     <TouchableOpacity
+                        disabled={isLoading}
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={styles.connectButton}
                         onPress={() => {
-                            logEvent(analytics, "send_connection_request", { target_user_id: connection.data.uid });
+                            logEvent(analytics, "send_connection_request", {
+                                target_user_id: connection.data.uid,
+                            });
+                            console.log(connection);
                             handleConnect(connection.data.uid);
                         }}
                     >
@@ -88,35 +99,37 @@ export default function ConnectionCard({
                         <Text style={styles.connectButtonText}>Connect</Text>
                     </TouchableOpacity>
                 )}
-                {handleAccept && (
+                {showAcceptBtn && (
                     <TouchableOpacity
+                        disabled={isLoading}
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={[styles.actionButton, styles.acceptButton]}
                         onPress={() => {
                             logEvent(analytics, "accept_connection_request", {
                                 connection_user_id: connection.data.uid,
                             });
-                            handleAccept();
+                            handleAccept(connection.data.uid);
                         }}
                     >
                         <Ionicons name="checkmark" size={14} color="white" />
                     </TouchableOpacity>
                 )}
-                {handleCancel && (
+                {showCancelBtn && (
                     <TouchableOpacity
+                        disabled={isLoading}
                         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
                         style={[styles.actionButton, styles.cancelButton]}
                         onPress={() => {
                             logEvent(analytics, "reject_connection_request", {
                                 connection_user_id: connection.data.uid,
                             });
-                            handleCancel();
+                            handleCancel(connection.data.uid);
                         }}
                     >
                         <Ionicons name="close" size={14} color={theme.colors.error} />
                     </TouchableOpacity>
                 )}
-                {!handleConnect && !handleAccept && !handleCancel && (
+                {!showConnectBtn && !showAcceptBtn && !showCancelBtn && (
                     <Ionicons name="chevron-forward" size={20} color={theme.colors.outline} />
                 )}
             </View>

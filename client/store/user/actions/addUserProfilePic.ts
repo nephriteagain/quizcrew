@@ -20,6 +20,6 @@ export async function addUserProfilePic(imageUri: string) {
     await updateDoc(userDataRef, {
         photoURL: url,
     });
-    logEvent(analytics, "update_profile_picture", {});
+    logEvent(analytics, "update_profile_picture", { url });
     return url;
 }

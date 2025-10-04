@@ -21,6 +21,9 @@ export async function searchNewConnection(keyword: string) {
     const filtered = data.filter((d) => d.uid !== selfUid);
     // filter yourself
     console.log(JSON.stringify(filtered, null, 2));
-    logEvent(analytics, "search_connections", { keyword_length: keyword.length, results_count: filtered.length });
+    logEvent(analytics, "search_connections", {
+        keyword_length: keyword.length,
+        results_count: filtered.length,
+    });
     return filtered;
 }

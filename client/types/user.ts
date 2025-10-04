@@ -1,5 +1,6 @@
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { Timestamp } from "@react-native-firebase/firestore";
+import { ToFieldValue } from "./utils";
 
 /** strips all method in FirebaseAuthTypes.User */
 export type AuthUser = {
@@ -53,5 +54,8 @@ export interface ConnectionMeta {
 
 export interface Connection {
     data: UserData;
+    /** the null is the handle search connections */
     meta: ConnectionMeta | null;
 }
+
+export type ConnectionMetaPayload = ToFieldValue<ConnectionMeta>;

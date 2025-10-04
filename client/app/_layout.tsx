@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import ToastManager from "toastify-react-native";
 
 function RootLayoutContent() {
     useLogScreen();
@@ -215,6 +216,7 @@ function RootLayoutContent() {
                 />
                 <CreateUsernameModal />
                 <VerifyEmailModal />
+                <ToastManager />
             </GestureHandlerRootView>
         </AuthProvider>
     );
