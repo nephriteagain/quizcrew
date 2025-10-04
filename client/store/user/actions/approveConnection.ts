@@ -5,7 +5,7 @@ import { doc, serverTimestamp, writeBatch } from "@react-native-firebase/firesto
 import authSelector from "../user.store";
 
 export async function approveConnection(uid: string) {
-    const selfUid = authSelector.getInitialState().user!.uid;
+    const selfUid = authSelector.getState().user!.uid;
 
     const selfConnectionRef = doc(db, COL.USERS_DATA, selfUid, COL.CONNECTIONS, uid);
     const otherConnectionRef = doc(db, COL.USERS_DATA, uid, COL.CONNECTIONS, selfUid);
