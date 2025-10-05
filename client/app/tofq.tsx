@@ -30,10 +30,13 @@ export default function TrueOrFalseQuestions() {
             return newSet;
         });
     };
-    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const params = useLocalSearchParams<{ quiz_id: string; quiz: string }>();
     const quiz_id = params.quiz_id;
+    const quiz = params.quiz;
     const quizzes = reviewSelector.use.useQuizzes();
-    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as TrueOrFalseQ | undefined;
+    const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
+        | TrueOrFalseQ
+        | undefined;
 
     if (!quiz_id) {
         return (
@@ -217,6 +220,7 @@ export default function TrueOrFalseQuestions() {
                         pathname: "/tofq-answer",
                         params: {
                             quiz_id,
+                            quiz: JSON.stringify(selectedQuiz),
                         },
                     }}
                     asChild

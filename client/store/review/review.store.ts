@@ -6,6 +6,7 @@ import { createZustandAsyncStorage } from "../persistence";
 
 interface Review {
     quizzes: QuizDoc[];
+    userQuizzes: QuizDoc[];
 }
 
 // const useReview = create<Review>((_set) => ({ quizzes: [] }));
@@ -14,6 +15,7 @@ const useReview = create<Review>()(
     persist(
         (_set) => ({
             quizzes: [],
+            userQuizzes: [],
         }),
         {
             name: "review-storage",

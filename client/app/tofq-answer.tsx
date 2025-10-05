@@ -22,10 +22,13 @@ export default function TrueOrFalseQuestionsAns() {
     const [resultModalVisible, setResultModalVisible] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const params = useLocalSearchParams<{ quiz_id: string; quiz: string }>();
     const quiz_id = params.quiz_id;
+    const quiz = params.quiz;
     const quizzes = reviewSelector.use.useQuizzes();
-    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as TrueOrFalseQ | undefined;
+    const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
+        | TrueOrFalseQ
+        | undefined;
 
     const TOF_QUESTIONS = selectedQuiz?.questions || [];
 

@@ -25,7 +25,6 @@ export async function subscribeOtherConnection({
     }
 
     const userConnectionRef = doc(db, COL.USERS_DATA, selfUid, COL.CONNECTIONS, uid);
-    console.log("hello there");
     const userConnectionUnsub = onSnapshot(userConnectionRef, (snap) => {
         if (!snap) {
             console.log("invalid snap");

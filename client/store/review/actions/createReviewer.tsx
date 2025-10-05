@@ -4,7 +4,6 @@ import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE, QuizDoc } from "@/types/review";
 import { logEvent } from "@react-native-firebase/analytics";
 import { doc, setDoc } from "@react-native-firebase/firestore";
-import reviewSelector from "../review.store";
 
 export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
     const URL =
@@ -56,10 +55,6 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
         await setDoc(quizRef, quizDoc);
         console.log("quiz created.");
 
-        reviewSelector.setState((s) => ({
-            quizzes: [quizDoc, ...s.quizzes],
-        }));
-
         logEvent(analytics, "create_quiz", {
             quiz_type: quiz.type,
             question_count: quiz.questions.length,
@@ -69,7 +64,10 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
         console.log("reviewer created and saved!");
         return true;
     } catch (error) {
-        logEvent(analytics, "create_quiz_error", { quiz_type: type, error_message: (error as Error).message });
+        logEvent(analytics, "create_quiz_error", {
+            quiz_type: type,
+            error_message: (error as Error).message,
+        });
         throw error;
     }
 }

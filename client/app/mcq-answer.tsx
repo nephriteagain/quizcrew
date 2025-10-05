@@ -25,10 +25,13 @@ export default function MultipleChoiceQuestionsAns() {
 
     const [resultModalVisible, setResultModalVisible] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const params = useLocalSearchParams<{ quiz_id: string; quiz: string }>();
     const quiz_id = params.quiz_id;
+    const quiz = params.quiz;
     const quizzes = reviewSelector.use.useQuizzes();
-    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as MultipleChoiceQ | undefined;
+    const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
+        | MultipleChoiceQ
+        | undefined;
 
     const MULTIPLE_CHOICE_QUESTIONS = selectedQuiz?.questions || [];
 
