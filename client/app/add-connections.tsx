@@ -118,6 +118,8 @@ export default function AddConnections() {
         const { error } = await requestConnectionFn(uid);
         if (error) {
             Toast.error(error?.message);
+        } else {
+            Toast.success("Connected requested");
         }
         setSearchQuery("");
         setConnectionSearch([]);
@@ -130,6 +132,8 @@ export default function AddConnections() {
         const { error } = await rejectConnectionFn(uid);
         if (error) {
             Toast.error(error?.message);
+        } else {
+            Toast.success("Connection request rejected");
         }
         setSearchQuery("");
         setConnectionSearch([]);
@@ -140,6 +144,8 @@ export default function AddConnections() {
         const { error } = await approveConnectionFn(uid);
         if (error) {
             Toast.error(error?.message);
+        } else {
+            Toast.success("Connection request accepted");
         }
         setSearchQuery("");
         setConnectionSearch([]);
