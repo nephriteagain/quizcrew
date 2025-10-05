@@ -29,10 +29,13 @@ export default function DragAndDropQuiz() {
         setShowAnswer((previousState) => !previousState);
         setIndividualAnswers(new Set());
     };
-    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const params = useLocalSearchParams<{ quiz_id: string; quiz: string }>();
     const quiz_id = params.quiz_id;
+    const quiz = params.quiz;
     const quizzes = reviewSelector.use.useQuizzes();
-    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as DragAndDrop | undefined;
+    const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
+        | DragAndDrop
+        | undefined;
 
     const toggleIndividualAnswer = (questionIndex: number) => {
         setIndividualAnswers((prev) => {
@@ -254,6 +257,7 @@ export default function DragAndDropQuiz() {
                         pathname: "/dndq-answer",
                         params: {
                             quiz_id,
+                            quiz: JSON.stringify(selectedQuiz),
                         },
                     }}
                     asChild

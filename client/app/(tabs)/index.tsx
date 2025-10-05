@@ -26,6 +26,7 @@ export default function Index() {
                 pathname: "../mcq",
                 params: {
                     quiz_id: quiz.quiz_id,
+                    quiz: JSON.stringify(quiz),
                 },
             });
         } else if (quiz.type === QUIZ_TYPE.TOFQ) {
@@ -33,6 +34,7 @@ export default function Index() {
                 pathname: "../tofq",
                 params: {
                     quiz_id: quiz.quiz_id,
+                    quiz: JSON.stringify(quiz),
                 },
             });
         } else if (quiz.type === QUIZ_TYPE.DNDQ) {
@@ -40,6 +42,7 @@ export default function Index() {
                 pathname: "/dndq",
                 params: {
                     quiz_id: quiz.quiz_id,
+                    quiz: JSON.stringify(quiz),
                 },
             });
         }

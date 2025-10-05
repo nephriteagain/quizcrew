@@ -1,5 +1,6 @@
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
+import { subscribeAllQuizzes } from "@/store/review/actions/subscribeAllQuizzes";
 import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizzes";
 import { recommendConnections } from "@/store/user/actions/recommendConnections";
 import { subscribeAuthState } from "@/store/user/actions/subscribeAuthState";
@@ -30,13 +31,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         } else {
             utilsSelector.setState({ isLoading: false, loadingText: null });
             // fetch quizzes
-            const quizzesUnsub = subscribeUserQuizzes(user.uid);
+            const userQuizzesUnsub = subscribeUserQuizzes(user.uid);
             const userDataUnsub = subscribeUserData(user.uid);
             const connectionUnsub = subscribeConnections(user.uid);
             const groupUnsub = subscribeGroups(user.uid);
 
             unsub = () => {
-                quizzesUnsub();
+                userQuizzesUnsub();
                 userDataUnsub();
                 connectionUnsub();
                 groupUnsub();
@@ -46,6 +47,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             unsub?.();
         };
     }, [user?.uid]);
+
+    useEffectLogRoute(() => {
+        if (!user?.uid) return;
+        const allQuizUnsub = subscribeAllQuizzes(user.uid, connections);
+
+        return () => {
+            allQuizUnsub();
+        };
+    }, [user?.uid, connections]);
 
     useEffectLogRoute(() => {
         const unsub = subscribeAuthState();

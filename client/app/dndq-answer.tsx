@@ -41,10 +41,13 @@ type DropZone = {
 export default function DragAndDropQuizAns() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const params = useLocalSearchParams<{ quiz_id: string }>();
+    const params = useLocalSearchParams<{ quiz_id: string; quiz: string; }>();
     const quiz_id = params.quiz_id;
+    const quiz = params.quiz
     const quizzes = reviewSelector.use.useQuizzes();
-    const selectedQuiz = quizzes.find((q) => q.quiz_id === quiz_id) as DragAndDrop | undefined;
+    const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
+           | DragAndDrop
+           | undefined;
 
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);

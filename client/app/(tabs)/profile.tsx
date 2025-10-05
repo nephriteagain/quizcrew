@@ -32,7 +32,7 @@ import Svg, { Path } from "react-native-svg";
 export default function Profile() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const quizzes = reviewSelector.use.useQuizzes();
+    const quizzes = reviewSelector.use.useUserQuizzes();
     const userData = authSelector.use.useUserData();
     const user = authSelector.use.useUser();
     const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
@@ -56,6 +56,7 @@ export default function Profile() {
                 pathname: "../mcq",
                 params: {
                     quiz_id: quiz.quiz_id,
+                    quiz: JSON.stringify(quiz),
                 },
             });
         } else if (quiz.type === QUIZ_TYPE.TOFQ) {
@@ -63,6 +64,7 @@ export default function Profile() {
                 pathname: "../tofq",
                 params: {
                     quiz_id: quiz.quiz_id,
+                    quiz: JSON.stringify(quiz),
                 },
             });
         } else if (quiz.type === QUIZ_TYPE.DNDQ) {
@@ -70,6 +72,7 @@ export default function Profile() {
                 pathname: "/dndq",
                 params: {
                     quiz_id: quiz.quiz_id,
+                    quiz: JSON.stringify(quiz),
                 },
             });
         }
