@@ -1,4 +1,6 @@
 import { analytics, auth } from "@/firebase";
+import reviewSelector from "@/store/review/review.store";
+import utilsSelector from "@/store/utils/utils.store";
 import { logEvent } from "@react-native-firebase/analytics";
 import { signOut } from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -16,6 +18,16 @@ export async function logout() {
             userData: null,
             connections: [],
             groups: [],
+        });
+        reviewSelector.setState({
+            quizzes: [],
+            userQuizzes: [],
+        });
+        utilsSelector.setState({
+            isLoading: false,
+            loadingText: null,
+            isCreateUsernameModalShown: false,
+            isVerifyEmailModalShown: false,
         });
         logEvent(analytics, "logout", { method: loginMethod });
     } catch (error) {
