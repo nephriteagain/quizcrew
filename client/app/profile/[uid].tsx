@@ -16,7 +16,8 @@ import { ConnectionMeta, UserData } from "@/types/user";
 import { Unsubscribe } from "@react-native-firebase/firestore";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
 import { Toast } from "toastify-react-native";
 
 export default function Profile() {

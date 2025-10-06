@@ -1,10 +1,19 @@
 import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import * as Yup from "yup";
 
@@ -60,8 +69,8 @@ export default function ForgotPasswordScreen() {
                 }) => (
                     <KeyboardAvoidingView
                         style={styles.keyboardAvoidingView}
-                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
                     >
                         <ScrollView
                             contentContainerStyle={styles.scrollContent}
@@ -70,11 +79,15 @@ export default function ForgotPasswordScreen() {
                         >
                             <View style={styles.header}>
                                 <View style={styles.logoContainer}>
-                                    <Ionicons name="key" size={64} color={theme.colors.primary} />
+                                    <Image
+                                        source={require("@/assets/images/quiz-crew-icon.png")}
+                                        style={{ width: 144, height: 144 }}
+                                    />
                                 </View>
                                 <Text style={styles.title}>Forgot Password?</Text>
                                 <Text style={styles.subtitle}>
-                                    No worries! Enter your email address and we&apos;ll send you a link to reset your password.
+                                    No worries! Enter your email address and we&apos;ll send you a
+                                    link to reset your password.
                                 </Text>
                             </View>
 
@@ -101,7 +114,10 @@ export default function ForgotPasswordScreen() {
                                 <Button
                                     mode="contained"
                                     onPress={() => handleSubmit()}
-                                    style={[styles.submitButton, (!isValid || isSubmitted) && styles.disabledButton]}
+                                    style={[
+                                        styles.submitButton,
+                                        (!isValid || isSubmitted) && styles.disabledButton,
+                                    ]}
                                     contentStyle={styles.submitButtonContent}
                                     labelStyle={styles.submitButtonLabel}
                                     disabled={!isValid || isSubmitted}
@@ -132,7 +148,9 @@ export default function ForgotPasswordScreen() {
                                         <View style={styles.supportContent}>
                                             <Text style={styles.supportTitle}>Need help?</Text>
                                             <Text style={styles.supportText}>
-                                                If you&apos;re having trouble receiving the reset email, check your spam folder or contact our support team.
+                                                If you&apos;re having trouble receiving the reset
+                                                email, check your spam folder or contact our support
+                                                team.
                                             </Text>
                                         </View>
                                     </View>
@@ -179,6 +197,7 @@ const makeStyles = (theme: AppTheme) => {
             shadowOpacity: 0.1,
             shadowRadius: 8,
             elevation: 6,
+            overflow: "hidden",
         },
         title: {
             fontSize: 32,

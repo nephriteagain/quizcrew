@@ -4,7 +4,8 @@ import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Connection, ConnectionStatus } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { logEvent } from "@react-native-firebase/analytics";
-import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "expo-image";
 
 interface ConnectionCardProps {
     connection: Connection;

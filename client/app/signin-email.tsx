@@ -2,7 +2,7 @@ import Container from "@/components/Container";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { signinEmail } from "@/store/user/actions/signinEmail";
-import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Formik } from "formik";
 import { useState } from "react";
@@ -70,7 +70,10 @@ export default function SigninEmail() {
                         >
                             <View style={styles.header}>
                                 <View style={styles.logoContainer}>
-                                    <Ionicons name="mail" size={64} color={theme.colors.primary} />
+                                    <Image
+                                        source={require("@/assets/images/quiz-crew-icon.png")}
+                                        style={{ width: 144, height: 144 }}
+                                    />
                                 </View>
                                 <Text style={styles.title}>Welcome Back</Text>
                                 <Text style={styles.subtitle}>
@@ -190,6 +193,7 @@ const makeStyles = (theme: AppTheme) => {
             shadowOpacity: 0.1,
             shadowRadius: 8,
             elevation: 6,
+            overflow: "hidden",
         },
         title: {
             fontSize: 32,

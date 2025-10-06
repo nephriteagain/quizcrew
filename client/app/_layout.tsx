@@ -57,7 +57,7 @@ function RootLayoutContent() {
                     <Stack.Protected guard={Boolean(user)}>
                         <Stack.Screen
                             name="(tabs)"
-                            options={{ headerShown: true, title: "QuizCraft" }}
+                            options={{ headerShown: true, title: "QuizCrew" }}
                         />
                         <Stack.Screen name="+not-found" options={{ headerShown: false }} />
                         <Stack.Screen
@@ -179,10 +179,13 @@ function RootLayoutContent() {
 
                     {/* Authentication */}
                     <Stack.Protected guard={!user}>
-                        <Stack.Screen name="signin" options={{ headerTitle: "Sign In" }} />
+                        <Stack.Screen
+                            name="signin"
+                            options={{ headerTitle: "", headerShown: false }}
+                        />
                         <Stack.Screen
                             name="signup"
-                            options={{ headerTitle: "Sign Up", headerShown: false }}
+                            options={{ headerTitle: "", headerShown: false }}
                         />
                         <Stack.Screen name="signup-email" options={{ headerTitle: "" }} />
                         <Stack.Screen name="signin-email" options={{ headerTitle: "" }} />

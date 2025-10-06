@@ -16,18 +16,26 @@ function GoogleSignupBtn({
     isLoading = false,
     setIsLoading,
     disabled = false,
+    onTermsNotAccepted,
 }: {
     type?: "long" | "short";
     variant?: "signup" | "signin";
     isLoading?: boolean;
     setIsLoading?: Dispatch<SetStateAction<boolean>>;
     disabled?: boolean;
+    onTermsNotAccepted?: () => void;
 }) {
     //   const isLogginIn = termsSelector.use.isLoggingIn?.();
     const theme = useAppTheme();
     const styles = makeStyles(theme);
 
     const signInWithGoogle = async () => {
+        // Check if terms callback exists and trigger it
+        if (onTermsNotAccepted) {
+            onTermsNotAccepted();
+            return;
+        }
+
         try {
             setIsLoading?.(true);
             const hasPlay = await GoogleSignin.hasPlayServices({
