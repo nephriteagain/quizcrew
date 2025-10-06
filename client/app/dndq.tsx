@@ -1,12 +1,29 @@
 import Container from "@/components/Container";
+import SettingsBottomSheet from "@/components/SettingsBottomSheet";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
 import { DragAndDrop } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
-import Animated, { FadeInLeft, FadeOutLeft, LinearTransition } from "react-native-reanimated";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { Link, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
+import {
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import Animated, {
+    FadeInLeft,
+    FadeOutLeft,
+    LinearTransition,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated";
 
 // Color palette for matching choices and answers
 const colors = [
@@ -23,6 +40,8 @@ const colors = [
 export default function DragAndDropQuiz() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
+    const navigation = useNavigation();
+
     const [showAnswer, setShowAnswer] = useState(false);
     const [individualAnswers, setIndividualAnswers] = useState<Set<number>>(new Set());
     const toggleSwitch = () => {
@@ -54,6 +73,69 @@ export default function DragAndDropQuiz() {
         const answerIndex = selectedQuiz.answers.indexOf(answer);
         return colors[answerIndex % colors.length];
     };
+
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const rotation = useSharedValue(0);
+    // callbacks
+    const handleSheetChanges = (index: number) => {
+        if (index === -1) {
+            // Bottom sheet is closing - spin back
+            rotation.value = withTiming(0, { duration: 1_000 });
+            // setQuizId(null);
+        } else {
+            // Bottom sheet is opening - spin forward
+            rotation.value = withTiming(360, { duration: 1_000 });
+        }
+    };
+
+    const handleSettingsPress = (quiz_id: string) => {
+        bottomSheetRef.current?.expand();
+    };
+
+    const animatedIconStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ rotate: `${rotation.value}deg` }],
+        };
+    });
+
+    useFocusEffect(
+        useCallback(() => {
+            navigation.setOptions({
+                headerRight: () => (
+                    <TouchableOpacity
+                        onPress={() => {
+                            if (quiz_id) {
+                                handleSettingsPress(quiz_id);
+                            }
+                        }}
+                    >
+                        <Animated.View style={animatedIconStyle}>
+                            <Ionicons
+                                name="settings-sharp"
+                                size={24}
+                                color={theme.colors.onSurface}
+                            />
+                        </Animated.View>
+                    </TouchableOpacity>
+                ),
+            });
+            return () => {
+                navigation.setOptions({
+                    headerRight: () => (
+                        <TouchableOpacity>
+                            <Animated.View style={animatedIconStyle}>
+                                <Ionicons
+                                    name="settings-sharp"
+                                    size={24}
+                                    color={theme.colors.onSurface}
+                                />
+                            </Animated.View>
+                        </TouchableOpacity>
+                    ),
+                });
+            };
+        }, [navigation, theme, animatedIconStyle, quiz_id])
+    );
 
     if (!quiz_id) {
         return (
@@ -275,6 +357,11 @@ export default function DragAndDropQuiz() {
                     </Pressable>
                 </Link>
             </View>
+            <SettingsBottomSheet
+                ref={bottomSheetRef}
+                quiz={selectedQuiz}
+                onSheetChanges={handleSheetChanges}
+            />
         </Container>
     );
 }

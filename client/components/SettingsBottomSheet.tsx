@@ -1,7 +1,7 @@
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { deleteQuiz } from "@/store/review/actions/deleteQuiz";
-import { QuizDoc } from "@/types/review";
+import { DragAndDrop, MultipleChoiceQ, TrueOrFalseQ } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
@@ -10,13 +10,12 @@ import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
 import LoadingModal from "./LoadingModal";
 
 interface SettingsBottomSheetProps {
-    reviews: QuizDoc[];
-    quizId: string | null;
     onSheetChanges: (index: number) => void;
+    quiz: MultipleChoiceQ | TrueOrFalseQ | DragAndDrop;
 }
 
 const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
-    ({ reviews, quizId, onSheetChanges }, ref) => {
+    ({ onSheetChanges, quiz }, ref) => {
         const theme = useAppTheme();
         const styles = makeStyles(theme);
         const router = useRouter();
@@ -52,7 +51,6 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
 
         const handleDeleteQuiz = () => {
             console.log("delete");
-            const quiz = reviews.find((q) => q.quiz_id === quizId);
             if (!quiz) return;
             Alert.alert(
                 "Delete Quiz",

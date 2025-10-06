@@ -1,54 +1,22 @@
 import CreateUsernameModal from "@/components/CreateUsernameModal";
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
-import SettingsBottomSheet from "@/components/SettingsBottomSheet";
 import VerifyEmailModal from "@/components/VerifyEmailModal";
 import { useLogScreen } from "@/hooks/useLogScreen";
 import AuthProvider from "@/providers/AuthProvider";
 import ThemeProvider, { useAppTheme } from "@/providers/ThemeProvider";
-import reviewSelector from "@/store/review/review.store";
 import authSelector from "@/store/user/user.store";
 import { Ionicons } from "@expo/vector-icons";
-import BottomSheet from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
-import { useRef, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import ToastManager from "toastify-react-native";
 
 function RootLayoutContent() {
     useLogScreen();
 
-    const [quizId, setQuizId] = useState<string | null>(null);
     const theme = useAppTheme();
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const reviews = reviewSelector.use.useQuizzes();
-    const rotation = useSharedValue(0);
 
     const user = authSelector.use.useUser();
-
-    // callbacks
-    const handleSheetChanges = (index: number) => {
-        if (index === -1) {
-            // Bottom sheet is closing - spin back
-            rotation.value = withTiming(0, { duration: 1_000 });
-            setQuizId(null);
-        } else {
-            // Bottom sheet is opening - spin forward
-            rotation.value = withTiming(360, { duration: 1_000 });
-        }
-    };
-
-    const handleSettingsPress = (quiz_id: string) => {
-        bottomSheetRef.current?.expand();
-        setQuizId(quiz_id);
-    };
-
-    const animatedIconStyle = useAnimatedStyle(() => {
-        return {
-            transform: [{ rotate: `${rotation.value}deg` }],
-        };
-    });
 
     return (
         <AuthProvider>
@@ -70,26 +38,17 @@ function RootLayoutContent() {
                         />
                         <Stack.Screen
                             name="mcq"
-                            options={(props) => ({
+                            options={() => ({
                                 headerTitle: "Multiple Choice Quiz",
                                 headerRight: () => (
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            const quiz_id = (
-                                                props.route.params as { quiz_id?: string }
-                                            )?.quiz_id;
-                                            if (quiz_id) {
-                                                handleSettingsPress(quiz_id);
-                                            }
-                                        }}
-                                    >
-                                        <Animated.View style={animatedIconStyle}>
+                                    <TouchableOpacity>
+                                        <View>
                                             <Ionicons
                                                 name="settings-sharp"
                                                 size={24}
                                                 color={theme.colors.onSurface}
                                             />
-                                        </Animated.View>
+                                        </View>
                                     </TouchableOpacity>
                                 ),
                             })}
@@ -99,23 +58,14 @@ function RootLayoutContent() {
                             options={(props) => ({
                                 headerTitle: "True or False Quiz",
                                 headerRight: () => (
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            const quiz_id = (
-                                                props.route.params as { quiz_id?: string }
-                                            )?.quiz_id;
-                                            if (quiz_id) {
-                                                handleSettingsPress(quiz_id);
-                                            }
-                                        }}
-                                    >
-                                        <Animated.View style={animatedIconStyle}>
+                                    <TouchableOpacity>
+                                        <View>
                                             <Ionicons
                                                 name="settings-sharp"
                                                 size={24}
                                                 color={theme.colors.onSurface}
                                             />
-                                        </Animated.View>
+                                        </View>
                                     </TouchableOpacity>
                                 ),
                             })}
@@ -129,23 +79,14 @@ function RootLayoutContent() {
                             options={(props) => ({
                                 headerTitle: "Drag and Drop Quiz",
                                 headerRight: () => (
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            const quiz_id = (
-                                                props.route.params as { quiz_id?: string }
-                                            )?.quiz_id;
-                                            if (quiz_id) {
-                                                handleSettingsPress(quiz_id);
-                                            }
-                                        }}
-                                    >
-                                        <Animated.View style={animatedIconStyle}>
+                                    <TouchableOpacity>
+                                        <View>
                                             <Ionicons
                                                 name="settings-sharp"
                                                 size={24}
                                                 color={theme.colors.onSurface}
                                             />
-                                        </Animated.View>
+                                        </View>
                                     </TouchableOpacity>
                                 ),
                             })}
@@ -211,12 +152,6 @@ function RootLayoutContent() {
                     />
                 </Stack>
                 <GlobalLoadingModal />
-                <SettingsBottomSheet
-                    ref={bottomSheetRef}
-                    reviews={reviews}
-                    quizId={quizId}
-                    onSheetChanges={handleSheetChanges}
-                />
                 <CreateUsernameModal />
                 <VerifyEmailModal />
                 <ToastManager />
