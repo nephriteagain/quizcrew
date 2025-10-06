@@ -6,7 +6,7 @@ import Container from "@/components/Container";
 import SettingsBottomSheet from "@/components/SettingsBottomSheet";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
-import { MultipleChoiceQ } from "@/types/review";
+import { MultipleChoiceQDoc } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Link, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
@@ -47,7 +47,7 @@ export default function MultipleChoiceQuestions() {
     const quiz = params.quiz;
     const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
-        | MultipleChoiceQ
+        | MultipleChoiceQDoc
         | undefined;
 
     const bottomSheetRef = useRef<BottomSheet>(null);
