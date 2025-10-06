@@ -59,7 +59,7 @@ export type Quiz = MultipleChoiceQ | TrueOrFalseQ | DragAndDrop;
 export type QuizDocStatus = "LIVE" | "DELETED";
 export type QuizDocPrivacy = "ALL" | "FRIENDS_ONLY" | "JUST_ME";
 
-export type QuizDoc = Quiz & {
+type QuizDocExtraField = {
     createdBy: string | null;
     status: QuizDocStatus;
     privacy: QuizDocPrivacy;
@@ -68,5 +68,11 @@ export type QuizDoc = Quiz & {
     /** if quiz is shared in a group, used along with QuizDocPrivacy(ALL) */
     gids?: string[];
 };
+
+export type QuizDoc = Quiz & QuizDocExtraField;
+
+export type MultipleChoiceQDoc = MultipleChoiceQ & QuizDocExtraField;
+export type TrueOrFalseQDoc = TrueOrFalseQ & QuizDocExtraField;
+export type DragAndDropDoc = DragAndDrop & QuizDocExtraField;
 
 export type QuizDocWithUserData = QuizDoc & { userData: UserData | null };

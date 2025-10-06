@@ -1,7 +1,8 @@
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { deleteQuiz } from "@/store/review/actions/deleteQuiz";
-import { DragAndDrop, MultipleChoiceQ, TrueOrFalseQ } from "@/types/review";
+import authSelector from "@/store/user/user.store";
+import { QuizDoc } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
@@ -11,11 +12,12 @@ import LoadingModal from "./LoadingModal";
 
 interface SettingsBottomSheetProps {
     onSheetChanges: (index: number) => void;
-    quiz: MultipleChoiceQ | TrueOrFalseQ | DragAndDrop;
+    quiz: QuizDoc;
 }
 
 const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
     ({ onSheetChanges, quiz }, ref) => {
+        const user = authSelector.use.useUser();
         const theme = useAppTheme();
         const styles = makeStyles(theme);
         const router = useRouter();
@@ -72,6 +74,8 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
             );
         };
 
+        const isOwner = user?.uid === quiz.createdBy;
+
         return (
             <>
                 <BottomSheet
@@ -90,14 +94,16 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
                     <BottomSheetView style={styles.contentContainer}>
                         <Text style={styles.headerTitle}>Quiz Settings</Text>
 
-                        <TouchableOpacity style={styles.settingButton} onPress={handleEditQuiz}>
-                            <Ionicons
-                                name="create-outline"
-                                size={24}
-                                color={theme.colors.primary}
-                            />
-                            <Text style={styles.settingButtonText}>Edit Quiz</Text>
-                        </TouchableOpacity>
+                        {isOwner && (
+                            <TouchableOpacity style={styles.settingButton} onPress={handleEditQuiz}>
+                                <Ionicons
+                                    name="create-outline"
+                                    size={24}
+                                    color={theme.colors.primary}
+                                />
+                                <Text style={styles.settingButtonText}>Edit Quiz</Text>
+                            </TouchableOpacity>
+                        )}
 
                         <TouchableOpacity style={styles.settingButton} onPress={handleShareQuiz}>
                             <Ionicons
@@ -115,12 +121,26 @@ const SettingsBottomSheet = forwardRef<BottomSheet, SettingsBottomSheetProps>(
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.settingButton} onPress={handleDeleteQuiz}>
-                            <Ionicons name="trash-outline" size={24} color={theme.colors.error} />
-                            <Text style={[styles.settingButtonText, { color: theme.colors.error }]}>
-                                Delete Quiz
-                            </Text>
-                        </TouchableOpacity>
+                        {isOwner && (
+                            <TouchableOpacity
+                                style={styles.settingButton}
+                                onPress={handleDeleteQuiz}
+                            >
+                                <Ionicons
+                                    name="trash-outline"
+                                    size={24}
+                                    color={theme.colors.error}
+                                />
+                                <Text
+                                    style={[
+                                        styles.settingButtonText,
+                                        { color: theme.colors.error },
+                                    ]}
+                                >
+                                    Delete Quiz
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                     </BottomSheetView>
                 </BottomSheet>
                 <LoadingModal isVisible={isLoading} loadingText="Deleting Quiz..." />

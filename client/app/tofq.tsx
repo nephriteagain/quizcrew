@@ -2,7 +2,7 @@ import Container from "@/components/Container";
 import SettingsBottomSheet from "@/components/SettingsBottomSheet";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import reviewSelector from "@/store/review/review.store";
-import { TrueOrFalseQ } from "@/types/review";
+import { TrueOrFalseQDoc } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
@@ -46,7 +46,7 @@ export default function TrueOrFalseQuestions() {
     const quiz = params.quiz;
     const quizzes = reviewSelector.use.useQuizzes();
     const selectedQuiz = (quizzes.find((q) => q.quiz_id === quiz_id) || JSON.parse(quiz)) as
-        | TrueOrFalseQ
+        | TrueOrFalseQDoc
         | undefined;
 
     const bottomSheetRef = useRef<BottomSheet>(null);
