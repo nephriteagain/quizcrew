@@ -12,7 +12,7 @@ import {
     query,
     where,
 } from "@react-native-firebase/firestore";
-import { cloneDeep } from "lodash";
+import { cloneDeep, uniqBy } from "lodash";
 import authSelector from "../user.store";
 
 export async function recommendConnections() {
@@ -72,7 +72,7 @@ export async function recommendConnections() {
     const connectionData: Connection[] = userDataDocs.map((u) => ({ data: u, meta: null }));
     // save to store
     authSelector.setState({
-        recommendedConnections: connectionData,
+        recommendedConnections: uniqBy(connectionData, "uid"),
     });
     return connectionData;
 }
