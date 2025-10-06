@@ -1,7 +1,8 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Image } from "expo-image";
 import { Text } from "react-native-paper";
 
 export interface GroupCardProps extends Group {

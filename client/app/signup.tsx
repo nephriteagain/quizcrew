@@ -3,17 +3,42 @@ import GoogleSignupBtn from "@/components/GoogleSignupBtn";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { anonSignin } from "@/store/user/actions/anonSignin";
-import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Button, Checkbox } from "react-native-paper";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSequence,
+    withTiming,
+} from "react-native-reanimated";
 
 export default function SignUpScreen() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const [isTermsAccepted, setIsTermsAccepted] = useState(false);
     const [googleSigninLoading, setGoogleSigninLoading] = useState(false);
+
+    // Shake animation
+    const shakeTranslateX = useSharedValue(0);
+
+    const shakeAnimatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ translateX: shakeTranslateX.value }],
+        };
+    });
+
+    const triggerShake = () => {
+        shakeTranslateX.value = withSequence(
+            withTiming(-10, { duration: 50 }),
+            withTiming(10, { duration: 50 }),
+            withTiming(-10, { duration: 50 }),
+            withTiming(10, { duration: 50 }),
+            withTiming(0, { duration: 50 })
+        );
+    };
 
     const [signUpAsGuest, { isLoading }] = useAsyncAction(anonSignin, {
         onComplete: () => {
@@ -30,6 +55,7 @@ export default function SignUpScreen() {
 
     const handleSignUpAsGuest = () => {
         if (!isTermsAccepted) {
+            triggerShake();
             Alert.alert(
                 "Terms Required",
                 "You must agree to the Terms of Service and Privacy Policy to continue.",
@@ -52,9 +78,12 @@ export default function SignUpScreen() {
                 {/* Header Section */}
                 <View style={styles.header}>
                     <View style={styles.logoContainer}>
-                        <Ionicons name="library" size={64} color={theme.colors.primary} />
+                        <Image
+                            source={require("@/assets/images/quiz-crew-icon.png")}
+                            style={{ width: 144, height: 144 }}
+                        />
                     </View>
-                    <Text style={styles.title}>Welcome to QuizCraft</Text>
+                    <Text style={styles.title}>Welcome to QuizCrew</Text>
                     <Text style={styles.subtitle}>
                         Create, share, and take quizzes with friends and colleagues
                     </Text>
@@ -81,6 +110,18 @@ export default function SignUpScreen() {
                         isLoading={googleSigninLoading}
                         setIsLoading={setGoogleSigninLoading}
                         disabled={hasLoading}
+                        onTermsNotAccepted={
+                            !isTermsAccepted
+                                ? () => {
+                                      triggerShake();
+                                      Alert.alert(
+                                          "Terms Required",
+                                          "You must agree to the Terms of Service and Privacy Policy to continue.",
+                                          [{ text: "OK" }]
+                                      );
+                                  }
+                                : undefined
+                        }
                     />
                     <Button
                         mode="contained"
@@ -89,7 +130,7 @@ export default function SignUpScreen() {
                         contentStyle={styles.signUpButtonContent}
                         labelStyle={styles.signUpButtonLabel}
                         loading={isLoading}
-                        disabled={hasLoading || !isTermsAccepted}
+                        disabled={hasLoading}
                         buttonColor={theme.colors.primary}
                         textColor={theme.colors.onPrimary}
                     >
@@ -97,7 +138,7 @@ export default function SignUpScreen() {
                     </Button>
 
                     <Text style={styles.guestDescription}>
-                        Start using QuizCraft immediately as a guest user. You can upgrade your
+                        Start using QuizCrew immediately as a guest user. You can upgrade your
                         account later.
                     </Text>
 
@@ -110,7 +151,7 @@ export default function SignUpScreen() {
                 </View>
 
                 {/* Terms and Privacy Section */}
-                <View style={styles.termsSection}>
+                <Animated.View style={[styles.termsSection, shakeAnimatedStyle]}>
                     <TouchableOpacity
                         style={styles.checkboxContainer}
                         onPress={() => setIsTermsAccepted(!isTermsAccepted)}
@@ -135,7 +176,7 @@ export default function SignUpScreen() {
                             </Text>
                         </View>
                     </TouchableOpacity>
-                </View>
+                </Animated.View>
             </ScrollView>
         </Container>
     );
@@ -171,6 +212,7 @@ const makeStyles = (theme: AppTheme) => {
             shadowOpacity: 0.1,
             shadowRadius: 8,
             elevation: 6,
+            overflow: "hidden",
         },
         title: {
             fontSize: 32,

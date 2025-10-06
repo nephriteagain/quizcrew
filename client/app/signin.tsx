@@ -1,35 +1,19 @@
 import Container from "@/components/Container";
 import GoogleSignupBtn from "@/components/GoogleSignupBtn";
-import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
-import { anonSignin } from "@/store/user/actions/anonSignin";
-import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-paper";
 
 export default function SignInScreen() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
 
-    const [signInAsGuest, { isLoading }] = useAsyncAction(anonSignin, {
-        onComplete: () => {
-            // Navigation will be handled by AuthProvider automatically
-        },
-        onError: (error) => {
-            Alert.alert("Sign In Failed", "We couldn't sign you in. Please try again.", [
-                { text: "OK" },
-            ]);
-        },
-    });
     const [googleSigninLoading, setGoogleSigninLoading] = useState(false);
 
-    const handleSignInAsGuest = () => {
-        signInAsGuest();
-    };
-
-    const hasLoading = isLoading || googleSigninLoading;
+    const hasLoading = googleSigninLoading;
 
     return (
         <Container style={styles.container}>
@@ -40,10 +24,13 @@ export default function SignInScreen() {
                 {/* Header Section */}
                 <View style={styles.header}>
                     <View style={styles.logoContainer}>
-                        <Ionicons name="library" size={64} color={theme.colors.primary} />
+                        <Image
+                            source={require("@/assets/images/quiz-crew-icon.png")}
+                            style={{ width: 144, height: 144 }}
+                        />
                     </View>
                     <Text style={styles.title}>Welcome Back</Text>
-                    <Text style={styles.subtitle}>Sign in to continue your QuizCraft journey</Text>
+                    <Text style={styles.subtitle}>Sign in to continue your QuizCrew journey</Text>
                 </View>
 
                 {/* Sign In Section */}
@@ -54,7 +41,7 @@ export default function SignInScreen() {
                             style={styles.signInButton}
                             contentStyle={styles.signInButtonContent}
                             labelStyle={styles.signInButtonLabel}
-                            disabled={isLoading}
+                            disabled={hasLoading}
                             buttonColor={theme.colors.primary}
                             textColor={theme.colors.onPrimary}
                         >
@@ -68,22 +55,8 @@ export default function SignInScreen() {
                         setIsLoading={setGoogleSigninLoading}
                         disabled={hasLoading}
                     />
-                    <Button
-                        mode="contained"
-                        onPress={handleSignInAsGuest}
-                        style={styles.signInButton}
-                        contentStyle={styles.signInButtonContent}
-                        labelStyle={styles.signInButtonLabel}
-                        loading={isLoading}
-                        disabled={hasLoading}
-                        buttonColor={theme.colors.primary}
-                        textColor={theme.colors.onPrimary}
-                    >
-                        {isLoading ? "Signing In..." : "Continue as Guest"}
-                    </Button>
-
                     <Text style={styles.guestDescription}>
-                        Access QuizCraft immediately without creating an account.
+                        Access QuizCrew immediately without creating an account.
                     </Text>
 
                     <Text style={styles.guestDescription}>
@@ -107,6 +80,7 @@ const makeStyles = (theme: AppTheme) => {
             flexGrow: 1,
             paddingHorizontal: 24,
             paddingVertical: 32,
+            justifyContent: "space-around",
         },
         header: {
             alignItems: "center",
@@ -128,6 +102,7 @@ const makeStyles = (theme: AppTheme) => {
             shadowOpacity: 0.1,
             shadowRadius: 8,
             elevation: 6,
+            overflow: "hidden",
         },
         title: {
             fontSize: 32,
