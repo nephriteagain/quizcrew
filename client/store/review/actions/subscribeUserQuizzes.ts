@@ -17,6 +17,7 @@ export function subscribeUserQuizzes(uid: string) {
         if (!snap) return;
         const quizzes = snap.docs.map((d) => d.data()) as QuizDoc[];
         // save quizzes to store
+        console.log("total user quizzes:", quizzes.length);
         reviewSelector.setState({
             userQuizzes: quizzes,
         });

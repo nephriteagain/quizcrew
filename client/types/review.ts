@@ -1,4 +1,5 @@
 import { Timestamp } from "@react-native-firebase/firestore";
+import { UserData } from "./user";
 
 export enum QUIZ_TYPE {
     MCQ = "MCQ",
@@ -67,3 +68,5 @@ export type QuizDoc = Quiz & {
     /** if quiz is shared in a group, used along with QuizDocPrivacy(ALL) */
     gids?: string[];
 };
+
+export type QuizDocWithUserData = QuizDoc & { userData: UserData | null };

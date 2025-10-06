@@ -26,23 +26,23 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const [recommendConnectionsFn] = useAsyncAction(recommendConnections);
 
     useEffectLogRoute(() => {
+        if (!user?.uid) return;
         let unsub: () => void | undefined;
-        if (!user?.uid) {
-        } else {
-            utilsSelector.setState({ isLoading: false, loadingText: null });
-            // fetch quizzes
-            const userQuizzesUnsub = subscribeUserQuizzes(user.uid);
-            const userDataUnsub = subscribeUserData(user.uid);
-            const connectionUnsub = subscribeConnections(user.uid);
-            const groupUnsub = subscribeGroups(user.uid);
 
-            unsub = () => {
-                userQuizzesUnsub();
-                userDataUnsub();
-                connectionUnsub();
-                groupUnsub();
-            };
-        }
+        utilsSelector.setState({ isLoading: false, loadingText: null });
+        // fetch quizzes
+        const userQuizzesUnsub = subscribeUserQuizzes(user.uid);
+        const userDataUnsub = subscribeUserData(user.uid);
+        const connectionUnsub = subscribeConnections(user.uid);
+        const groupUnsub = subscribeGroups(user.uid);
+
+        unsub = () => {
+            userQuizzesUnsub();
+            userDataUnsub();
+            connectionUnsub();
+            groupUnsub();
+        };
+
         return () => {
             unsub?.();
         };
