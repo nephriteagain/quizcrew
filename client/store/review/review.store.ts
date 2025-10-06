@@ -1,11 +1,11 @@
-import { QuizDoc } from "@/types/review";
+import { QuizDoc, QuizDocWithUserData } from "@/types/review";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { createSelectors } from "../createSelector";
 import { createZustandAsyncStorage } from "../persistence";
 
 interface Review {
-    quizzes: QuizDoc[];
+    quizzes: QuizDocWithUserData[];
     userQuizzes: QuizDoc[];
 }
 

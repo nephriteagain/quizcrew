@@ -1,15 +1,19 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
+import { UserData } from "@/types/user";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Pressable, PressableProps, StyleSheet, Text, View } from "react-native";
+import { Pressable, PressableProps, StyleSheet, View } from "react-native";
+import { Avatar, Text } from "react-native-paper";
 
 type QuizCardProps = {
-    quiz: Quiz;
+    quiz: Quiz & { userData?: UserData | null };
 } & PressableProps;
 
 export default function QuizCard({ quiz, ...props }: QuizCardProps) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
+    const router = useRouter();
 
     // Format timestamp to readable date
     const formatDate = (timestamp: number) => {
@@ -94,7 +98,36 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
                     </Text>
                 </View>
             </View>
-
+            {quiz.userData && (
+                <Pressable
+                    onPress={() => {
+                        if (!quiz.userData?.uid) return;
+                        router.push({
+                            pathname: "/profile/[uid]",
+                            params: { uid: quiz.userData.uid },
+                        });
+                    }}
+                    hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        columnGap: 6,
+                        paddingTop: 4,
+                    }}
+                >
+                    {quiz.userData.photoURL ? (
+                        <Avatar.Image source={{ uri: quiz.userData.photoURL }} size={24} />
+                    ) : (
+                        <Avatar.Text
+                            label={quiz.userData.username?.[0] ?? "Q"}
+                            size={24}
+                            color={theme.colors?.onPrimary}
+                            labelStyle={{ fontSize: 18 }}
+                        />
+                    )}
+                    <Text variant="labelMedium">{quiz.userData.username}</Text>
+                </Pressable>
+            )}
             <Text style={styles.description} numberOfLines={3}>
                 {quiz.description}
             </Text>
@@ -142,7 +175,6 @@ const makeStyles = (theme: AppTheme) => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "flex-start",
-            marginBottom: 8,
         },
         title: {
             fontSize: 16,
@@ -179,6 +211,7 @@ const makeStyles = (theme: AppTheme) => {
             color: theme.colors.onSurfaceVariant,
             lineHeight: 18,
             flex: 1,
+            paddingTop: 8,
         },
         footer: {
             marginTop: 8,

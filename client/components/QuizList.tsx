@@ -1,5 +1,6 @@
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
+import { UserData } from "@/types/user";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
 import React from "react";
 import { RefreshControl, StyleSheet, Text, View } from "react-native";
@@ -19,7 +20,7 @@ type FlashListPropsFiltered = Omit<
 >;
 
 type QuizListProps = {
-    quizzes: Quiz[];
+    quizzes: (Quiz & { userData?: UserData | null })[];
     onQuizPress?: (quiz: Quiz) => void;
     emptyMessage?: string;
     isLoading?: boolean;
@@ -48,7 +49,7 @@ export default function QuizList({
 >) {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
-    const renderQuizCard = ({ item }: { item: Quiz }) => (
+    const renderQuizCard = ({ item }: { item: Quiz & { userData?: UserData | null } }) => (
         <QuizCard quiz={item} onPress={() => onQuizPress?.(item)} />
     );
 
