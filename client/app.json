@@ -8,12 +8,21 @@
     "scheme": "quiz-crew",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/7f65790f-a0ec-466d-a87c-b596668cdfd8",
+      "requestHeaders": {
+        "expo-runtime-version": "1.0.0",
+        "expo-channel-name": "production"
+      }
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nephritesoftware.quizcrew",
       "googleServicesFile": "GoogleService-Info.plist"
     },
     "android": {
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/quiz-crew-icon.png",
         "backgroundColor": "#ffffff"
@@ -73,10 +82,7 @@
         "projectId": "7f65790f-a0ec-466d-a87c-b596668cdfd8"
       }
     },
-    "owner": "nephrite-software",
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/7f65790f-a0ec-466d-a87c-b596668cdfd8",
-    }
+    "owner": "nephrite-software"
+
   }
 }

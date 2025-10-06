@@ -2198,7 +2198,7 @@
   dependencies:
     merge-options "^3.0.4"
 
-"@react-native-firebase/analytics@^23.4.0":
+"@react-native-firebase/analytics@^23.3.1":
   version "23.4.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/analytics/-/analytics-23.4.0.tgz#8d7545db1b27fe4b26ffb1dfd6a30d2c9de3d25a"
   integrity sha512-heLX46ykjw+DNO3hQcJoXFelvnyx5sDEzyMdJjlQRKwOFlcPlnCArIxvgz8tm57RrNe/eohY+h4sKyIJqzoSZQ==
@@ -2219,7 +2219,7 @@
   dependencies:
     plist "^3.1.0"
 
-"@react-native-firebase/crashlytics@^23.4.0":
+"@react-native-firebase/crashlytics@^23.3.0":
   version "23.4.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/crashlytics/-/crashlytics-23.4.0.tgz#55913eaced726b42d24c71c29e4ae62dc94e4324"
   integrity sha512-R8NHA43S+Gy7IS9xmYU7ILo4crkD/L/d4GIDIZTdWJoL6OmPN52EoSBdgXW9ssDVBlNfEfQqmACp+KThTVEzXQ==
@@ -4548,10 +4548,10 @@ expo-updates-interface@~2.0.0:
   resolved "https://registry.yarnpkg.com/expo-updates-interface/-/expo-updates-interface-2.0.0.tgz#7721cb64c37bcb46b23827b2717ef451a9378749"
   integrity sha512-pTzAIufEZdVPKql6iMi5ylVSPqV1qbEopz9G6TSECQmnNde2nwq42PxdFBaUEd8IZJ/fdJLQnOT3m6+XJ5s7jg==
 
-expo-updates@~29.0.11:
-  version "29.0.11"
-  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-29.0.11.tgz#d9bdc8676f563330461f7950fa504dd4bb48aafc"
-  integrity sha512-zD7Zxe3P61WA6fyTdKRckmTFr7h/0BaSSD+Ssr73YiOLOak7GJUb19B+ysADjJP1L0IIOUR9U/UkMLv0r8k9dA==
+expo-updates@~29.0.12:
+  version "29.0.12"
+  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-29.0.12.tgz#cb43a20a6d32426694d414a2551f7300a4f75631"
+  integrity sha512-gE3bU6qi5g8Y1TtBzoeHac3utR0i1Wj1ufThh+zpDyFjFbegFm+gwvNLVCBagZUClYKk/4CKxh5ytnwZmPzH+g==
   dependencies:
     "@expo/code-signing-certificates" "0.0.5"
     "@expo/plist" "^0.4.7"
