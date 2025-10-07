@@ -8,10 +8,6 @@
     <true/>
     <key>EXUpdatesLaunchWaitMs</key>
     <integer>0</integer>
-    <key>EXUpdatesRuntimeVersion</key>
-    <string>1.0.0</string>
-    <key>EXUpdatesURL</key>
-    <string>https://u.expo.dev/7f65790f-a0ec-466d-a87c-b596668cdfd8</string>
     <key>EXUpdatesRequestHeaders</key>
     <dict>
       <key>expo-runtime-version</key>
@@ -19,5 +15,9 @@
       <key>expo-channel-name</key>
       <string>production</string>
     </dict>
+    <key>EXUpdatesRuntimeVersion</key>
+    <string>1.0.0</string>
+    <key>EXUpdatesURL</key>
+    <string>https://u.expo.dev/7f65790f-a0ec-466d-a87c-b596668cdfd8</string>
   </dict>
 </plist>
