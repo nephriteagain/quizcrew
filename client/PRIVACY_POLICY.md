@@ -26,6 +26,7 @@ We may collect the following personal information:
 - Usage data and analytics
 - Location information (if enabled)
 - Communication records and correspondence
+- Camera access for capturing photos and images (if enabled)
 
 ### 3.2 Sensitive Personal Information
 We may collect sensitive personal information only with your explicit consent or when legally permitted, including:
@@ -45,6 +46,7 @@ We process your personal information for the following specific and legitimate p
 - To communicate with you about our services
 - To provide customer support and assistance
 - To improve our application and user experience
+- To enable camera functionality for capturing and uploading photos within the app
 
 ### 4.2 Secondary Purposes
 - To send promotional materials and updates (with consent)
