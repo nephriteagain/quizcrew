@@ -82,8 +82,8 @@ export default function Index() {
 const makeStyles = (theme: any) =>
     StyleSheet.create({
         container: {
-            padding: 16,
-            rowGap: 16,
+            padding: 10,
+            rowGap: 10,
             paddingBottom: 0,
         },
         routeButton: {

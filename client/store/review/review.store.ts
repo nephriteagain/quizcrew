@@ -1,8 +1,6 @@
 import { QuizDoc, QuizDocWithUserData } from "@/types/review";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { createSelectors } from "../createSelector";
-import { createZustandAsyncStorage } from "../persistence";
 
 interface Review {
     quizzes: QuizDocWithUserData[];
@@ -12,16 +10,16 @@ interface Review {
 // const useReview = create<Review>((_set) => ({ quizzes: [] }));
 
 const useReview = create<Review>()(
-    persist(
-        (_set) => ({
-            quizzes: [],
-            userQuizzes: [],
-        }),
-        {
-            name: "review-storage",
-            storage: createZustandAsyncStorage(),
-        }
-    )
+    // persist(
+    (_set) => ({
+        quizzes: [],
+        userQuizzes: [],
+    })
+    //     {
+    //         name: "review-storage",
+    //         storage: createZustandAsyncStorage(),
+    //     }
+    // )
 );
 
 const reviewSelector = createSelectors(useReview);

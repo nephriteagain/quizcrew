@@ -20,9 +20,7 @@ export default function LoadingModal({
             style={{ flex: 1 }}
         >
             <View style={styles.backdrop}>
-                <Text style={styles.loadingText}>
-                    {loadingText}
-                </Text>
+                <Text style={styles.loadingText}>{loadingText}</Text>
             </View>
         </Modal>
     );
@@ -42,6 +40,7 @@ const makeStyles = (theme: AppTheme) => {
             textAlign: "center",
             color: theme.colors.onPrimary,
             zIndex: 10,
+            padding: 20,
         },
     });
 };

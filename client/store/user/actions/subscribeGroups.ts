@@ -20,9 +20,12 @@ export function subscribeGroups(uid: string) {
 
     const unsub = userGroupsQ.onSnapshot((snap) => {
         console.log("subscribeGroups snapshot");
-        if (!snap) return;
-        const groupsMeta = snap.docs.map((d) => d.data()) as UserGroupMeta[];
-        handleGroups(groupsMeta);
+        try {
+            const groupsMeta = snap.docs.map((d) => d.data()) as UserGroupMeta[];
+            handleGroups(groupsMeta);
+        } catch (error) {
+            console.error(error);
+        }
     });
 
     return unsub;

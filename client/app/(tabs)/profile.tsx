@@ -5,7 +5,9 @@ import SettingsDrawer, { SettingsDrawerRef } from "@/components/SettingsDrawer";
 import { DEFAULT_USER } from "@/constants/values";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
+import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizzes";
 import reviewSelector from "@/store/review/review.store";
 import { addUserProfilePic } from "@/store/user/actions/addUserProfilePic";
 import { deleteAccount } from "@/store/user/actions/deleteAccount";
@@ -224,12 +226,21 @@ export default function Profile() {
 
     const isGoogleProviderLinked = user?.providerData.some((p) => p.providerId === "google.com");
 
+    useEffectLogRoute(() => {
+        if (!user) return;
+        const userQuizzesUnsub = subscribeUserQuizzes(user.uid);
+
+        return () => {
+            userQuizzesUnsub();
+        };
+    }, [user]);
+
     return (
         <SettingsDrawer
             ref={drawerRef}
             renderDrawerContent={
                 <View style={styles.drawerContainer}>
-                    <View style={styles.drawerHeader}>
+                    <View>
                         <Text style={styles.drawerTitle}>User Settings</Text>
                     </View>
 
@@ -318,10 +329,9 @@ export default function Profile() {
                             {!user?.isAnonymous && (
                                 <Button
                                     onPress={handleLogout}
-                                    mode="contained"
-                                    buttonColor={theme.colors.primary}
-                                    textColor={theme.colors.onPrimary}
-                                    style={styles.actionButton}
+                                    mode="outlined"
+                                    textColor={theme.colors.error}
+                                    style={[styles.actionButton, styles.logoutButton]}
                                     contentStyle={styles.actionButtonContent}
                                     labelStyle={styles.actionButtonLabel}
                                     loading={isLogoutLoading}
@@ -369,7 +379,7 @@ export default function Profile() {
                 </View>
             }
         >
-            <Container style={styles.container}>
+            <Container style={{ paddingBottom: 0 }}>
                 <View style={styles.header}>
                     <View style={styles.avatarContainer}>
                         <Image
@@ -451,16 +461,14 @@ export default function Profile() {
 
 const makeStyles = (theme: AppTheme) => {
     return StyleSheet.create({
-        container: {},
         header: {
-            alignItems: "center",
             flexDirection: "row",
+            columnGap: 16,
             paddingTop: 16,
             paddingHorizontal: 16,
         },
         avatarContainer: {
             position: "relative",
-            marginRight: 16,
         },
         avatar: {
             width: 80,
@@ -489,80 +497,23 @@ const makeStyles = (theme: AppTheme) => {
             elevation: 5,
         },
         displayName: {
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: "bold",
-            marginBottom: 5,
             color: theme.colors.onSurface,
-        },
-        email: {
-            fontSize: 16,
-            color: theme.colors.onSurfaceVariant,
         },
         quizzesSection: {
             flex: 1,
-            paddingHorizontal: 16,
-            paddingBottom: 16,
+            padding: 16,
         },
         sectionTitle: {
             fontSize: 18,
             fontWeight: "bold",
-            marginBottom: 8,
             color: theme.colors.onSurface,
-        },
-        listContainer: {
-            paddingBottom: 20,
-        },
-        quizItem: {
-            backgroundColor: theme.colors.surface,
-            padding: 16,
-            marginBottom: 12,
-            borderRadius: 8,
-            shadowColor: theme.colors.onSurface,
-            shadowOffset: {
-                width: 0,
-                height: 2,
-            },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 3,
-        },
-        quizTitle: {
-            fontSize: 18,
-            fontWeight: "bold",
-            marginBottom: 8,
-            color: theme.colors.onSurface,
-        },
-        quizDescription: {
-            fontSize: 14,
-            color: theme.colors.onSurfaceVariant,
-            marginBottom: 8,
-        },
-        quizType: {
-            fontSize: 12,
-            fontWeight: "bold",
-            color: theme.colors.primary,
-            marginBottom: 4,
-        },
-        quizDate: {
-            fontSize: 12,
-            color: theme.colors.onSurfaceVariant,
-            marginBottom: 8,
-        },
-        tagsContainer: {
-            flexDirection: "row",
-            flexWrap: "wrap",
-        },
-        tag: {
-            fontSize: 12,
-            color: theme.colors.primary,
-            marginRight: 8,
-            marginBottom: 4,
         },
         drawerContainer: {
             flex: 1,
             backgroundColor: theme.colors.surface,
         },
-        drawerHeader: {},
         drawerTitle: {
             fontSize: 24,
             fontWeight: "bold",
@@ -590,12 +541,16 @@ const makeStyles = (theme: AppTheme) => {
             elevation: 6,
         },
         actionButtonContent: {
-            paddingVertical: 8,
-            paddingHorizontal: 16,
+            paddingVertical: 4,
+            paddingHorizontal: 12,
         },
         actionButtonLabel: {
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: "600",
+        },
+        logoutButton: {
+            borderColor: theme.colors.error,
+            borderWidth: 1,
         },
         linksContainer: {
             backgroundColor: theme.colors.surfaceVariant,

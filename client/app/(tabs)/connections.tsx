@@ -167,12 +167,14 @@ export default function Connections() {
                         label: "ADD CONNECTION",
                         onPress: () => router.push("/add-connections"),
                         labelTextColor: theme.colors.tertiary,
+                        containerStyle: { backgroundColor: theme.colors.tertiaryContainer },
                     },
                     {
                         icon: "account-group",
                         label: "ADD GROUP",
                         onPress: () => router.push("/add-groups"),
                         labelTextColor: theme.colors.tertiary,
+                        containerStyle: { backgroundColor: theme.colors.tertiaryContainer },
                     },
                 ]}
                 onStateChange={onStateChange}

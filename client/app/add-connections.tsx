@@ -123,7 +123,6 @@ export default function AddConnections() {
         }
         setSearchQuery("");
         setConnectionSearch([]);
-        await searchFunction(searchQuery);
         setLoadingCards((prev) => prev.filter((id) => id !== uid));
     };
 
@@ -158,6 +157,10 @@ export default function AddConnections() {
                 target_user_id: item.data.uid,
                 connection_status: item.meta?.status,
             });
+            if (!item.data.uid) {
+                Toast.error("User deleted");
+                return;
+            }
             router.push({
                 pathname: "/profile/[uid]",
                 params: {
@@ -230,7 +233,7 @@ export default function AddConnections() {
                         </View>
                     </View>
                 )}
-                extraData={{ connectionSearch, loadingCards }}
+                extraData={{ connectionSearch, loadingCards, searchQuery }}
             />
         </Container>
     );
