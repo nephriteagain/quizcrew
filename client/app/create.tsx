@@ -154,29 +154,6 @@ export default function CreateQuiz() {
                 </Pressable>
             </View>
 
-            {/* Save Buttons */}
-            {assets.length > 0 && (
-                <>
-                    <View style={styles.buttonContainer}>
-                        <Pressable
-                            disabled={!Boolean(quizType) || isSubmitting}
-                            onPress={onCreateQuizReviewer}
-                            style={({ pressed }) => [
-                                styles.button,
-                                styles.primaryButton,
-                                pressed && styles.buttonPressed,
-                                !Boolean(quizType) && { opacity: 0.6 },
-                            ]}
-                        >
-                            <Text style={styles.buttonIcon}>💡</Text>
-                            <Text style={styles.primaryButtonText}>
-                                {isSubmitting ? "Creating Reviewer..." : "Create Reviewer"}
-                            </Text>
-                        </Pressable>
-                    </View>
-                </>
-            )}
-
             {/* Images Section */}
             <View style={styles.imagesSection}>
                 <View style={styles.imagesSectionHeader}>
@@ -193,6 +170,7 @@ export default function CreateQuiz() {
                 <FlashList
                     data={assets}
                     numColumns={2}
+                    showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={() => (
                         <View style={styles.emptyState}>
@@ -206,7 +184,15 @@ export default function CreateQuiz() {
                     )}
                     ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
                     renderItem={({ item, index }) => (
-                        <View style={styles.imageContainer}>
+                        <View
+                            style={[
+                                styles.imageContainer,
+                                {
+                                    paddingRight: index % 2 === 0 ? 8 : 0,
+                                    paddingLeft: index % 2 !== 0 ? 8 : 0,
+                                },
+                            ]}
+                        >
                             <Image
                                 source={{ uri: item.uri }}
                                 style={styles.image}
@@ -222,6 +208,29 @@ export default function CreateQuiz() {
                     )}
                 />
             </View>
+            {/* Save Buttons */}
+            {assets.length > 0 && (
+                <>
+                    <View>
+                        <Pressable
+                            disabled={!Boolean(quizType) || isSubmitting}
+                            onPress={onCreateQuizReviewer}
+                            style={({ pressed }) => [
+                                styles.button,
+                                styles.primaryButton,
+                                pressed && styles.buttonPressed,
+                                !Boolean(quizType) && { opacity: 0.6 },
+                                { paddingVertical: 12 },
+                            ]}
+                        >
+                            <Text style={styles.buttonIcon}>💡</Text>
+                            <Text style={styles.primaryButtonText}>
+                                {isSubmitting ? "Creating Reviewer..." : "Create Reviewer"}
+                            </Text>
+                        </Pressable>
+                    </View>
+                </>
+            )}
             <LoadingModal
                 isVisible={isSubmitting}
                 loadingText="Creating reviewer, please don't close the app..."
@@ -233,18 +242,16 @@ export default function CreateQuiz() {
 const makeStyles = (theme: AppTheme) =>
     StyleSheet.create({
         container: {
-            rowGap: 12,
+            rowGap: 10,
+            paddingHorizontal: 20,
         },
         header: {
-            paddingHorizontal: 20,
-            paddingTop: 8,
-            paddingBottom: 8,
+            paddingTop: 10,
         },
         title: {
-            fontSize: 28,
+            fontSize: 20,
             fontWeight: "700",
             color: theme.colors.onSurface,
-            marginBottom: 4,
         },
         subtitle: {
             fontSize: 16,
@@ -252,7 +259,6 @@ const makeStyles = (theme: AppTheme) =>
             fontWeight: "400",
         },
         buttonContainer: {
-            paddingHorizontal: 20,
             columnGap: 12,
             flexDirection: "row",
             width: "100%",
@@ -261,7 +267,8 @@ const makeStyles = (theme: AppTheme) =>
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            padding: 16,
+            paddingHorizontal: 16,
+            paddingVertical: 8,
             borderRadius: 16,
             shadowColor: theme.colors.onSurface,
             shadowOffset: {
@@ -271,7 +278,6 @@ const makeStyles = (theme: AppTheme) =>
             shadowOpacity: 0.1,
             shadowRadius: 4,
             elevation: 3,
-            flexGrow: 1,
         },
         primaryButton: {
             backgroundColor: theme.colors.primary,
@@ -286,22 +292,21 @@ const makeStyles = (theme: AppTheme) =>
             opacity: 0.9,
         },
         buttonIcon: {
-            fontSize: 20,
-            marginRight: 12,
+            fontSize: 16,
+            marginRight: 6,
         },
         primaryButtonText: {
             color: theme.colors.onPrimary,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: "600",
         },
         secondaryButtonText: {
             color: theme.colors.primary,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: "600",
         },
         imagesSection: {
             flex: 1,
-            padding: 20,
         },
         imagesSectionHeader: {
             flexDirection: "row",
@@ -325,7 +330,6 @@ const makeStyles = (theme: AppTheme) =>
         emptyState: {
             alignItems: "center",
             paddingVertical: 60,
-            paddingHorizontal: 40,
         },
         emptyStateIcon: {
             fontSize: 48,
@@ -344,12 +348,7 @@ const makeStyles = (theme: AppTheme) =>
             textAlign: "center",
             lineHeight: 24,
         },
-        imageContainer: {
-            marginHorizontal: 8,
-            marginBottom: 16,
-            paddingTop: 8,
-            paddingRight: 8,
-        },
+        imageContainer: {},
         image: {
             width: imageSize,
             height: imageSize,

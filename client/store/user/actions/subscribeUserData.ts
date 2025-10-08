@@ -8,22 +8,30 @@ export function subscribeUserData(uid: string) {
     const userDataRef = doc(db, COL.USERS_DATA, uid);
     const unsubUserData = onSnapshot(userDataRef, (snap) => {
         console.log("userData snapshot");
-        const userData = snap.data() as UserData | undefined;
-        if (userData) {
-            authSelector.setState({ userData });
-        } else {
-            console.log("user data not found.");
-            authSelector.setState({ userData: null });
+        try {
+            const userData = snap.data() as UserData | undefined;
+            if (userData) {
+                authSelector.setState({ userData });
+            } else {
+                console.log("user data not found.");
+                authSelector.setState({ userData: null });
+            }
+        } catch (error) {
+            console.error(error);
         }
     });
     const userRef = doc(db, COL.USERS, uid);
     const unsubUser = onSnapshot(userRef, (snap) => {
         console.log("user snapshot");
-        const user = snap.data() as AuthUser | undefined;
-        if (user) {
-            authSelector.setState({ user });
-        } else {
-            authSelector.setState({ user: null });
+        try {
+            const user = snap.data() as AuthUser | undefined;
+            if (user) {
+                authSelector.setState({ user });
+            } else {
+                authSelector.setState({ user: null });
+            }
+        } catch (error) {
+            console.error(error);
         }
     });
 

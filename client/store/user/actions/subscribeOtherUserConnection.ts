@@ -26,19 +26,23 @@ export async function subscribeOtherConnection({
 
     const userConnectionRef = doc(db, COL.USERS_DATA, selfUid, COL.CONNECTIONS, uid);
     const userConnectionUnsub = onSnapshot(userConnectionRef, (snap) => {
-        if (!snap) {
-            console.log("invalid snap");
-        }
-        console.log(userConnectionRef.path);
-        console.log(snap);
-        const meta = snap.data() as ConnectionMeta | undefined;
-        getUserData(uid).then((data) => {
-            console.log(data);
-            onChange({
-                data: data ?? null,
-                meta: meta ?? null,
+        try {
+            if (!snap) {
+                console.log("invalid snap");
+            }
+            console.log(userConnectionRef.path);
+            console.log(snap);
+            const meta = snap.data() as ConnectionMeta | undefined;
+            getUserData(uid).then((data) => {
+                console.log(data);
+                onChange({
+                    data: data ?? null,
+                    meta: meta ?? null,
+                });
             });
-        });
+        } catch (error) {
+            console.error(error);
+        }
     });
     return userConnectionUnsub;
 }

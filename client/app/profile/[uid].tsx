@@ -133,14 +133,14 @@ export default function Profile() {
         };
     }, [uid]);
 
-    const showConnectBtn = user && !profile.meta;
+    const showConnectBtn = user && !profile.meta && user.uid !== profile.data?.uid;
     const showAcceptAndRejectBtn = user && profile.meta?.status === "INVITED";
     const showCancelBtn = user && profile.meta?.status === "REQUESTED";
 
     return (
         <Container style={styles.container}>
             <View style={styles.header}>
-                <View style={styles.avatarContainer}>
+                <View>
                     <Avatar.Image
                         source={{
                             uri: profile.data?.photoURL ?? DEFAULT_USER,
@@ -148,8 +148,21 @@ export default function Profile() {
                         size={80}
                     />
                 </View>
-                <View style={styles.profileInfo}>
-                    <Text style={styles.displayName}>{profile?.data?.username}</Text>
+                <View>
+                    <Text
+                        style={[
+                            styles.displayName,
+                            {
+                                color:
+                                    profile.data?.status === "DELETED"
+                                        ? "red"
+                                        : theme.colors?.onBackground,
+                            },
+                        ]}
+                    >
+                        {profile?.data?.username}
+                        {profile.data?.status === "DELETED" && " (DELETED)"}
+                    </Text>
                     {showConnectBtn && (
                         <TouchableOpacity
                             style={styles.connectButton}
@@ -195,7 +208,6 @@ export default function Profile() {
                             <Text style={styles.connectButtonText}>Cancel Request</Text>
                         </TouchableOpacity>
                     )}
-
                     <View style={styles.statsContainer}>
                         <Link href={"/connections"}>
                             <Text style={{ color: theme.colors.onSurfaceVariant }}>
@@ -239,12 +251,6 @@ const makeStyles = (theme: AppTheme) => {
             paddingTop: 16,
             paddingHorizontal: 16,
         },
-        avatarContainer: {
-            position: "relative",
-        },
-        profileInfo: {
-            rowGap: 8,
-        },
         actionButtons: {
             flexDirection: "row",
             columnGap: 8,
@@ -275,7 +281,7 @@ const makeStyles = (theme: AppTheme) => {
             elevation: 5,
         },
         displayName: {
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: "bold",
             color: theme.colors.onSurface,
         },

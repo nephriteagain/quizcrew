@@ -6,7 +6,6 @@ import {
     collection,
     doc,
     getDoc,
-    orderBy,
     query,
     Unsubscribe,
     where,
@@ -27,66 +26,64 @@ export function subscribeAllQuizzes(uid: string, connections: Connection[]) {
     let unsubs: Unsubscribe[] = [];
 
     for (const uids of activeConnectionUidGrouped) {
-        const quizQ = query(
-            quizRef,
-            where("status", "==", "LIVE"),
-            where("createdBy", "in", uids),
-            orderBy("createdAt", "desc")
-        );
+        const quizQ = query(quizRef, where("status", "==", "LIVE"), where("createdBy", "in", uids));
         const unsub = quizQ.onSnapshot(async (snap) => {
             console.log("subscribeAllQuizzes snapshot");
-            if (!snap) return;
-            const newData = snap
-                .docChanges()
-                .filter((change) => change.type === "added")
-                .map((d) => d.doc.data()) as QuizDoc[];
-            const updatedData = snap
-                .docChanges()
-                .filter((change) => change.type === "modified")
-                .map((d) => d.doc.data()) as QuizDoc[];
-            const removedData = snap
-                .docChanges()
-                .filter((change) => change.type === "removed")
-                .map((d) => d.doc.data()) as QuizDoc[];
+            try {
+                const newData = snap
+                    .docChanges()
+                    .filter((change) => change.type === "added")
+                    .map((d) => d.doc.data()) as QuizDoc[];
+                const updatedData = snap
+                    .docChanges()
+                    .filter((change) => change.type === "modified")
+                    .map((d) => d.doc.data()) as QuizDoc[];
+                const removedData = snap
+                    .docChanges()
+                    .filter((change) => change.type === "removed")
+                    .map((d) => d.doc.data()) as QuizDoc[];
 
-            const prevQuzzes = reviewSelector.getState().quizzes;
-            const withUpdatedData = prevQuzzes.map((q) => {
-                const hasUpdate = updatedData.find((u) => u.quiz_id === q.quiz_id);
-                if (hasUpdate) {
-                    return hasUpdate;
-                }
-                return q;
-            });
-            const withoutRemovedData = withUpdatedData.filter((q) => {
-                const isRemoved = removedData.some((u) => u.quiz_id === q.quiz_id);
-                if (isRemoved) {
-                    return false;
-                }
-                return true;
-            });
-            const withNewData = uniqBy(
-                [...newData, ...withoutRemovedData].sort((a, b) => b.createdAt - a.createdAt),
-                "quiz_id"
-            );
-            console.log(console.log("total quizzes:", withNewData.length));
+                const prevQuzzes = reviewSelector.getState().quizzes;
+                const withUpdatedData = prevQuzzes.map((q) => {
+                    const hasUpdate = updatedData.find((u) => u.quiz_id === q.quiz_id);
+                    if (hasUpdate) {
+                        return hasUpdate;
+                    }
+                    return q;
+                });
+                const withoutRemovedData = withUpdatedData.filter((q) => {
+                    const isRemoved = removedData.some((u) => u.quiz_id === q.quiz_id);
+                    if (isRemoved) {
+                        return false;
+                    }
+                    return true;
+                });
+                const withNewData = uniqBy(
+                    [...newData, ...withoutRemovedData].sort((a, b) => b.createdAt - a.createdAt),
+                    "quiz_id"
+                );
+                console.log(console.log("total quizzes:", withNewData.length));
 
-            const uniqUids = [
-                ...new Set(
-                    withNewData.map((q) => q.createdBy).filter((uid) => typeof uid === "string")
-                ),
-            ];
+                const uniqUids = [
+                    ...new Set(
+                        withNewData.map((q) => q.createdBy).filter((uid) => typeof uid === "string")
+                    ),
+                ];
 
-            console.log("uniq uids", uniqUids);
-            const userDatas = await Promise.all(uniqUids.map((uid) => getUserData(uid)));
-            const quizWithUserDatas: QuizDocWithUserData[] = withNewData.map((q) => ({
-                ...q,
-                userData: userDatas.find((uid) => uid?.uid === q.createdBy) ?? null,
-            }));
+                console.log("uniq uids", uniqUids);
+                const userDatas = await Promise.all(uniqUids.map((uid) => getUserData(uid)));
+                const quizWithUserDatas: QuizDocWithUserData[] = withNewData.map((q) => ({
+                    ...q,
+                    userData: userDatas.find((uid) => uid?.uid === q.createdBy) ?? null,
+                }));
 
-            // save quizzes to store
-            reviewSelector.setState(() => ({
-                quizzes: quizWithUserDatas,
-            }));
+                // save quizzes to store
+                reviewSelector.setState(() => ({
+                    quizzes: quizWithUserDatas.sort((a, b) => b.createdAt - a.createdAt),
+                }));
+            } catch (error) {
+                console.error(error);
+            }
         });
 
         unsubs.push(unsub);

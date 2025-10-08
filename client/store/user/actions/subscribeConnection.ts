@@ -13,9 +13,12 @@ export function subscribeConnections(uid: string) {
 
     const unsub = connectionsQ.onSnapshot((snap) => {
         console.log("subscribeConnections snapshot");
-        if (!snap) return;
-        const connectionMeta = snap.docs.map((d) => d.data()) as ConnectionMeta[];
-        handleConnections(connectionMeta);
+        try {
+            const connectionMeta = snap.docs.map((d) => d.data()) as ConnectionMeta[];
+            handleConnections(connectionMeta);
+        } catch (error) {
+            console.error(error);
+        }
     });
 
     return unsub;

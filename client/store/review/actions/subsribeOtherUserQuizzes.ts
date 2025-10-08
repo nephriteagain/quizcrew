@@ -8,9 +8,12 @@ export function subscribeOtherUserQuizzes(uid: string, onChange: (quizzes: QuizD
     const quizQ = query(quizRef, where("createdBy", "==", uid), where("status", "==", "LIVE"));
     const unsub = quizQ.onSnapshot((snap) => {
         console.log("subscribeUserQuizzes snapshot");
-        if (!snap) return;
-        const quizzes = snap.docs.map((d) => d.data()) as QuizDoc[];
-        onChange(quizzes);
+        try {
+            const quizzes = snap.docs.map((d) => d.data()) as QuizDoc[];
+            onChange(quizzes.sort((a, b) => b.createdAt - a.createdAt));
+        } catch (error) {
+            console.error(error);
+        }
     });
 
     return unsub;
