@@ -1,7 +1,8 @@
 export const QUIZ = {
     MCQ: {
         name: "multiple_choice_question",
-        description: "Create a multiple choice quiz with 4 choices based on the given subject.",
+        description:
+            "Create a multiple choice quiz with 4 choices based on the given subject, make sure 1 of the choices matches the answer word for word",
     },
     TOFQ: {
         name: "true_or_false_question",
@@ -10,6 +11,6 @@ export const QUIZ = {
     DNDQ: {
         name: "drag_and_drop_question",
         description:
-            "Create a one to one (question to answer) multi choice quiz, each question should match one answer in the pool, The choices should only be a single word or a very short phrase.",
+            "Create a one to one (question to answer) multi choice quiz, each question should match one answer in the pool, The choices should only be a single word or a very short phrase, make sure each question has a matched answer word for word.",
     },
 };
