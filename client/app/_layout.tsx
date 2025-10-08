@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Avatar, Text } from "react-native-paper";
 import ToastManager from "toastify-react-native";
 
 function RootLayoutContent() {
@@ -25,7 +26,27 @@ function RootLayoutContent() {
                     <Stack.Protected guard={Boolean(user)}>
                         <Stack.Screen
                             name="(tabs)"
-                            options={{ headerShown: true, title: "QuizCrew" }}
+                            options={{
+                                headerShown: true,
+                                title: "QuizCrew",
+                                headerTitle: () => (
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            alignItems: "center",
+                                            columnGap: 8,
+                                        }}
+                                    >
+                                        <Avatar.Image
+                                            source={require("@/assets/images/quiz-crew-icon.png")}
+                                            size={32}
+                                        />
+                                        <Text style={{ fontWeight: "bold" }} variant="titleLarge">
+                                            QuizCrew
+                                        </Text>
+                                    </View>
+                                ),
+                            }}
                         />
                         <Stack.Screen name="+not-found" options={{ headerShown: false }} />
                         <Stack.Screen

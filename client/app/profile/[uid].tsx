@@ -17,7 +17,7 @@ import { Unsubscribe } from "@react-native-firebase/firestore";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Image } from "expo-image";
+import { Avatar } from "react-native-paper";
 import { Toast } from "toastify-react-native";
 
 export default function Profile() {
@@ -141,11 +141,11 @@ export default function Profile() {
         <Container style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.avatarContainer}>
-                    <Image
+                    <Avatar.Image
                         source={{
                             uri: profile.data?.photoURL ?? DEFAULT_USER,
                         }}
-                        style={styles.avatar}
+                        size={80}
                     />
                 </View>
                 <View style={styles.profileInfo}>
@@ -252,11 +252,6 @@ const makeStyles = (theme: AppTheme) => {
         statsContainer: {
             flexDirection: "row",
             columnGap: 8,
-        },
-        avatar: {
-            width: 80,
-            height: 80,
-            borderRadius: 40,
         },
         editPhotoButton: {
             position: "absolute",
