@@ -3,7 +3,7 @@ import { Quiz } from "@/types/review";
 import { UserData } from "@/types/user";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Pressable, PressableProps, StyleSheet, View } from "react-native";
+import { Pressable, PressableProps, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Avatar, Text } from "react-native-paper";
 
 type QuizCardProps = {
@@ -99,7 +99,7 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
                 </View>
             </View>
             {quiz.userData && (
-                <Pressable
+                <TouchableOpacity
                     onPress={() => {
                         if (!quiz.userData?.uid) return;
                         router.push({
@@ -126,7 +126,7 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
                         />
                     )}
                     <Text variant="labelMedium">{quiz.userData.username}</Text>
-                </Pressable>
+                </TouchableOpacity>
             )}
             <Text style={styles.description} numberOfLines={3}>
                 {quiz.description}
