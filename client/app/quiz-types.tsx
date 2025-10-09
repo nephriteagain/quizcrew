@@ -7,7 +7,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { logEvent } from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
 
 const QUIZ_ARR = [
     {

@@ -15,7 +15,8 @@ import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { useLocalSearchParams } from "expo-router";
 import { cloneDeep, debounce } from "lodash";
 import React, { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, {
     FadeIn,

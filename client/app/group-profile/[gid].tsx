@@ -7,9 +7,9 @@ import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
-import { Button, FAB } from "react-native-paper";
+import { Button, FAB, Text } from "react-native-paper";
 
 const mockGroup: Group = {
     gid: "1",

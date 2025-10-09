@@ -1,7 +1,7 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import utilsSelector from "@/store/utils/utils.store";
-import { Modal, StyleSheet, Text, View } from "react-native";
-import { Portal } from "react-native-paper";
+import { Modal, StyleSheet, View } from "react-native";
+import { Portal, Text } from "react-native-paper";
 
 export default function GlobalLoadingModal() {
     const theme = useAppTheme();

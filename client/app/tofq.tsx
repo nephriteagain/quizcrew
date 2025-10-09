@@ -8,7 +8,8 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
 import { Link, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
-import { Pressable, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 import Animated, {
     FadeInLeft,
     FadeOutLeft,

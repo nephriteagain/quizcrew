@@ -4,9 +4,9 @@ import { Connection, ConnectionStatus } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { SectionList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SectionList, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Image } from "expo-image";
-import { Button, Menu, TextInput } from "react-native-paper";
+import { Button, Menu, Text, TextInput } from "react-native-paper";
 
 interface Member extends Connection {
     role: "admin" | "moderator" | "member";

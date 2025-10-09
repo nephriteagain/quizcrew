@@ -6,8 +6,8 @@ import { anonSignin } from "@/store/user/actions/anonSignin";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Button, Checkbox } from "react-native-paper";
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Button, Checkbox, Text } from "react-native-paper";
 import Animated, {
     useAnimatedStyle,
     useSharedValue,

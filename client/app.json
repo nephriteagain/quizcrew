@@ -70,7 +70,19 @@
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       "@react-native-firebase/crashlytics",
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Sansation-Regular.ttf",
+            "./assets/fonts/Sansation-Light.ttf",
+            "./assets/fonts/Sansation-LightItalic.ttf",
+            "./assets/fonts/Sansation-Italic.ttf",
+            "./assets/fonts/Sansation-Bold.ttf",
+            "./assets/fonts/Sansation-BoldItalic.ttf"
+          ]
+        }
+      ],
       "expo-web-browser"
     ],
     "experiments": {
@@ -83,7 +95,6 @@
         "projectId": "7f65790f-a0ec-466d-a87c-b596668cdfd8"
       }
     },
-    "owner": "nephrite-software"
-
+    "owner": "nephrite-software",
   }
 }
