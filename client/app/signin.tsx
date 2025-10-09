@@ -4,8 +4,8 @@ import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { Button } from "react-native-paper";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { Button, Text } from "react-native-paper";
 
 export default function SignInScreen() {
     const theme = useAppTheme();

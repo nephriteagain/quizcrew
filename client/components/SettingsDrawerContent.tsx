@@ -5,7 +5,8 @@ import { logout } from "@/store/user/actions/logout";
 import authSelector from "@/store/user/user.store";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 import LoadingModal from "./LoadingModal";
 
 interface SettingsDrawerContentProps {

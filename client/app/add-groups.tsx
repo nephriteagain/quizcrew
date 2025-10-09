@@ -7,8 +7,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Timestamp } from "@react-native-firebase/firestore";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { SectionList, StyleSheet, Text, View } from "react-native";
-import { Button, TextInput } from "react-native-paper";
+import { SectionList, StyleSheet, View } from "react-native";
+import { Button, Text, TextInput } from "react-native-paper";
 
 const mockInvitesFromGroups: Group[] = [
     {

@@ -63,6 +63,24 @@
     </array>
     <key>RCTNewArchEnabled</key>
     <true/>
+    <key>UIAppFonts</key>
+    <array>
+      <string>SpaceMono-Regular.ttf</string>
+      <string>Sansation-Regular.ttf</string>
+      <string>Sansation-Light.ttf</string>
+      <string>Sansation-LightItalic.ttf</string>
+      <string>Sansation-Italic.ttf</string>
+      <string>Sansation-Bold.ttf</string>
+      <string>Sansation-BoldItalic.ttf</string>
+      <string>ComicNeue-Regular.ttf</string>
+      <string>ComicNeue-Light.ttf</string>
+      <string>ComicNeue-LightItalic.ttf</string>
+      <string>ComicNeue-Italic.ttf</string>
+      <string>ComicNeue-Bold.ttf</string>
+      <string>ComicNeue-BoldItalic.ttf</string>
+      <string>Montserrat-VariableFont_wght.ttf</string>
+      <string>Montserrat-Italic-VariableFont_wght.ttf</string>
+    </array>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

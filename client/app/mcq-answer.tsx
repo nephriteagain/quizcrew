@@ -2,7 +2,8 @@ import { QuizResultModal } from "@/components/QuizResultModal";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
 import { cloneDeep, debounce } from "lodash";
 import React, { useRef, useState } from "react";
-import { Dimensions, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Pressable, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 
 import Card from "@/components/Card";
 import Container from "@/components/Container";

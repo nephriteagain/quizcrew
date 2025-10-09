@@ -4,8 +4,8 @@ import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { linkAnonAccToGoogle } from "@/store/user/actions/linkAnonAccToGoogle";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Button } from "react-native-paper";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Button, Text } from "react-native-paper";
 import Svg, { Path } from "react-native-svg";
 
 export default function LinkGoogle() {

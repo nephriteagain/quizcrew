@@ -9,7 +9,8 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Dimensions, Pressable, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 const imageSize = (width - 48) / 2; // 2 columns with padding
