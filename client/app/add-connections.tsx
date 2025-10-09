@@ -15,8 +15,8 @@ import { logEvent } from "@react-native-firebase/analytics";
 import { useRouter } from "expo-router";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { SectionList, StyleSheet, Text, View } from "react-native";
-import { TextInput } from "react-native-paper";
+import { SectionList, StyleSheet, View } from "react-native";
+import { Text, TextInput } from "react-native-paper";
 import { Toast } from "toastify-react-native";
 
 type SectionData = {

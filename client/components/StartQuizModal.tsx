@@ -6,7 +6,8 @@ import { logEvent } from "@react-native-firebase/analytics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { debounce } from "lodash";
 import React, { useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
 import Animated, { FadeIn, FadeInDown, FadeInUp } from "react-native-reanimated";
 
 interface StartQuizModalProps {

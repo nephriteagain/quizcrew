@@ -1,6 +1,7 @@
 import { useAppTheme } from "@/providers/ThemeProvider";
 import { useState } from "react";
-import { Pressable, PressableProps, StyleSheet, Text, View, ViewProps } from "react-native";
+import { Pressable, PressableProps, StyleSheet, View, ViewProps } from "react-native";
+import { Text } from "react-native-paper";
 
 export function Radio({ isChecked, onPress, ...props }: { isChecked: boolean } & PressableProps) {
     const theme = useAppTheme();

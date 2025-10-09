@@ -3,7 +3,8 @@ import { Quiz } from "@/types/review";
 import { UserData } from "@/types/user";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
 import React from "react";
-import { RefreshControl, StyleSheet, Text, View } from "react-native";
+import { RefreshControl, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
 import QuizCard from "./QuizCard";
 
 type FlashListPropsFiltered = Omit<

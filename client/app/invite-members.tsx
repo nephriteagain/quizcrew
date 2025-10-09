@@ -4,9 +4,9 @@ import { Connection } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ScrollView, SectionList, StyleSheet, Text, View } from "react-native";
+import { ScrollView, SectionList, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
-import { Button, Chip, TextInput } from "react-native-paper";
+import { Button, Chip, Text, TextInput } from "react-native-paper";
 
 const mockConnections: Connection[] = [
     {
