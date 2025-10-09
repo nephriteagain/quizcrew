@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { SectionList, StyleSheet, Text, View } from "react-native";
+import { SectionList, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
 
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";

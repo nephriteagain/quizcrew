@@ -7,7 +7,8 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { forwardRef } from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity } from "react-native";
+import { Text } from "react-native-paper";
 import LoadingModal from "./LoadingModal";
 
 interface SettingsBottomSheetProps {

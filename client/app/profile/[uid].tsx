@@ -16,8 +16,8 @@ import { ConnectionMeta, UserData } from "@/types/user";
 import { Unsubscribe } from "@react-native-firebase/firestore";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Avatar } from "react-native-paper";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Avatar, Text } from "react-native-paper";
 import { Toast } from "toastify-react-native";
 
 export default function Profile() {

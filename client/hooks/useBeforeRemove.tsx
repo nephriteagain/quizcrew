@@ -1,6 +1,7 @@
 import { useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, View } from "react-native";
+import { Text } from "react-native-paper";
 
 import { useAppTheme } from "@/providers/ThemeProvider";
 

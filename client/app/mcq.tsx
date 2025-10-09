@@ -1,6 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useRef, useState } from "react";
-import { Pressable, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Switch, TouchableOpacity, View } from "react-native";
+import { Text } from "react-native-paper";
 
 import Container from "@/components/Container";
 import SettingsBottomSheet from "@/components/SettingsBottomSheet";

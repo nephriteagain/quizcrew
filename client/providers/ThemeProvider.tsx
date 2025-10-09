@@ -1,6 +1,201 @@
 import { ReactNode } from "react";
-import { StyleSheet } from "react-native";
-import { MD3LightTheme, PaperProvider, useTheme } from "react-native-paper";
+import { Platform, StyleSheet } from "react-native";
+import { configureFonts, MD3LightTheme, PaperProvider, useTheme } from "react-native-paper";
+
+const fontConfig = {
+    displayLarge: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0,
+        lineHeight: 64,
+        fontSize: 57,
+    },
+    displayMedium: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0,
+        lineHeight: 52,
+        fontSize: 45,
+    },
+    displaySmall: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0,
+        lineHeight: 44,
+        fontSize: 36,
+    },
+    headlineLarge: {
+        fontFamily: Platform.select({
+            web: "Sansation-Bold",
+            ios: "Sansation-Bold",
+            android: "Sansation-Bold",
+            default: "Sansation-Bold",
+        }),
+        fontWeight: "700",
+        letterSpacing: 0,
+        lineHeight: 40,
+        fontSize: 32,
+    },
+    headlineMedium: {
+        fontFamily: Platform.select({
+            web: "Sansation-Bold",
+            ios: "Sansation-Bold",
+            android: "Sansation-Bold",
+            default: "Sansation-Bold",
+        }),
+        fontWeight: "700",
+        letterSpacing: 0,
+        lineHeight: 36,
+        fontSize: 28,
+    },
+    headlineSmall: {
+        fontFamily: Platform.select({
+            web: "Sansation-Bold",
+            ios: "Sansation-Bold",
+            android: "Sansation-Bold",
+            default: "Sansation-Bold",
+        }),
+        fontWeight: "700",
+        letterSpacing: 0,
+        lineHeight: 32,
+        fontSize: 24,
+    },
+    titleLarge: {
+        fontFamily: Platform.select({
+            web: "Sansation-Bold",
+            ios: "Sansation-Bold",
+            android: "Sansation-Bold",
+            default: "Sansation-Bold",
+        }),
+        fontWeight: "700",
+        letterSpacing: 0,
+        lineHeight: 28,
+        fontSize: 22,
+    },
+    titleMedium: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "500",
+        letterSpacing: 0.15,
+        lineHeight: 24,
+        fontSize: 16,
+    },
+    titleSmall: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "500",
+        letterSpacing: 0.1,
+        lineHeight: 20,
+        fontSize: 14,
+    },
+    bodyLarge: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0.5,
+        lineHeight: 24,
+        fontSize: 16,
+    },
+    bodyMedium: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0.25,
+        lineHeight: 20,
+        fontSize: 14,
+    },
+    bodySmall: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0.4,
+        lineHeight: 16,
+        fontSize: 12,
+    },
+    labelLarge: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "500",
+        letterSpacing: 0.1,
+        lineHeight: 20,
+        fontSize: 14,
+    },
+    labelMedium: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "500",
+        letterSpacing: 0.5,
+        lineHeight: 16,
+        fontSize: 12,
+    },
+    labelSmall: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "500",
+        letterSpacing: 0.5,
+        lineHeight: 16,
+        fontSize: 11,
+    },
+    default: {
+        fontFamily: Platform.select({
+            web: "Sansation-Regular",
+            ios: "Sansation-Regular",
+            android: "Sansation-Regular",
+            default: "Sansation-Regular",
+        }),
+        fontWeight: "400",
+        letterSpacing: 0.25,
+        lineHeight: 20,
+        fontSize: 14,
+    },
+} as const;
 
 const theme = {
     ...MD3LightTheme,
@@ -50,6 +245,7 @@ const theme = {
             level5: "#94a3b8",
         },
     },
+    fonts: configureFonts({ config: fontConfig, isV3: true }),
 };
 
 export type AppTheme = typeof theme;
