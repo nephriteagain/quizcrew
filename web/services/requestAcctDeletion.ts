@@ -1,5 +1,4 @@
-import { analytics, db } from "@/config/firebase";
-import { logEvent } from "firebase/analytics";
+import { db } from "@/config/firebase";
 import { FirebaseError } from "firebase/app";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
@@ -20,14 +19,8 @@ export async function requestAcctDeletion(email: string, userInfo: UserInfo) {
       createdAt: serverTimestamp(),
     });
 
-    logEvent(analytics, "account_deletion", { email, userInfo });
     return true;
   } catch (error) {
-    logEvent(analytics, "exception", {
-      description: "requestAcctDeletion",
-      fatal: true,
-      error,
-    });
     if (error instanceof FirebaseError) {
       return error;
     }
