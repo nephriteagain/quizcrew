@@ -16,6 +16,7 @@ config();
 
 const fastify = Fastify({
     logger: true,
+    bodyLimit: 30 * 1024 * 1024, // 30MB limit for image uploads
 });
 
 const schema = {
