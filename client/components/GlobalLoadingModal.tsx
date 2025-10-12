@@ -1,7 +1,7 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import utilsSelector from "@/store/utils/utils.store";
 import { Modal, StyleSheet, View } from "react-native";
-import { Portal, Text } from "react-native-paper";
+import { ActivityIndicator, Portal, Text } from "react-native-paper";
 
 export default function GlobalLoadingModal() {
     const theme = useAppTheme();
@@ -20,6 +20,7 @@ export default function GlobalLoadingModal() {
                 style={{ flex: 1 }}
             >
                 <View style={[styles.overlay, StyleSheet.absoluteFill]}>
+                    <ActivityIndicator size={36} />
                     <Text style={styles.text}>{text}</Text>
                 </View>
             </Modal>

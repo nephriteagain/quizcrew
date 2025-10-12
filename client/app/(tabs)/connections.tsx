@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { SectionList, StyleSheet, View } from "react-native";
-import { Text } from "react-native-paper";
+import { FAB, Text } from "react-native-paper";
 
 import ConnectionCard from "@/components/ConnectionCard";
 import Container from "@/components/Container";
@@ -9,67 +9,12 @@ import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import authSelector from "@/store/user/user.store";
 import { Connection, Group } from "@/types/user";
 import { useRouter } from "expo-router";
-import { FAB } from "react-native-paper";
 
 interface SectionData {
     title: string;
     data: (Group | Connection)[];
     type: "groups" | "connections";
 }
-
-const mockGroups: Group[] = [
-    {
-        gid: "1",
-        status: "ACTIVE",
-        name: "Quiz Masters",
-        avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=100&h=100&fit=crop&crop=faces",
-        description: "Community for quiz enthusiasts",
-        owner: "owner1",
-        createdAt: new Date() as any,
-        memberCount: 234,
-        ownerData: {
-            status: "ACTIVE",
-            uid: "owner1",
-            username: "Owner User",
-            photoURL:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        },
-    },
-    {
-        gid: "2",
-        status: "ACTIVE",
-        name: "Study Group Alpha",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        description: "Weekly study sessions",
-        owner: "owner2",
-        createdAt: new Date() as any,
-        memberCount: 45,
-        ownerData: {
-            status: "ACTIVE",
-            uid: "owner2",
-            username: "Alpha Leader",
-            photoURL:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        },
-    },
-    {
-        gid: "3",
-        status: "ACTIVE",
-        name: "Trivia Night",
-        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b820?w=100&h=100&fit=crop&crop=faces",
-        description: "Friday night trivia challenges",
-        owner: "owner3",
-        createdAt: new Date() as any,
-        memberCount: 89,
-        ownerData: {
-            status: "ACTIVE",
-            uid: "owner3",
-            username: "Trivia Host",
-            photoURL:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        },
-    },
-];
 
 export default function Connections() {
     const theme = useAppTheme();
@@ -86,12 +31,16 @@ export default function Connections() {
     const activeConnections = useMemo(() => {
         return connections.filter((c) => c.meta?.status === "CONNECTED");
     }, [connections]);
+    const groups = authSelector.use.useGroups();
+    const activeGroups = useMemo(() => {
+        return groups.filter((g) => g.status === "ACTIVE");
+    }, [groups]);
 
     const sections: SectionData[] = useMemo(
         () => [
             {
                 title: "Groups",
-                data: mockGroups,
+                data: activeGroups,
                 type: "groups",
             },
             {
@@ -100,7 +49,7 @@ export default function Connections() {
                 type: "connections",
             },
         ],
-        [activeConnections]
+        [activeConnections, activeGroups]
     );
 
     const renderGroupItem = (item: Group) => (

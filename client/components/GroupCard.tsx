@@ -1,8 +1,9 @@
+import { DEFAULT_GROUP } from "@/constants/values";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 
 export interface GroupCardProps extends Group {
@@ -22,7 +23,7 @@ export default function GroupCard({ handlePress, ...item }: GroupCardProps) {
             onPress={handlePress}
         >
             <View style={styles.avatarContainer}>
-                <Image source={{ uri: item.avatar }} style={styles.groupAvatar} />
+                <Image source={{ uri: item.avatar ?? DEFAULT_GROUP }} style={styles.groupAvatar} />
                 {item.unreadMessages && item.unreadMessages > 0 && (
                     <View style={styles.unreadBadge}>
                         <Text style={styles.unreadText}>
@@ -33,9 +34,13 @@ export default function GroupCard({ handlePress, ...item }: GroupCardProps) {
             </View>
             <View style={styles.itemInfo}>
                 <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemDescription}>{item.description}</Text>
+                <Text numberOfLines={3} style={styles.itemDescription}>
+                    {item.description}
+                </Text>
                 <View style={styles.groupMeta}>
-                    <Text style={styles.memberCount}>{item.memberCount} members</Text>
+                    <Text style={styles.memberCount}>
+                        {item.memberCount} member{item.memberCount > 1 ? "s" : ""}
+                    </Text>
                     <Text style={styles.lastActivity}>• {item.lastActivity}</Text>
                 </View>
             </View>

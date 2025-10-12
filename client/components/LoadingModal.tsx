@@ -1,6 +1,6 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Modal, StyleSheet, View } from "react-native";
-import { Text } from "react-native-paper";
+import { ActivityIndicator, Text } from "react-native-paper";
 
 export default function LoadingModal({
     isVisible,
@@ -21,6 +21,7 @@ export default function LoadingModal({
             style={{ flex: 1 }}
         >
             <View style={styles.backdrop}>
+                <ActivityIndicator size={36} />
                 <Text style={styles.loadingText}>{loadingText}</Text>
             </View>
         </Modal>
