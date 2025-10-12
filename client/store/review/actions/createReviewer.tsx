@@ -20,15 +20,14 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
 
     console.log("creating reviewer...");
     try {
+        // Create FormData for multipart/form-data request
+        const formData = new FormData();
+        formData.append("type", type);
+        formData.append("images", JSON.stringify(images));
+
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                type,
-                images,
-            }),
+            body: formData,
         });
 
         // Check if the response is ok

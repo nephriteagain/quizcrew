@@ -16,7 +16,7 @@ export default function Container({ children, style, ...props }: ContainerProps)
                 {
                     flex: 1,
                     backgroundColor: theme.colors.surfaceVariant,
-                    paddingBottom: insets.bottom,
+                    paddingBottom: insets.bottom + 10,
                 },
                 style,
             ]}
