@@ -2,10 +2,10 @@ import Container from "@/components/Container";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Connection } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { Image } from "expo-image";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, SectionList, StyleSheet, View } from "react-native";
-import { Image } from "expo-image";
 import { Button, Chip, Text, TextInput } from "react-native-paper";
 
 const mockConnections: Connection[] = [
@@ -122,6 +122,7 @@ export default function InviteMembers() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const router = useRouter();
+    const { gid, groupName } = useLocalSearchParams<{ gid: string; groupName: string }>();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
@@ -214,7 +215,7 @@ export default function InviteMembers() {
         <Container>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={styles.title}>Invite Members</Text>
+                    <Text style={styles.title}>{groupName}</Text>
                     <Text style={styles.subtitle}>
                         Add members from your connections to join the group
                     </Text>

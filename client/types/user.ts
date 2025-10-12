@@ -18,25 +18,22 @@ export type UserData = {
 
 export type UserGroupStatus = "INVITED" | "REQUESTED" | "CONNECTED";
 
-export interface UserGroupMeta {
-    status: UserGroupStatus;
-    gid: string;
-    createdAt: Timestamp;
-    updatedAt?: Timestamp;
-}
-
 export type GroupStatus = "DELETED" | "ACTIVE";
 
 export interface GroupDoc {
     createdAt: Timestamp;
     updatedAt?: Timestamp;
-    gid: string;
-    name: string;
-    avatar: string;
-    description: string;
-    owner: string;
     status: GroupStatus;
+    gid: string;
+    owner: string;
+
+    name: string;
+    avatar: string | null;
+    description: string;
+    isPrivate: boolean;
 }
+
+export type GroupForm = Omit<GroupDoc, "createdAt" | "updatedAt" | "gid" | "status" | "owner">;
 
 export interface Group extends GroupDoc {
     memberCount: number;
@@ -50,6 +47,18 @@ export interface ConnectionMeta {
     status: ConnectionStatus;
     createdAt: Timestamp;
     updatedAt?: Timestamp;
+}
+
+export interface GroupMember {
+    gid: string;
+    uid: string;
+    /** group member id (doc id) */
+    gmId: string;
+    status: ConnectionStatus;
+    createdAt: Timestamp;
+    updatedAt?: Timestamp;
+    memberType: "OWNER" | "ADMIN" | "MEMBER";
+    invitedBy?: string;
 }
 
 export interface Connection {

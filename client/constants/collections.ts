@@ -4,6 +4,5 @@ export enum COL {
     USERS_DATA = "users-data",
     CONNECTIONS = "connections",
     GROUPS = "groups",
-    USER_GROUPS = "user-groups",
-    MEMBERS = "members",
+    GROUP_MEMBERS = "group-members",
 }

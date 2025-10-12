@@ -1,118 +1,235 @@
 import Container from "@/components/Container";
+import LoadingModal from "@/components/LoadingModal";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useImagePicker } from "@/hooks/useImagePicker";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { addGroupProfilePic } from "@/store/group/actions/addGroupProfilePic";
+import { createGroup } from "@/store/group/actions/createGroup";
+import authSelector from "@/store/user/user.store";
+import { GroupForm } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { Formik } from "formik";
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Button, Switch, Text, TextInput } from "react-native-paper";
+import { Toast } from "toastify-react-native";
+import * as Yup from "yup";
+
+const INITIAL_VALUES: GroupForm = {
+    name: "",
+    description: "",
+    avatar: "",
+    isPrivate: false,
+};
+
+const createGroupSchema = Yup.object().shape({
+    name: Yup.string()
+        .min(1, "Group name is required")
+        .max(50, "Group name must be 50 characters or less")
+        .required("Group name is required"),
+    description: Yup.string()
+        .min(1, "Description is required")
+        .max(200, "Description must be 200 characters or less")
+        .required("Description is required"),
+    avatar: Yup.string().required(),
+    isPrivate: Yup.boolean(),
+});
 
 export default function CreateGroup() {
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const router = useRouter();
+    const { pickImage } = useImagePicker();
 
-    const [groupName, setGroupName] = useState("");
-    const [description, setDescription] = useState("");
-    const [isPrivate, setIsPrivate] = useState(false);
-    const [groupImage, setGroupImage] = useState<string | null>(null);
+    const handleCreate = async (values: GroupForm) => {
+        if (!user) {
+            Toast.error("User not logged in");
+            return;
+        }
+        const url = await addGroupProfilePic(values.avatar!);
+        if (!url) {
+            Toast.error("Failed to upload group avatar.");
+        }
+        const result = await createGroup({ ...values, avatar: url ?? null }, user.uid);
+        if (!result) {
+            Toast.error("Failed to create group.");
+            return;
+        }
 
-    const handleCreateGroup = () => {
-        router.push("/invite-members");
+        Toast.success("Group created.");
+        router.push({
+            pathname: "/invite-members",
+            params: { gid: result, groupName: values.name },
+        });
     };
 
-    const handleImagePicker = () => {
-        console.log("Image picker will be implemented");
-    };
+    const [handleCreateFn, status] = useAsyncAction(handleCreate);
+    const user = authSelector.use.useUser();
 
-    const isFormValid = groupName.trim().length > 0 && description.trim().length > 0;
+    const handleSubmit = async (values: GroupForm) => {
+        console.log(JSON.stringify(values, null, 2));
+        Alert.alert(
+            `Create Group`,
+            `Name: "${values.name}"\nPrivacy: ${values.isPrivate ? "PRIVATE" : "PUBLIC"}\nDescription: ${values.description}`,
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => {},
+                    style: "cancel",
+                },
+                {
+                    text: "Continue",
+                    onPress: () => handleCreateFn(values),
+                },
+            ]
+        );
+    };
 
     return (
         <Container>
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                <View style={styles.contentContainer}>
-                    <View style={styles.header}>
-                        <Text style={styles.title}>Create Your Group</Text>
-                        <Text style={styles.subtitle}>
-                            Set up your group and invite members to get started
-                        </Text>
-                    </View>
-
-                    <TouchableOpacity style={styles.imageContainer} onPress={handleImagePicker}>
-                        {groupImage ? (
-                            <Image source={{ uri: groupImage }} style={styles.groupImage} />
-                        ) : (
-                            <View style={styles.imagePlaceholder}>
-                                <Ionicons
-                                    name="camera-outline"
-                                    size={40}
-                                    color={theme.colors.onSurfaceVariant}
-                                />
-                                <Text style={styles.imagePlaceholderText}>Add Group Photo</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
-
-                    <View style={styles.formContainer}>
-                        <TextInput
-                            mode="outlined"
-                            label="Group Name"
-                            placeholder="Enter group name"
-                            value={groupName}
-                            onChangeText={setGroupName}
-                            style={styles.input}
-                            maxLength={50}
-                            right={<TextInput.Affix text={`${groupName.length}/50`} />}
-                        />
-
-                        <TextInput
-                            mode="outlined"
-                            label="Description"
-                            placeholder="Describe what this group is about"
-                            value={description}
-                            onChangeText={setDescription}
-                            style={styles.input}
-                            multiline
-                            numberOfLines={4}
-                            maxLength={200}
-                            right={<TextInput.Affix text={`${description.length}/200`} />}
-                        />
-
-                        <View style={styles.privacyContainer}>
-                            <View style={styles.privacyInfo}>
-                                <Text style={styles.privacyTitle}>Private Group</Text>
-                                <Text style={styles.privacyDescription}>
-                                    {isPrivate
-                                        ? "Only invited members can join and see content"
-                                        : "Anyone can discover and join this group"}
+            <Formik
+                initialValues={INITIAL_VALUES}
+                validationSchema={createGroupSchema}
+                onSubmit={handleSubmit}
+            >
+                {({
+                    values,
+                    errors,
+                    touched,
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    setFieldValue,
+                    isValid,
+                }) => (
+                    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.header}>
+                                <Text style={styles.title}>Create Your Group</Text>
+                                <Text style={styles.subtitle}>
+                                    Set up your group and invite members to get started
                                 </Text>
                             </View>
-                            <Switch value={isPrivate} onValueChange={setIsPrivate} />
-                        </View>
 
-                        <View style={styles.infoCard}>
-                            <Ionicons
-                                name="information-circle-outline"
-                                size={20}
-                                color={theme.colors.primary}
-                            />
-                            <Text style={styles.infoText}>
-                                You can invite members and customize your group settings after creation
-                            </Text>
-                        </View>
-                    </View>
+                            <TouchableOpacity
+                                style={styles.imageContainer}
+                                onPress={async () => {
+                                    const assets = await pickImage({
+                                        mediaTypes: "images",
+                                        quality: 0.8,
+                                        allowsEditing: true,
+                                        aspect: [1, 1],
+                                    });
+                                    if (assets && assets[0]) {
+                                        setFieldValue("avatar", assets[0].uri);
+                                    }
+                                }}
+                            >
+                                {values.avatar ? (
+                                    <Image
+                                        source={{ uri: values.avatar }}
+                                        style={styles.groupImage}
+                                    />
+                                ) : (
+                                    <View style={styles.imagePlaceholder}>
+                                        <Ionicons
+                                            name="camera-outline"
+                                            size={40}
+                                            color={theme.colors.onSurfaceVariant}
+                                        />
+                                        <Text style={styles.imagePlaceholderText}>
+                                            Add Group Photo
+                                        </Text>
+                                    </View>
+                                )}
+                            </TouchableOpacity>
 
-                    <Button
-                        mode="contained"
-                        onPress={handleCreateGroup}
-                        disabled={!isFormValid}
-                        style={[styles.createButton, !isFormValid && styles.disabledButton]}
-                        contentStyle={styles.createButtonContent}
-                    >
-                        Create Group
-                    </Button>
-                </View>
-            </ScrollView>
+                            <View style={styles.formContainer}>
+                                <TextInput
+                                    mode="outlined"
+                                    label="Group Name"
+                                    placeholder="Enter group name"
+                                    onChangeText={handleChange("name")}
+                                    onBlur={handleBlur("name")}
+                                    style={styles.input}
+                                    maxLength={50}
+                                    error={touched.name && !!errors.name}
+                                    right={<TextInput.Affix text={`${values.name.length}/50`} />}
+                                />
+                                {touched.name && errors.name && (
+                                    <Text style={styles.errorText}>{errors.name}</Text>
+                                )}
+
+                                <TextInput
+                                    mode="outlined"
+                                    label="Description"
+                                    placeholder="Describe what this group is about"
+                                    onChangeText={handleChange("description")}
+                                    onBlur={handleBlur("description")}
+                                    style={styles.input}
+                                    multiline
+                                    numberOfLines={4}
+                                    maxLength={200}
+                                    error={touched.description && !!errors.description}
+                                    right={
+                                        <TextInput.Affix
+                                            text={`${values.description.length}/200`}
+                                        />
+                                    }
+                                />
+                                {touched.description && errors.description && (
+                                    <Text style={styles.errorText}>{errors.description}</Text>
+                                )}
+
+                                <View style={styles.privacyContainer}>
+                                    <View style={styles.privacyInfo}>
+                                        <Text style={styles.privacyTitle}>Private Group</Text>
+                                        <Text style={styles.privacyDescription}>
+                                            {values.isPrivate
+                                                ? "Only invited members can join and see content"
+                                                : "Anyone can discover and join this group"}
+                                        </Text>
+                                    </View>
+                                    <Switch
+                                        style={{ alignSelf: "flex-start" }}
+                                        value={values.isPrivate}
+                                        onValueChange={(value) => {
+                                            setFieldValue("isPrivate", value);
+                                        }}
+                                    />
+                                </View>
+
+                                <View style={styles.infoCard}>
+                                    <Ionicons
+                                        name="information-circle-outline"
+                                        size={20}
+                                        color={theme.colors.primary}
+                                    />
+                                    <Text style={styles.infoText}>
+                                        You can invite members and customize your group settings
+                                        after creation
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <Button
+                                mode="contained"
+                                onPress={() => handleSubmit()}
+                                disabled={!isValid}
+                                style={[styles.createButton, !isValid && styles.disabledButton]}
+                                contentStyle={styles.createButtonContent}
+                            >
+                                Create Group
+                            </Button>
+                        </View>
+                    </ScrollView>
+                )}
+            </Formik>
+            <LoadingModal
+                isVisible={status.isLoading}
+                loadingText="Creating group, please wait..."
+            />
         </Container>
     );
 }
@@ -161,7 +278,7 @@ const makeStyles = (theme: AppTheme) =>
             gap: 8,
         },
         imagePlaceholderText: {
-            fontSize: 12,
+            fontSize: 10,
             color: theme.colors.onSurfaceVariant,
             fontWeight: "500",
         },
@@ -216,5 +333,10 @@ const makeStyles = (theme: AppTheme) =>
         },
         disabledButton: {
             opacity: 0.6,
+        },
+        errorText: {
+            fontSize: 12,
+            color: theme.colors.error,
+            marginTop: -12,
         },
     });

@@ -6,6 +6,7 @@ import { DEFAULT_USER } from "@/constants/values";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
+import { useImagePicker } from "@/hooks/useImagePicker";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizzes";
 import reviewSelector from "@/store/review/review.store";
@@ -17,7 +18,7 @@ import { Quiz, QUIZ_TYPE } from "@/types/review";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Link, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -37,7 +38,7 @@ export default function Profile() {
     const quizzes = reviewSelector.use.useUserQuizzes();
     const userData = authSelector.use.useUserData();
     const user = authSelector.use.useUser();
-    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+    const { isUploadingPhoto, pickImage, takePhoto } = useImagePicker();
     const [
         deleteAccountFn,
         { isError: isDeleteError, isLoading: isDeleteLoading, error: deleteError },
@@ -81,80 +82,51 @@ export default function Profile() {
     };
 
     const pickImageFromLibrary = async () => {
-        setIsUploadingPhoto(true);
-        try {
-            let result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: "images",
-                quality: 0.8,
-                allowsEditing: true,
-                aspect: [1, 1],
-                base64: true,
-            });
-
-            if (!result.canceled && result.assets[0]) {
-                const asset = result.assets[0];
-                // TODO: Upload to Firebase storage and update user profile
-                console.log("Selected image:", asset.uri);
-                if (userData) {
-                    const url = await addUserProfilePicFn(asset.uri);
-                    if (!url) {
-                        Alert.alert("Failed", "Failed to updated user profile picture");
-                    } else {
-                        Alert.alert("Success", "Your profile picture has been updated");
-                    }
+        const assets = await pickImage({
+            mediaTypes: "images",
+            quality: 0.8,
+            allowsEditing: true,
+            aspect: [1, 1],
+            base64: true,
+        });
+        if (assets && assets[0]) {
+            const asset = assets[0];
+            console.log("Selected image:", asset.uri);
+            if (userData) {
+                const url = await addUserProfilePicFn(asset.uri);
+                if (!url) {
+                    Alert.alert("Failed", "Failed to updated user profile picture");
                 } else {
-                    Alert.alert("Aborted", "User is not logged in");
+                    Alert.alert("Success", "Your profile picture has been updated");
                 }
+            } else {
+                Alert.alert("Aborted", "User is not logged in");
             }
-        } catch (error) {
-            console.error("Error picking image:", error);
-            Alert.alert("Error", "Failed to select image");
-        } finally {
-            setIsUploadingPhoto(false);
         }
     };
 
-    const takePhoto = async () => {
-        const status = await ImagePicker.getCameraPermissionsAsync();
-        if (!status.granted) {
-            const permission = await ImagePicker.requestCameraPermissionsAsync();
-            if (!permission.granted) {
-                Alert.alert("Permission Required", "Camera permission is required to take photos");
-                return;
-            }
-        }
-
-        setIsUploadingPhoto(true);
-        try {
-            const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: "images",
-                quality: 0.8,
-                allowsEditing: true,
-                aspect: [1, 1],
-                base64: true,
-                cameraType: ImagePicker.CameraType.front,
-            });
-
-            if (!result.canceled && result.assets[0]) {
-                const asset = result.assets[0];
-                // TODO: Upload to Firebase storage and update user profile
-                console.log("Captured photo:", asset.uri);
-                if (userData) {
-                    const url = await addUserProfilePicFn(asset.uri);
-                    if (!url) {
-                        Alert.alert("Failed", "Failed to updated user profile picture");
-                    } else {
-                        Alert.alert("Success", "Your profile picture has been updated");
-                    }
+    const takePhotoHandler = async () => {
+        const assets = await takePhoto({
+            mediaTypes: "images",
+            quality: 0.8,
+            allowsEditing: true,
+            aspect: [1, 1],
+            base64: true,
+            cameraType: ImagePicker.CameraType.front,
+        });
+        if (assets && assets[0]) {
+            const asset = assets[0];
+            console.log("Captured photo:", asset.uri);
+            if (userData) {
+                const url = await addUserProfilePicFn(asset.uri);
+                if (!url) {
+                    Alert.alert("Failed", "Failed to updated user profile picture");
                 } else {
-                    Alert.alert("Aborted", "User is not logged in");
+                    Alert.alert("Success", "Your profile picture has been updated");
                 }
+            } else {
+                Alert.alert("Aborted", "User is not logged in");
             }
-        } catch (error) {
-            console.error("Error taking photo:", error);
-            Alert.alert("Error", "Failed to take photo");
-        } finally {
-            setIsUploadingPhoto(false);
         }
     };
 
@@ -165,7 +137,7 @@ export default function Profile() {
             [
                 {
                     text: "Camera",
-                    onPress: takePhoto,
+                    onPress: takePhotoHandler,
                 },
                 {
                     text: "Photo Library",

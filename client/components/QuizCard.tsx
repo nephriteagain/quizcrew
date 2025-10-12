@@ -1,9 +1,9 @@
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { Quiz } from "@/types/review";
 import { UserData } from "@/types/user";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React from "react";
-import { Pressable, PressableProps, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, PressableProps, StyleSheet, View } from "react-native";
 import { Avatar, Text } from "react-native-paper";
 
 type QuizCardProps = {
@@ -99,34 +99,34 @@ export default function QuizCard({ quiz, ...props }: QuizCardProps) {
                 </View>
             </View>
             {quiz.userData && (
-                <TouchableOpacity
-                    onPress={() => {
-                        if (!quiz.userData?.uid) return;
-                        router.push({
-                            pathname: "/profile/[uid]",
-                            params: { uid: quiz.userData.uid },
-                        });
-                    }}
-                    hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
-                    style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        columnGap: 6,
-                        paddingTop: 4,
+                <Link
+                    href={{
+                        pathname: "/profile/[uid]",
+                        params: { uid: quiz.userData.uid },
                     }}
                 >
-                    {quiz.userData.photoURL ? (
-                        <Avatar.Image source={{ uri: quiz.userData.photoURL }} size={24} />
-                    ) : (
-                        <Avatar.Text
-                            label={quiz.userData.username?.[0] ?? "Q"}
-                            size={24}
-                            color={theme.colors?.onPrimary}
-                            labelStyle={{ fontSize: 18 }}
-                        />
-                    )}
-                    <Text variant="labelMedium">{quiz.userData.username}</Text>
-                </TouchableOpacity>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            columnGap: 6,
+                            paddingTop: 4,
+                            alignSelf: "flex-start",
+                        }}
+                    >
+                        {quiz.userData.photoURL ? (
+                            <Avatar.Image source={{ uri: quiz.userData.photoURL }} size={24} />
+                        ) : (
+                            <Avatar.Text
+                                label={quiz.userData.username?.[0] ?? "Q"}
+                                size={24}
+                                color={theme.colors?.onPrimary}
+                                labelStyle={{ fontSize: 18 }}
+                            />
+                        )}
+                        <Text variant="labelMedium">{quiz.userData.username}</Text>
+                    </View>
+                </Link>
             )}
             <Text style={styles.description} numberOfLines={3}>
                 {quiz.description}

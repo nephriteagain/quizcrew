@@ -1,6 +1,6 @@
 import { COL } from "@/constants/collections";
 import { db } from "@/firebase";
-import { Group, GroupDoc, UserData, UserGroupMeta } from "@/types/user";
+import { Group, GroupDoc, GroupMember, UserData } from "@/types/user";
 import {
     collection,
     doc,
@@ -12,16 +12,13 @@ import {
 import authSelector from "../user.store";
 
 export function subscribeGroups(uid: string) {
-    const userGroupsRef = collection(db, COL.USERS_DATA, uid, COL.USER_GROUPS);
-    const userGroupsQ = query(
-        userGroupsRef,
-        where("status", "in", ["CONNECTED", "INVITED", "REQUESTED"])
-    );
+    const groupMembersRef = collection(db, COL.GROUP_MEMBERS);
+    const groupMembersQ = query(groupMembersRef, where("uid", "==", uid));
 
-    const unsub = userGroupsQ.onSnapshot((snap) => {
+    const unsub = groupMembersQ.onSnapshot((snap) => {
         console.log("subscribeGroups snapshot");
         try {
-            const groupsMeta = snap.docs.map((d) => d.data()) as UserGroupMeta[];
+            const groupsMeta = snap.docs.map((d) => d.data()) as GroupMember[];
             handleGroups(groupsMeta);
         } catch (error) {
             console.error(error);
@@ -31,20 +28,21 @@ export function subscribeGroups(uid: string) {
     return unsub;
 }
 
-async function handleGroups(groupsMeta: UserGroupMeta[]) {
+async function handleGroups(groupsMeta: GroupMember[]) {
     const result = await Promise.all(groupsMeta.map(getGroupData));
     authSelector.setState({ groups: result });
 }
 
-async function getGroupData(groupMeta: UserGroupMeta): Promise<Group> {
+async function getGroupData(groupMeta: GroupMember): Promise<Group> {
     const groupRef = doc(db, COL.GROUPS, groupMeta.gid);
     const groupSnap = await getDoc(groupRef);
     const groupData = groupSnap.data() as GroupDoc;
     if (!groupData) {
         throw new Error("Group document not found.");
     }
-    const groupMembersRef = collection(db, COL.GROUPS, groupData.gid, COL.MEMBERS);
-    const groupMemberSnap = await getCountFromServer(groupMembersRef);
+    const groupMembersRef = collection(db, COL.GROUP_MEMBERS);
+    const groupMembersQ = query(groupMembersRef, where("gid", "==", groupMeta.gid));
+    const groupMemberSnap = await getCountFromServer(groupMembersQ);
     const memberCount = groupMemberSnap.data().count;
 
     const userDataRef = doc(db, COL.USERS_DATA, groupData.owner);
