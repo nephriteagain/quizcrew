@@ -1,41 +1,36 @@
 import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
+import { DEFAULT_GROUP } from "@/constants/values";
+import { useAsyncStateEffect } from "@/hooks/useAsyncStateEffect";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
+import { getGroupData } from "@/store/group/actions/getGroupData";
+import { getGroupMemberData } from "@/store/group/actions/getGroupMemberData";
 import reviewSelector from "@/store/review/review.store";
+import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
-import { Group } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import { Image } from "expo-image";
-import { Button, FAB, Text } from "react-native-paper";
-
-const mockGroup: Group = {
-    gid: "1",
-    status: "ACTIVE",
-    name: "React Native Developers",
-    avatar: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&h=150&fit=crop",
-    description: "A community for React Native developers to share knowledge and experiences",
-    owner: "owner1",
-    createdAt: new Date() as any,
-    memberCount: 1250,
-    ownerData: {
-        uid: "owner1",
-        username: "Group Owner",
-        photoURL:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
-        status: "ACTIVE",
-    },
-};
+import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, Button, FAB, Text } from "react-native-paper";
 
 export default function GroupProfile() {
     const { gid } = useLocalSearchParams<{ gid: string }>();
 
+    const user = authSelector.use.useUser();
     const theme = useAppTheme();
     const styles = makeStyles(theme);
     const quizzes = reviewSelector.use.useQuizzes();
     const router = useRouter();
+    const params = useLocalSearchParams<{ gid: string }>();
+    const [groupData] = useAsyncStateEffect(() => getGroupData(params.gid), [params.gid], {
+        initialValue: null,
+    });
+    const [groupMemberData, { isLoading: groupMemberDataLoading }] = useAsyncStateEffect(
+        () => getGroupMemberData(params.gid, user?.uid),
+        [params.gid, user?.uid]
+    );
 
     const [state, setState] = useState({ open: false });
 
@@ -92,7 +87,21 @@ export default function GroupProfile() {
         });
     };
 
-    const isMember = true;
+    if (!groupData) {
+        return (
+            <Container style={{ alignItems: "center", justifyContent: "center" }}>
+                <ActivityIndicator size={48} />
+            </Container>
+        );
+    }
+
+    const isOwner = groupData.owner === user?.uid;
+    const isJoined = groupMemberData?.status === "CONNECTED";
+    const isInvited = groupMemberData?.status === "INVITED";
+    const isRequested = groupMemberData?.status === "REQUESTED";
+    const canManage =
+        groupMemberData?.status === "CONNECTED" &&
+        ["ADMIN", "OWNER"].includes(groupMemberData.memberType);
 
     return (
         <Container style={styles.container}>
@@ -100,25 +109,28 @@ export default function GroupProfile() {
                 <View style={styles.avatarContainer}>
                     <Image
                         source={{
-                            uri: mockGroup.avatar,
+                            uri: groupData.avatar ?? DEFAULT_GROUP,
                         }}
                         style={styles.avatar}
                     />
                 </View>
                 <View style={styles.groupInfo}>
-                    <Text style={styles.groupName}>{mockGroup.name}</Text>
-                    <Text style={styles.groupDescription}>{mockGroup.description}</Text>
+                    <Text style={styles.groupName}>{groupData.name}</Text>
+                    <Text style={styles.groupDescription}>{groupData.description}</Text>
                     <View style={styles.groupStats}>
                         <View style={styles.stat}>
                             <Ionicons name="people" size={16} color={theme.colors.primary} />
-                            <Text style={styles.statText}>{mockGroup.memberCount} members</Text>
+                            <Text style={styles.statText}>
+                                {groupData.memberCount} member
+                                {groupData.memberCount > 1 ? "s" : ""}
+                            </Text>
                         </View>
                         <View style={styles.stat}>
                             <Ionicons name="time" size={16} color={theme.colors.primary} />
                             <Text style={styles.statText}>
                                 Created{" "}
-                                {mockGroup.createdAt?.toDate?.()
-                                    ? mockGroup.createdAt.toDate().toLocaleDateString()
+                                {groupData.createdAt?.toDate?.()
+                                    ? groupData.createdAt.toDate().toLocaleDateString()
                                     : "Recently"}
                             </Text>
                         </View>
@@ -127,25 +139,76 @@ export default function GroupProfile() {
             </View>
 
             <View style={styles.actionButtons}>
-                <Button
-                    mode="contained"
-                    onPress={handleJoinGroup}
-                    style={styles.primaryButton}
-                    icon="account-plus"
-                >
-                    Join Group
-                </Button>
-                <Button
-                    mode="outlined"
-                    onPress={handleShareQuiz}
-                    style={styles.secondaryButton}
-                    icon="share"
-                >
-                    Share Quiz
-                </Button>
-                <Pressable style={styles.menuButton} onPress={handleLeaveGroup}>
-                    <Ionicons name="ellipsis-vertical" size={20} color={theme.colors.onSurface} />
-                </Pressable>
+                {groupMemberData && groupMemberData.status === "CONNECTED" && !isOwner && (
+                    <Button
+                        mode="outlined"
+                        onPress={handleLeaveGroup}
+                        style={styles.primaryButton}
+                        icon="account-minus"
+                        disabled={groupMemberDataLoading}
+                    >
+                        Leave Group
+                    </Button>
+                )}
+
+                {!groupData && (
+                    <Button
+                        mode="contained"
+                        onPress={handleJoinGroup}
+                        style={styles.primaryButton}
+                        icon="account-plus"
+                        disabled={groupMemberDataLoading}
+                    >
+                        Join Group
+                    </Button>
+                )}
+                {isInvited && (
+                    <>
+                        <Button
+                            mode="contained"
+                            onPress={handleJoinGroup}
+                            style={styles.primaryButton}
+                            icon="account-plus"
+                            disabled={groupMemberDataLoading}
+                        >
+                            Accept Invitation
+                        </Button>
+                        <Button
+                            mode="contained"
+                            onPress={handleJoinGroup}
+                            style={styles.primaryButton}
+                            icon="account-plus"
+                            disabled={groupMemberDataLoading}
+                        >
+                            Reject Invitation
+                        </Button>
+                    </>
+                )}
+                {isRequested && (
+                    <>
+                        <Button
+                            mode="contained"
+                            onPress={handleJoinGroup}
+                            style={styles.primaryButton}
+                            icon="account-plus"
+                            disabled={groupMemberDataLoading}
+                        >
+                            Cancel Join Request
+                        </Button>
+                    </>
+                )}
+                {canManage && (
+                    <Button
+                        mode="outlined"
+                        onPress={() => {
+                            router.push("/members");
+                        }}
+                        style={styles.secondaryButton}
+                        icon="account-group"
+                    >
+                        Manage Members
+                    </Button>
+                )}
             </View>
 
             <View style={styles.quizzesSection}>
@@ -178,7 +241,7 @@ export default function GroupProfile() {
                     />
                 )}
             </View>
-            {isMember && (
+            {isJoined && (
                 <FAB.Group
                     backdropColor={"transparent"}
                     open={open}
@@ -228,7 +291,7 @@ const makeStyles = (theme: AppTheme) => {
         avatar: {
             width: 80,
             height: 80,
-            borderRadius: 12,
+            borderRadius: 40,
         },
         groupInfo: {
             flex: 1,
