@@ -3,6 +3,7 @@ import LoadingModal from "@/components/LoadingModal";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { createReviewer } from "@/store/review/actions/createReviewer";
+import authSelector from "@/store/user/user.store";
 import { QUIZ_TYPE } from "@/types/review";
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
@@ -29,6 +30,7 @@ export default function CreateQuiz() {
     const router = useRouter();
     const params = useLocalSearchParams<{ type: QUIZ_TYPE }>();
     const quizType = params.type;
+    const user = authSelector.use.useUser();
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -96,6 +98,10 @@ export default function CreateQuiz() {
             {
                 text: "Confirm",
                 onPress: async () => {
+                    if (!user) {
+                        Alert.alert("Invalid user data.");
+                        return;
+                    }
                     if (!quizType) {
                         Alert.alert("Invalid quiz type");
                         return;
@@ -104,11 +110,9 @@ export default function CreateQuiz() {
                         Alert.alert("Select atleast 1 image first.");
                         return;
                     }
-                    const imagesBase64 = assets
-                        .map((a) => a.base64)
-                        .filter((s) => typeof s === "string");
+                    const imagesBase64 = assets.map((a) => a.uri);
                     console.log(`sending ${imagesBase64.length} images...`);
-                    const result = await handleCreateQuizReviewer(quizType, imagesBase64);
+                    const result = await handleCreateQuizReviewer(quizType, imagesBase64, user.uid);
                     if (!result.data) {
                         Alert.alert("Server error.");
                         return;

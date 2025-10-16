@@ -3,21 +3,18 @@
 // ESM
 import fastifyCors from "@fastify/cors";
 import fastifyEnv from "@fastify/env";
-import fastifyMultipart from "@fastify/multipart";
 import fastifySensible from "@fastify/sensible";
 import { config } from "dotenv";
 import Fastify from "fastify";
 import { v4 as uuidv4 } from "uuid";
-import { getImageDataUrl } from "./lib/utils/getImageDataUrl.js";
 import { getImageInstructions } from "./lib/utils/getImageInstructions.js";
 import openAiConnector from "./plugins/openai.js";
-import { QUIZSchema } from "./schema/ai.js";
+import { OpenAiImagePromptDto, openAiImagePromptSchema, QUIZSchema } from "./schema/ai.js";
 
 config();
 
 const fastify = Fastify({
     logger: true,
-    bodyLimit: 30 * 1024 * 1024, // 30MB limit for image uploads
 });
 
 const schema = {
@@ -76,11 +73,6 @@ fastify.register(fastifyCors, {
 });
 
 fastify.register(fastifySensible);
-fastify.register(fastifyMultipart, {
-    limits: {
-        fileSize: 30 * 1024 * 1024, // 30MB per file
-    },
-});
 
 fastify.register(fastifyEnv, options).after((err) => {
     if (err) {
@@ -95,87 +87,31 @@ fastify.get("/", function (request, reply) {
     reply.send({ hello: "world" });
 });
 
-fastify.post("/quiz/from-images", async (request, reply) => {
-    const requestId = Date.now().toString().slice(-6);
-    fastify.log.info(`[${requestId}] Starting quiz generation from images`);
+fastify.post<{ Body: OpenAiImagePromptDto }>(
+    "/quiz/from-images",
+    {
+        schema: {
+            body: openAiImagePromptSchema,
+        },
+    },
+    async (request, reply) => {
+        const requestId = Date.now().toString().slice(-6); // Simple request ID for tracking
+        fastify.log.info(`[${requestId}] Starting quiz generation from images`);
 
-    // Log request size
-    const contentLength = request.headers["content-length"];
-    if (contentLength) {
-        const sizeInMB = (parseInt(contentLength) / (1024 * 1024)).toFixed(2);
-        console.log(`[${requestId}] Request size: ${sizeInMB} MB (${contentLength} bytes)`);
-    }
-
-    try {
-        // Parse multipart form data
-        const parts = request.parts();
-        const images: string[] = [];
-        let type: "MCQ" | "TOFQ" | "DNDQ" = "MCQ";
-        let additionalPrompt: string | undefined;
-        let totalBytesReceived = 0;
-
-        for await (const part of parts) {
-            if (part.type === "file") {
-                // Stream the file and convert to base64
-                const buffer = await part.toBuffer();
-                const base64 = buffer.toString("base64");
-                const fileSizeKB = (buffer.length / 1024).toFixed(2);
-                totalBytesReceived += buffer.length;
-                images.push(base64);
-                console.log(
-                    `[${requestId}] Received image file: ${part.filename} (${fileSizeKB} KB)`
-                );
-            } else {
-                // Handle form fields
-                const fieldSize = Buffer.byteLength(part.value as string);
-                totalBytesReceived += fieldSize;
-
-                if (part.fieldname === "type") {
-                    const typeValue = part.value as string;
-                    if (typeValue === "MCQ" || typeValue === "TOFQ" || typeValue === "DNDQ") {
-                        type = typeValue;
-                    }
-                    console.log(`[${requestId}] Received type field: ${typeValue}`);
-                } else if (part.fieldname === "prompt") {
-                    additionalPrompt = part.value as string;
-                    console.log(
-                        `[${requestId}] Received prompt field (${(fieldSize / 1024).toFixed(2)} KB)`
-                    );
-                } else if (part.fieldname === "images") {
-                    // Handle JSON array of base64 images
-                    const fieldSizeMB = (fieldSize / (1024 * 1024)).toFixed(2);
-                    console.log(`[${requestId}] Received images field (${fieldSizeMB} MB)`);
-                    try {
-                        const imageArray = JSON.parse(part.value as string);
-                        images.push(...imageArray);
-                        console.log(`[${requestId}] Parsed ${imageArray.length} images from field`);
-                    } catch (e) {
-                        images.push(part.value as string);
-                    }
-                }
-            }
-        }
-
-        const totalSizeMB = (totalBytesReceived / (1024 * 1024)).toFixed(2);
-        console.log(
-            `[${requestId}] Total data received: ${totalSizeMB} MB (${totalBytesReceived} bytes)`
+        const { images, type, prompt: additionalPrompt } = request.body;
+        fastify.log.info(
+            `[${requestId}] Processing ${images.length} image(s) for quiz type: ${type}`
         );
 
-        if (images.length === 0) {
-            return fastify.httpErrors.badRequest("No images provided");
-        }
-
-        console.log(`[${requestId}] Processing ${images.length} image(s) for quiz type: ${type}`);
-
-        // Validate base64 images
-        fastify.log.info(`[${requestId}] Validating image data...`);
+        // Validate image URLs
+        fastify.log.info(`[${requestId}] Validating image URLs...`);
         for (const image of images) {
             if (!image || typeof image !== "string") {
-                fastify.log.error(`[${requestId}] Invalid image data provided`);
-                return fastify.httpErrors.badRequest("Invalid image data provided");
+                fastify.log.error(`[${requestId}] Invalid image URL provided`);
+                return fastify.httpErrors.badRequest("Invalid image URL provided");
             }
         }
-        fastify.log.info(`[${requestId}] Image validation completed successfully`);
+        fastify.log.info(`[${requestId}] Image URL validation completed successfully`);
 
         const { outputName, description, structuredSchema } = getImageInstructions(
             type,
@@ -206,10 +142,10 @@ fastify.post("/quiz/from-images", async (request, reply) => {
         const messageContent: any[] = [];
         // Add all images
         for (let i = 0; i < images.length; i++) {
-            const base64Image = images[i];
+            const imageUrl = images[i];
             messageContent.push({
                 type: "input_image",
-                image_url: getImageDataUrl(base64Image), // string only
+                image_url: imageUrl, // Firebase URL
                 detail: "high",
             });
             fastify.log.info(`[${requestId}] Added image ${i + 1}/${images.length}`);
@@ -294,11 +230,7 @@ fastify.post("/quiz/from-images", async (request, reply) => {
         } finally {
             clearInterval(interval);
         }
-    } catch (error) {
-        fastify.log.error(`[${requestId}] Request processing failed:`);
-        console.error(error);
-        throw error;
     }
-});
+);
 
 export default fastify;
