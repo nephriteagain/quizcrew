@@ -1,11 +1,13 @@
 import { COL } from "@/constants/collections";
-import { analytics, db } from "@/firebase";
+import { analytics, db, storage } from "@/firebase";
+import { uploadImageResumable } from "@/lib/utils/uploadImageResumable";
 import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE, QuizDoc } from "@/types/review";
 import { logEvent } from "@react-native-firebase/analytics";
 import { doc, setDoc } from "@react-native-firebase/firestore";
+import { ref } from "@react-native-firebase/storage";
 
-export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
+export async function createReviewer(type: QUIZ_TYPE, images: string[], uid: string) {
     const URL =
         process.env.NODE_ENV === "production"
             ? process.env.EXPO_PUBLIC_API_URL_PROD
@@ -20,14 +22,24 @@ export async function createReviewer(type: QUIZ_TYPE, images: string[]) {
 
     console.log("creating reviewer...");
     try {
-        // Create FormData for multipart/form-data request
-        const formData = new FormData();
-        formData.append("type", type);
-        formData.append("images", JSON.stringify(images));
+        const imageUrls = await Promise.all(
+            images.map(async (img) => {
+                const path = `/users/${uid}/quizTemp/${Math.random().toString(16)}.png`;
+                const storageRef = ref(storage, path);
+                const response = await fetch(img);
+                const blob = await response.blob();
+                return uploadImageResumable(storageRef, blob);
+            })
+        );
+
+        const body = { images: imageUrls, type };
 
         const response = await fetch(url, {
             method: "POST",
-            body: formData,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
         });
 
         // Check if the response is ok
