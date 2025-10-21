@@ -4,6 +4,7 @@ import QuizList from "@/components/QuizList";
 import SettingsDrawer, { SettingsDrawerRef } from "@/components/SettingsDrawer";
 import { DEFAULT_USER } from "@/constants/values";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useAsyncStateEffect } from "@/hooks/useAsyncStateEffect";
 import { useAsyncStatus } from "@/hooks/useAsyncStatus";
 import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { useImagePicker } from "@/hooks/useImagePicker";
@@ -12,6 +13,8 @@ import { subscribeUserQuizzes } from "@/store/review/actions/subscribeUserQuizze
 import reviewSelector from "@/store/review/review.store";
 import { addUserProfilePic } from "@/store/user/actions/addUserProfilePic";
 import { deleteAccount } from "@/store/user/actions/deleteAccount";
+import { getTotalConnections } from "@/store/user/actions/getTotalConnections";
+import { getTotalGroups } from "@/store/user/actions/getTotalGroups";
 import { logout } from "@/store/user/actions/logout";
 import authSelector from "@/store/user/user.store";
 import { Quiz, QUIZ_TYPE } from "@/types/review";
@@ -38,6 +41,9 @@ export default function Profile() {
     const quizzes = reviewSelector.use.useUserQuizzes();
     const userData = authSelector.use.useUserData();
     const user = authSelector.use.useUser();
+
+    // const [totalConnections, setTotalConnections] = useState(0);
+
     const { isUploadingPhoto, pickImage, takePhoto } = useImagePicker();
     const [
         deleteAccountFn,
@@ -50,6 +56,22 @@ export default function Profile() {
             onComplete: () => {},
         });
     const [addUserProfilePicFn, profilePicLoading] = useAsyncStatus(addUserProfilePic);
+    const [totalConnections] = useAsyncStateEffect(
+        async () => {
+            if (!user) return null;
+            return getTotalConnections(user.uid);
+        },
+        [user?.uid],
+        { initialValue: 0 }
+    );
+    const [totalGroups] = useAsyncStateEffect(
+        async () => {
+            if (!user) return null;
+            return getTotalGroups(user.uid);
+        },
+        [user?.uid],
+        { initialValue: 0 }
+    );
 
     const router = useRouter();
 
@@ -380,7 +402,7 @@ export default function Profile() {
                                     <Text
                                         style={{ fontWeight: "600", color: theme.colors.onSurface }}
                                     >
-                                        10{" "}
+                                        {totalConnections}{" "}
                                     </Text>
                                     connections
                                 </Text>
@@ -390,7 +412,7 @@ export default function Profile() {
                                     <Text
                                         style={{ fontWeight: "600", color: theme.colors.onSurface }}
                                     >
-                                        2{" "}
+                                        {totalGroups}{" "}
                                     </Text>
                                     groups
                                 </Text>

@@ -2,11 +2,13 @@ import Container from "@/components/Container";
 import QuizList from "@/components/QuizList";
 import { DEFAULT_USER } from "@/constants/values";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useAsyncStateEffect } from "@/hooks/useAsyncStateEffect";
 import { useEffectLogRoute } from "@/hooks/useEffectLogRoute";
 import { AppTheme, useAppTheme } from "@/providers/ThemeProvider";
 import { subscribeOtherUserQuizzes } from "@/store/review/actions/subsribeOtherUserQuizzes";
 import { approveConnection } from "@/store/user/actions/approveConnection";
 import { getTotalConnections } from "@/store/user/actions/getTotalConnections";
+import { getTotalGroups } from "@/store/user/actions/getTotalGroups";
 import { rejectConnection } from "@/store/user/actions/rejectConnection";
 import { requestConnection } from "@/store/user/actions/requestConnection";
 import { subscribeOtherConnection } from "@/store/user/actions/subscribeOtherUserConnection";
@@ -30,7 +32,6 @@ export default function Profile() {
         data: null,
         meta: null,
     });
-    const [totalConnections, setTotalConnections] = useState(0);
 
     const user = authSelector.use.useUser();
 
@@ -38,7 +39,12 @@ export default function Profile() {
     const [requestConnectionFn, { isLoading: connectLoading }] = useAsyncAction(requestConnection);
     const [rejectConnectionFn, { isLoading: cancelLoading }] = useAsyncAction(rejectConnection);
     const [approveConnectionFn, { isLoading: approveLoading }] = useAsyncAction(approveConnection);
-    const [getTotalConnectionsFn] = useAsyncAction(getTotalConnections);
+    const [totalConnections] = useAsyncStateEffect(async () => getTotalConnections(uid), [uid], {
+        initialValue: 0,
+    });
+    const [totalGroups] = useAsyncStateEffect(async () => getTotalGroups(uid), [uid], {
+        initialValue: 0,
+    });
 
     const handleConnect = async (uid: string) => {
         console.log({ uid });
@@ -122,11 +128,6 @@ export default function Profile() {
     useEffectLogRoute(() => {
         const unsub = subscribeOtherUserQuizzes(uid, (quizzes) => {
             setQuizzes(quizzes);
-        });
-        getTotalConnectionsFn(uid).then((count) => {
-            if (typeof count.data === "number") {
-                setTotalConnections(count.data);
-            }
         });
         return () => {
             unsub();
@@ -220,7 +221,7 @@ export default function Profile() {
                         <Link href={"/under-construction"}>
                             <Text style={{ color: theme.colors.onSurfaceVariant }}>
                                 <Text style={{ fontWeight: "600", color: theme.colors.onSurface }}>
-                                    2{" "}
+                                    {totalGroups}{" "}
                                 </Text>
                                 groups
                             </Text>
