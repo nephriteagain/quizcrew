@@ -1,16 +1,24 @@
+import Container from "@/components/Container";
 import CreateUsernameModal from "@/components/CreateUsernameModal";
 import GlobalLoadingModal from "@/components/GlobalLoadingModal";
 import VerifyEmailModal from "@/components/VerifyEmailModal";
+import { crashlytics } from "@/firebase";
 import { useLogScreen } from "@/hooks/useLogScreen";
 import AuthProvider from "@/providers/AuthProvider";
 import ThemeProvider, { useAppTheme } from "@/providers/ThemeProvider";
 import authSelector from "@/store/user/user.store";
 import { Ionicons } from "@expo/vector-icons";
+import { recordError } from "@react-native-firebase/crashlytics";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import * as Updates from "expo-updates";
+import { useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Avatar, Text } from "react-native-paper";
 import ToastManager from "toastify-react-native";
+
+SplashScreen.preventAutoHideAsync();
 
 function RootLayoutContent() {
     useLogScreen();
@@ -18,6 +26,49 @@ function RootLayoutContent() {
     const theme = useAppTheme();
 
     const user = authSelector.use.useUser();
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    const onFetchUpdateAsync = async () => {
+        try {
+            if (__DEV__) {
+                SplashScreen.hide();
+                return;
+            }
+            const update = await Updates.checkForUpdateAsync();
+
+            if (update.isAvailable) {
+                setIsUpdating(true);
+                SplashScreen.hide();
+                await Updates.fetchUpdateAsync();
+                await Updates.reloadAsync();
+            }
+        } catch (error) {
+            SplashScreen.hide();
+            if (error instanceof Error) {
+                recordError(crashlytics, error, "expo_update_error");
+            }
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    useEffect(() => {
+        onFetchUpdateAsync();
+    }, []);
+
+    if (isUpdating) {
+        return (
+            <Container style={{ justifyContent: "center", alignItems: "center" }}>
+                <Avatar.Image source={require("@/assets/images/quiz-crew-icon.png")} size={200} />
+                <Text variant="headlineMedium" style={{ marginTop: 24 }}>
+                    Updating QuizCrew...
+                </Text>
+                <Text variant="bodyMedium" style={{ marginTop: 8, opacity: 0.7 }}>
+                    Please wait while we update the app
+                </Text>
+            </Container>
+        );
+    }
 
     return (
         <AuthProvider>
